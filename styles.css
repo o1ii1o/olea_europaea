@@ -2,9 +2,26 @@ html{
     background-color: rgb(238, 246, 243)
 }
 
-<style>
-    img {
-        max-width: 100%;
-        height: auto;
-    }
-</style>
+*{
+    font-size: 14px;
+}
+
+h2{
+    color: teal;
+    font-size: 20px;
+}
+
+li{
+    color: darkcyan;
+    font-size: 16px;
+}
+
+a{
+    color: rgb(2, 68, 25);
+}
+
+
+img {
+    max-width: 100%;
+    height: auto; 
+}
