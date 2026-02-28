@@ -8,89 +8,192 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Bad+Script&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Bad+Script&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --page-bg: #f6f8fa;
+      --page-bg: #f0f3fa;
       --surface: #ffffff;
-      --muted: #6b7280;
-      --text: #0f1724;
-      --accent: #0b74d1;
-      --accent-2: #0f766e;
-      --card-border: rgba(15,23,36,0.06);
-      --max-width: 1200px;
-      --gap: 18px;
+      --muted: #5b6b7d;
+      --text: #1a2332;
+      --text-secondary: #3a4a5c;
+      --accent: #2962ff;
+      --accent-hover: #0d47a1;
+      --header-bg: #0b2948;
+      --header-bg-2: #0a1f3a;
+      --card-border: #e2e8f0;
+      --divider: #dce3ed;
+      --section-bg: #e8edf5;
+      --max-width: 1260px;
+      --gap: 20px;
+      --radius: 6px;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--page-bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    html,body{height:100%;margin:0;background:var(--page-bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
 
+    /* ── Header ── */
     header.app-header{
       position:sticky;
       top:0;
       z-index:40;
       display:flex;
       align-items:center;
-      gap:16px;
-      justify-content:center;
-      padding:14px 20px;
-      background: linear-gradient(180deg, rgba(11,20,35,0.95), rgba(11,20,35,0.92));
+      justify-content:space-between;
+      padding:0 24px;
+      height:52px;
+      background: linear-gradient(180deg, var(--header-bg), var(--header-bg-2));
       color:#fff;
-      box-shadow: 0 2px 14px rgba(6,8,12,0.25);
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .brand{ display:flex; gap:12px; align-items:center; min-width:0; }
-    .brand img{ width:44px; height:44px; border-radius:8px; object-fit:contain; background:#fff; padding:6px; }
-    .brand h1{ margin:0; font-family:'Bad Script', cursive; font-size:20px; line-height:1; color:#fff; letter-spacing:0.6px; }
+    .brand{ display:flex; gap:8px; align-items:center; }
+    .brand img{ width:32px; height:32px; border-radius:4px; object-fit:contain; background:#fff; padding:3px; }
+    .brand h1{ margin:0; font-family:'Bad Script', cursive; font-size:18px; line-height:1; color:#fff; letter-spacing:0.4px; }
 
-    main.container{
+    .header-nav{ display:flex; gap:2px; align-items:center; }
+    .header-nav a{
+      color:rgba(255,255,255,0.7);
+      text-decoration:none;
+      font-size:13px;
+      font-weight:500;
+      padding:14px 16px;
+      border-bottom:2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .header-nav a:hover{ color:#fff; }
+    .header-nav a.active{
+      color:#fff;
+      border-bottom-color: var(--accent);
+    }
+
+    /* ── Layout ── */
+    .page-wrap{
       max-width: var(--max-width);
-      margin:20px auto;
-      padding:0 16px 60px;
+      margin:0 auto;
+      padding:20px 20px 60px;
+      display:grid;
+      grid-template-columns: 1fr 300px;
+      gap:24px;
+      align-items:start;
+    }
+
+    .content{ display:flex; flex-direction:column; gap:28px; min-width:0; }
+
+    /* ── Sidebar ── */
+    aside.sidebar{
+      position:sticky;
+      top:72px;
       display:flex;
       flex-direction:column;
+      gap:16px;
+    }
+    .sidebar-panel{
+      background:var(--surface);
+      border-radius:var(--radius);
+      border:1px solid var(--card-border);
+      padding:16px;
+    }
+    .sidebar-panel h4{
+      margin:0 0 12px 0;
+      font-size:12px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      color:var(--muted);
+    }
+    .sidebar-panel ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
+    .sidebar-panel li a{
+      color:var(--accent);
+      text-decoration:none;
+      font-size:13px;
+    }
+    .sidebar-panel li a:hover{ color:var(--accent-hover); text-decoration:underline; }
+
+    /* ── Sections ── */
+    .section-block{ }
+    .section-block + .section-block{ padding-top:24px; border-top:1px solid var(--divider); }
+
+    h2.section-title{
+      margin:0 0 14px 0;
+      font-size:13px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.6px;
+      color:var(--muted);
+      display:flex;
       align-items:center;
-      gap:var(--gap);
+      gap:10px;
+    }
+    h2.section-title::after{
+      content:'';
+      flex:1;
+      height:1px;
+      background:var(--divider);
     }
 
-    .content{ display:flex; flex-direction:column; gap:18px; width:100%; }
-
-    h2.section-title{ margin:0; font-size:16px; color:var(--text); font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; }
-    h2.section-title small{ color:var(--muted); font-weight:400; font-size:13px }
-
-    .cards{ display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:14px; margin-top:8px; }
+    /* ── Cards ── */
+    .cards{ display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:14px; }
     .card{
       background:var(--surface);
-      border-radius:10px;
+      border-radius:var(--radius);
       border:1px solid var(--card-border);
-      padding:14px;
-      box-shadow: 0 6px 18px rgba(12,20,30,0.04);
+      padding:16px;
       display:flex;
       flex-direction:column;
-      gap:10px;
-      transition:transform .18s ease, box-shadow .18s ease;
-      min-height:120px;
-      overflow:auto;
+      gap:8px;
+      transition: box-shadow .15s ease;
     }
-    .card:hover{ transform: translateY(-6px); box-shadow: 0 12px 30px rgba(12,20,30,0.08); }
-    .card h3{ margin:0; font-size:13px; color:var(--text); display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .card h3 .badge{ font-size:11px; color:var(--muted); background: #f1f5f9; padding:4px 8px; border-radius:999px; border:1px solid rgba(15,23,36,0.03); }
-    .card ul{ margin:6px 0 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
-    .card li a{ color:var(--accent); text-decoration:none; font-size:13px; display:inline-block; }
-    .card li a:hover{ text-decoration:underline; color:var(--accent-2) }
+    .card:hover{ box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 
-    .muted{ color:var(--muted); font-size:13px }
+    .card h3{
+      margin:0;
+      font-size:14px;
+      font-weight:600;
+      color:var(--text);
+      padding-bottom:8px;
+      border-bottom:1px solid var(--divider);
+    }
+    .card ul,
+    .card ol{
+      margin:4px 0 0 0;
+      padding:0;
+      list-style:none;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
+    }
+    .card li a{
+      color:var(--accent);
+      text-decoration:none;
+      font-size:13px;
+      line-height:1.4;
+    }
+    .card li a:hover{ color:var(--accent-hover); text-decoration:underline; }
 
-    footer.site-footer{ max-width:var(--max-width); margin:24px auto; padding:16px; color:var(--muted); font-size:13px; text-align:center; }
+    .card .sub-header{
+      font-size:11px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.4px;
+      color:var(--muted);
+      margin:8px 0 2px 0;
+      padding-top:8px;
+      border-top:1px solid #f0f3f7;
+    }
 
+    /* ── Footer ── */
+    footer.site-footer{ max-width:var(--max-width); margin:0 auto; padding:20px; color:var(--muted); font-size:12px; text-align:center; }
+
+    /* ── Responsive ── */
     @media (max-width:980px){
-      main.container{ padding-bottom:120px }
+      .page-wrap{ grid-template-columns:1fr; padding-bottom:100px; }
+      aside.sidebar{ position:static; }
+      .header-nav{ display:none; }
     }
     @media (max-width:640px){
-      .cards{ grid-template-columns: repeat(auto-fill,minmax(200px,1fr)) }
+      .cards{ grid-template-columns:1fr; }
+      header.app-header{ padding:0 16px; }
     }
 
-    .small{ font-size:12px; color:var(--muted) }
     .sr-only{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden }
   </style>
 </head>
@@ -102,18 +205,22 @@
       <img src="./assets/images/olea%20europaea.png" alt="Olive tree">
       <h1>ilO</h1>
     </div>
+    <nav class="header-nav" aria-label="Main sections">
+      <a href="#markets-section" class="active">Markets</a>
+      <a href="#news-section">News</a>
+      <a href="#resources-section">Resources</a>
+    </nav>
   </header>
 
-  <main class="container" id="page">
-    <section class="content" id="main-content" aria-live="polite">
+  <div class="page-wrap">
+    <section class="content" id="main-content">
       <!-- MARKETS -->
-      <div id="markets-section">
-        <h2 class="section-title">MARKETS <small class="small">complete index</small></h2>
+      <div class="section-block" id="markets-section">
+        <h2 class="section-title">Markets</h2>
 
         <div class="cards" id="markets">
-          <!-- Sentiment / Positioning -->
-          <article class="card" data-section="markets">
-            <h3>Sentiment / Positioning <span class="badge">sentiment</span></h3>
+          <article class="card">
+            <h3>Sentiment / Positioning</h3>
             <ul>
               <li><a href="https://stockcharts.com/freecharts/marketsummary.html#&t=C" target="_blank">StockCharts Summary</a></li>
               <li><a href="https://www.cboe.com/delayed_quotes/vix" target="_blank">VIX</a></li>
@@ -130,9 +237,8 @@
             </ul>
           </article>
 
-          <!-- Currencies (full list) -->
-          <article class="card" data-section="markets">
-            <h3>Currencies <span class="badge">fx</span></h3>
+          <article class="card">
+            <h3>Currencies</h3>
             <ul>
               <li><a href="https://www.investing.com/currencies/us-dollar-index" target="_blank">DXY</a></li>
               <li><a href="https://www.investing.com/currencies/aud-usd" target="_blank">AUD/USD</a></li>
@@ -153,9 +259,8 @@
             </ul>
           </article>
 
-          <!-- Commodities -->
-          <article class="card" data-section="markets">
-            <h3>Commodities <span class="badge">commod.</span></h3>
+          <article class="card">
+            <h3>Commodities</h3>
             <ul>
               <li><a href="https://www.investing.com/commodities/crude-oil-contracts" target="_blank">WTI</a></li>
               <li><a href="https://www.investing.com/commodities/brent-oil-contracts" target="_blank">Brent</a></li>
@@ -170,9 +275,8 @@
             </ul>
           </article>
 
-          <!-- Rates (with US nested) -->
-          <article class="card" data-section="markets">
-            <h3>Rates <span class="badge">rates</span></h3>
+          <article class="card">
+            <h3>Rates</h3>
             <ul>
               <li><a href="https://www.investing.com/central-banks/" target="_blank">Central Banks</a></li>
               <li><a href="https://www.investing.com/rates-bonds/australia-government-bonds?maturity_from=40&maturity_to=290" target="_blank">Australia</a></li>
@@ -186,7 +290,7 @@
               <li><a href="https://www.investing.com/rates-bonds/uk-government-bonds?maturity_from=40&maturity_to=310" target="_blank">UK</a></li>
               <li><a href="https://www.investing.com/rates-bonds/usa-government-bonds" target="_blank">US</a></li>
             </ul>
-            <div class="small muted">US rates &amp; related</div>
+            <div class="sub-header">US Rates &amp; Related</div>
             <ul>
               <li><a href="https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics" target="_blank">Treasury.gov</a></li>
               <li><a href="https://www.treasurydirect.gov/auctions/announcements-data-results/" target="_blank">US Treasury Auctions</a></li>
@@ -199,6 +303,7 @@
               <li><a href="https://fred.stlouisfed.org/series/DFII5" target="_blank">US 5Y Real</a></li>
               <li><a href="https://fred.stlouisfed.org/series/DFII10" target="_blank">US 10Y Real</a></li>
             </ul>
+            <div class="sub-header">Americas</div>
             <ul>
               <li><a href="https://www.investing.com/rates-bonds/canada-government-bonds?maturity_from=40&maturity_to=290" target="_blank">Canada</a></li>
               <li><a href="https://www.investing.com/rates-bonds/mexico-government-bonds?maturity_from=10&maturity_to=290" target="_blank">Mexico</a></li>
@@ -207,9 +312,8 @@
             </ul>
           </article>
 
-          <!-- Bonds -->
-          <article class="card" data-section="markets">
-            <h3>Bonds <span class="badge">bonds</span></h3>
+          <article class="card">
+            <h3>Bonds</h3>
             <ul>
               <li><a href="https://fred.stlouisfed.org/series/BAMLC0A1CAAAEY" target="_blank">US AAA YTM</a></li>
               <li><a href="https://fred.stlouisfed.org/series/BAMLC0A1CAAA" target="_blank">US AAA OAS</a></li>
@@ -232,21 +336,18 @@
             </ul>
           </article>
 
-          <!-- Equities (full) -->
-          <article class="card" data-section="markets">
-            <h3>Equities <span class="badge">equities</span></h3>
+          <article class="card">
+            <h3>Equities</h3>
             <ul>
               <li><a href="https://www.investing.com/indices/indices-futures" target="_blank">Index Futures</a></li>
             </ul>
-
-            <div class="small muted">Global & Region</div>
+            <div class="sub-header">Global &amp; Region</div>
             <ul>
               <li><a href="https://seekingalpha.com/symbol/ACWI" target="_blank">MSCI All Country World Index</a></li>
               <li><a href="https://seekingalpha.com/symbol/URTH" target="_blank">MSCI World Index</a></li>
             </ul>
-
-            <div class="small muted">Country / Regional ETFs</div>
-            <ol>
+            <div class="sub-header">Country / Regional ETFs</div>
+            <ul>
               <li><a href="https://seekingalpha.com/symbol/SPY" target="_blank">US SPY</a></li>
               <li><a href="https://seekingalpha.com/symbol/EWJ" target="_blank">Japan EWJ</a></li>
               <li><a href="https://seekingalpha.com/symbol/EWG" target="_blank">Germany EWG</a></li>
@@ -270,13 +371,10 @@
               <li><a href="https://seekingalpha.com/symbol/EFNL" target="_blank">Finland EFNL</a></li>
               <li><a href="https://seekingalpha.com/symbol/EIRL" target="_blank">Ireland EIRL</a></li>
               <li><a href="https://seekingalpha.com/symbol/PGAL" target="_blank">Portugal PGAL</a></li>
-            </ol>
-
-            <div class="small muted">Emerging Markets & Country ETFs</div>
+            </ul>
+            <div class="sub-header">Emerging Markets</div>
             <ul>
               <li><a href="https://seekingalpha.com/symbol/EEM" target="_blank">MSCI Emerging Markets</a></li>
-            </ul>
-            <ol>
               <li><a href="https://seekingalpha.com/symbol/GXC" target="_blank">China GXC</a></li>
               <li><a href="https://seekingalpha.com/symbol/PIN" target="_blank">India PIN</a></li>
               <li><a href="https://seekingalpha.com/symbol/IDX" target="_blank">Indonesia IDX</a></li>
@@ -302,12 +400,11 @@
               <li><a href="https://seekingalpha.com/symbol/GREK" target="_blank">Greece GREK</a></li>
               <li><a href="https://seekingalpha.com/symbol/QAT" target="_blank">Qatar QAT</a></li>
               <li><a href="https://seekingalpha.com/symbol/KWT" target="_blank">Kuwait KWT</a></li>
-            </ol>
+            </ul>
           </article>
 
-          <!-- Derivatives -->
-          <article class="card" data-section="markets">
-            <h3>Derivatives <span class="badge">deriv.</span></h3>
+          <article class="card">
+            <h3>Derivatives</h3>
             <ul>
               <li><a href="https://keyinvest-ch-en.ubs.com" target="_blank">UBS KeyInvest</a></li>
               <li><a href="https://markets.vontobel.com/en-ch" target="_blank">Vontobel Derinet</a></li>
@@ -319,25 +416,15 @@
               <li><a href="https://www.optionseducation.org" target="_blank">OptionsEducation</a></li>
             </ul>
           </article>
-
-          <!-- Private Markets / Real Assets / Distributed Ledger -->
-          <article class="card" data-section="markets">
-            <h3>Private Markets / Real Assets / Distributed Ledger</h3>
-            <ul>
-              <li>Private Markets</li>
-              <li>Real Assets</li>
-              <li>Distributed Ledger</li>
-            </ul>
-          </article>
         </div>
       </div>
 
       <!-- NEWS -->
-      <div id="news-section">
-        <h2 class="section-title">NEWS <small class="small">complete index</small></h2>
+      <div class="section-block" id="news-section">
+        <h2 class="section-title">News</h2>
 
         <div class="cards" id="news">
-          <article class="card" data-section="news">
+          <article class="card">
             <h3>General</h3>
             <ul>
               <li><a href="https://www.ft.com/news-feed" target="_blank">FT News Feed</a></li>
@@ -363,7 +450,7 @@
             </ul>
           </article>
 
-          <article class="card" data-section="news">
+          <article class="card">
             <h3>Regional &amp; Local</h3>
             <ul>
               <li><a href="https://en.globes.co.il/en/" target="_blank">Globes</a></li>
@@ -390,7 +477,7 @@
             </ul>
           </article>
 
-          <article class="card" data-section="news">
+          <article class="card">
             <h3>US &amp; Global Press</h3>
             <ul>
               <li><a href="https://www.nytimes.com/section/business" target="_blank">NY Times (Business)</a></li>
@@ -402,8 +489,7 @@
               <li><a href="https://www.arabnews.com" target="_blank">Arab News</a></li>
               <li><a href="https://dailystar.com.lb/news/" target="_blank">Daily Star Lebanon</a></li>
             </ul>
-
-            <div class="small muted">Regional Africa / Latin America / Sports</div>
+            <div class="sub-header">Africa / Latin America / Sports</div>
             <ul>
               <li><a href="https://www.bbc.com/news/world/africa" target="_blank">BBC Africa</a></li>
               <li><a href="https://edition.cnn.com/world/africa" target="_blank">CNN Africa</a></li>
@@ -428,8 +514,7 @@
               <li><a href="https://www.nba.com" target="_blank">NBA</a></li>
               <li><a href="https://www.nhl.com" target="_blank">NHL</a></li>
             </ul>
-
-            <div class="small muted">GeoPolitics</div>
+            <div class="sub-header">GeoPolitics</div>
             <ul>
               <li><a href="https://en.wikipedia.org/wiki/2024_national_electoral_calendar" target="_blank">2024 Election Calendar</a></li>
               <li><a href="https://projects.fivethirtyeight.com/polls/president-general/2024/national/" target="_blank">FiveThirtyEight</a></li>
@@ -443,8 +528,8 @@
             </ul>
           </article>
 
-          <article class="card" data-section="news">
-            <h3>Data &amp; Currencies / Commodities / Equities News</h3>
+          <article class="card">
+            <h3>Data &amp; Market News</h3>
             <ul>
               <li><a href="https://fred.stlouisfed.org/releases/calendar" target="_blank">FRED Release Calendar</a></li>
               <li><a href="https://www.dailyfx.com/economic-calendar#next-fourteen-days" target="_blank">DailyFX Economic Calendar</a></li>
@@ -452,16 +537,14 @@
               <li><a href="https://app.koyfin.com/ecal" target="_blank">KoyFin Economic Calendar</a></li>
               <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datacurrent.html" target="_blank">Damodaran Data</a></li>
             </ul>
-
-            <div class="small muted">Currencies news sources</div>
+            <div class="sub-header">Currencies</div>
             <ul>
               <li><a href="https://www.ft.com/currencies" target="_blank">FT - Currencies</a></li>
               <li><a href="https://www.bloomberg.com/fx-center" target="_blank">Bloomberg FX Center</a></li>
               <li><a href="https://www.investing.com/news/forex-news" target="_blank">Investing.com FX</a></li>
               <li><a href="https://www.dailyfx.com/market-news" target="_blank">Daily FX</a></li>
             </ul>
-
-            <div class="small muted">Commodities news sources</div>
+            <div class="sub-header">Commodities</div>
             <ul>
               <li><a href="https://www.ft.com/commodities" target="_blank">FT - Commodities</a></li>
               <li><a href="https://www.bloomberg.com/commodities" target="_blank">Bloomberg Commodities</a></li>
@@ -475,38 +558,21 @@
               <li><a href="https://oilprice.com/Latest-Energy-News/World-News/" target="_blank">OilPrice.com</a></li>
               <li><a href="https://www.worldbank.org/en/research/commodity-markets" target="_blank">World Bank Commodity Markets</a></li>
             </ul>
-
-            <div class="small muted">Equities news</div>
+            <div class="sub-header">Equities</div>
             <ul>
               <li><a href="https://app.koyfin.com/mov" target="_blank">Koyfin Movers</a></li>
               <li><a href="https://app.koyfin.com/earc" target="_blank">Koyfin Earnings Calendar</a></li>
-            </ul>
-          </article>
-
-          <article class="card" data-section="news">
-            <h3>Resources index (short)</h3>
-            <ul>
-              <li><a href="https://onedrive.live.com/view.aspx?resid=1FE8B0EC508EAAEA%21634&id=documents" target="_blank">OneNote olea europaea</a></li>
-              <li><a href="https://www.barchart.com" target="_blank">BarChart</a></li>
-              <li><a href="https://www.tradingview.com" target="_blank">TradingView</a></li>
             </ul>
           </article>
         </div>
       </div>
 
       <!-- RESOURCES -->
-      <div id="resources-section">
-        <h2 class="section-title">RESOURCES <small class="small">tools &amp; research (complete)</small></h2>
+      <div class="section-block" id="resources-section">
+        <h2 class="section-title">Resources</h2>
 
         <div class="cards" id="resources">
-          <article class="card" data-section="resources">
-            <h3>OneNote</h3>
-            <ul>
-              <li><a href="https://onedrive.live.com/view.aspx?resid=1FE8B0EC508EAAEA%21634&id=documents" target="_blank">olea europaea (OneNote)</a></li>
-            </ul>
-          </article>
-
-          <article class="card" data-section="resources">
+          <article class="card">
             <h3>Charts</h3>
             <ul>
               <li><a href="https://www.barchart.com" target="_blank">BarChart</a></li>
@@ -515,7 +581,7 @@
             </ul>
           </article>
 
-          <article class="card" data-section="resources">
+          <article class="card">
             <h3>Screener</h3>
             <ul>
               <li><a href="https://finviz.com" target="_blank">FinViz</a></li>
@@ -527,7 +593,7 @@
             </ul>
           </article>
 
-          <article class="card" data-section="resources">
+          <article class="card">
             <h3>ETFs</h3>
             <ul>
               <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/global_and_regions" target="_blank">Global &amp; Regional</a></li>
@@ -545,7 +611,7 @@
             </ul>
           </article>
 
-          <article class="card" data-section="resources">
+          <article class="card">
             <h3>Research</h3>
             <ul>
               <li><a href="https://neo.ubs.com/static/login.html?origin=%2finsight" target="_blank">UBS Investment Bank (login)</a></li>
@@ -554,13 +620,44 @@
               <li><a href="https://www.tipranks.com/dashboard" target="_blank">TipRanks</a></li>
               <li><a href="https://www.tandfonline.com/journals/ufaj20" target="_blank">Financial Analyst Journal</a></li>
               <li><a href="https://rpc.cfainstitute.org/en/research" target="_blank">CFA Research &amp; Policy</a></li>
-              <li><a href="https://my.cfainstitute.org/Refresher-Readings-Collection" target="_blank">CFA Refresher Readings</a>
-              </li>
+              <li><a href="https://my.cfainstitute.org/Refresher-Readings-Collection" target="_blank">CFA Refresher Readings</a></li>
             </ul>
           </article>
         </div>
       </div>
     </section>
-  </main>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-panel">
+        <h4>Quick Access</h4>
+        <ul>
+          <li><a href="https://www.barchart.com" target="_blank">BarChart</a></li>
+          <li><a href="https://www.tradingview.com" target="_blank">TradingView</a></li>
+          <li><a href="https://finviz.com" target="_blank">FinViz</a></li>
+          <li><a href="https://app.koyfin.com/ms" target="_blank">Koyfin</a></li>
+          <li><a href="https://www.ft.com/news-feed" target="_blank">FT News Feed</a></li>
+          <li><a href="https://www.bloomberg.com/europe" target="_blank">Bloomberg</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-panel">
+        <h4>Notebooks</h4>
+        <ul>
+          <li><a href="https://onedrive.live.com/view.aspx?resid=1FE8B0EC508EAAEA%21634&id=documents" target="_blank">Olea Europaea (OneNote)</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-panel">
+        <h4>Data &amp; Calendars</h4>
+        <ul>
+          <li><a href="https://fred.stlouisfed.org/releases/calendar" target="_blank">FRED Release Calendar</a></li>
+          <li><a href="https://app.koyfin.com/ecal" target="_blank">KoyFin Econ Calendar</a></li>
+          <li><a href="https://app.koyfin.com/earc" target="_blank">KoyFin Earnings</a></li>
+          <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datacurrent.html" target="_blank">Damodaran Data</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
 </body>
 </html>
