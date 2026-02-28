@@ -81,8 +81,15 @@
       padding:6px 0;
       z-index:50;
     }
-    .nav-dropdown:hover .dropdown-menu{ display:block; }
-    .nav-dropdown:hover > a{ color:#fff; }
+    .nav-dropdown:hover .dropdown-menu,
+    .nav-dropdown:focus-within .dropdown-menu{ display:block; }
+    .nav-dropdown:hover > a,
+    .nav-dropdown:focus-within > a{ color:#fff; }
+    .nav-dropdown > a:focus-visible{
+      outline:2px solid var(--accent);
+      outline-offset:-2px;
+      color:#fff;
+    }
     .dropdown-menu a{
       display:block;
       padding:8px 16px;
@@ -145,7 +152,7 @@
     .snapshot-table{ width:100%; border-collapse:collapse; font-size:11px; line-height:1.3; }
     .snapshot-table th{
       position:sticky; top:0; z-index:2;
-      background:var(--bg); color:var(--muted);
+      background:var(--surface); color:var(--muted);
       font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px;
       padding:6px 6px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--divider);
     }
@@ -239,11 +246,32 @@
     footer.site-footer{ max-width:var(--max-width); margin:0 auto; padding:20px; color:var(--muted); font-size:12px; text-align:center; }
 
     /* ── Responsive ── */
+    .mobile-nav{
+      display:none;
+      align-items:center;
+      gap:10px;
+    }
+    .mobile-nav a{
+      color:rgba(255,255,255,0.9);
+      text-decoration:none;
+      font-size:12px;
+      font-weight:600;
+      padding:6px 8px;
+      border:1px solid rgba(255,255,255,0.35);
+      border-radius:4px;
+    }
+    .mobile-nav a:hover,
+    .mobile-nav a:focus-visible{
+      color:#fff;
+      border-color:#fff;
+      outline:none;
+    }
+
     @media (max-width:980px){
       .page-wrap{ grid-template-columns:1fr; padding-bottom:100px; }
       aside.sidebar{ position:static; }
       .header-nav{ display:none; }
-      .nav-dropdown .dropdown-menu{ display:none !important; }
+      .mobile-nav{ display:flex; }
     }
     @media (max-width:640px){
       .cards{ grid-template-columns:1fr; }
@@ -262,7 +290,7 @@
     </div>
     <nav class="header-nav" aria-label="Main sections">
       <div class="nav-dropdown">
-        <a href="#markets-section" class="active">Markets</a>
+        <a href="#markets-section" class="active" aria-haspopup="true">Markets</a>
         <div class="dropdown-menu">
           <a href="#card-sentiment">Sentiment / Positioning</a>
           <a href="#card-currencies">Currencies</a>
@@ -274,7 +302,7 @@
         </div>
       </div>
       <div class="nav-dropdown">
-        <a href="#news-section">News</a>
+        <a href="#news-section" aria-haspopup="true">News</a>
         <div class="dropdown-menu">
           <a href="#card-general">General</a>
           <a href="#card-regional">Regional &amp; Local</a>
@@ -285,7 +313,7 @@
         </div>
       </div>
       <div class="nav-dropdown">
-        <a href="#resources-section">Resources</a>
+        <a href="#resources-section" aria-haspopup="true">Resources</a>
         <div class="dropdown-menu">
           <a href="#card-charts">Charts</a>
           <a href="#card-screener">Screener</a>
@@ -293,6 +321,11 @@
           <a href="#card-research">Research</a>
         </div>
       </div>
+    </nav>
+    <nav class="mobile-nav" aria-label="Mobile sections">
+      <a href="#markets-section">Markets</a>
+      <a href="#news-section">News</a>
+      <a href="#resources-section">Resources</a>
     </nav>
   </header>
 
@@ -306,240 +339,240 @@
           <article class="card" id="card-sentiment">
             <h3>Sentiment / Positioning</h3>
             <ul>
-              <li><a href="https://stockcharts.com/freecharts/marketsummary.html#&t=C" target="_blank">StockCharts Summary</a></li>
-              <li><a href="https://www.cboe.com/delayed_quotes/vix" target="_blank">VIX</a></li>
-              <li><a href="http://vixcentral.com" target="_blank">VIX Term Structure</a></li>
-              <li><a href="https://www.aaii.com/sentimentsurvey" target="_blank">AAII Investor Sentiment Survey</a></li>
-              <li><a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank">CNN Fear &amp; Greed Index</a></li>
-              <li><a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank">Commitments of Traders</a></li>
-              <li><a href="https://www.barchart.com/futures/commitment-of-traders" target="_blank">COT Graphs</a></li>
-              <li><a href="https://www.dailyfx.com/sentiment-report" target="_blank">IG FX Sentiment</a></li>
-              <li><a href="http://www.market-risk-premia.com/us.html" target="_blank">Equity Risk Premium</a></li>
-              <li><a href="https://www.wsj.com/market-data/stocks/peyields" target="_blank">US P/E (WSJ)</a></li>
-              <li><a href="https://www.investing.com/indices/cboe-skew" target="_blank">CBOE Skew</a></li>
-              <li><a href="https://www.longtermtrends.net/copper-gold-ratio/" target="_blank">Copper/Gold Ratio</a></li>
+              <li><a href="https://stockcharts.com/freecharts/marketsummary.html#&t=C" target="_blank" rel="noopener noreferrer">StockCharts Summary</a></li>
+              <li><a href="https://www.cboe.com/delayed_quotes/vix" target="_blank" rel="noopener noreferrer">VIX</a></li>
+              <li><a href="http://vixcentral.com" target="_blank" rel="noopener noreferrer">VIX Term Structure</a></li>
+              <li><a href="https://www.aaii.com/sentimentsurvey" target="_blank" rel="noopener noreferrer">AAII Investor Sentiment Survey</a></li>
+              <li><a href="https://edition.cnn.com/markets/fear-and-greed" target="_blank" rel="noopener noreferrer">CNN Fear &amp; Greed Index</a></li>
+              <li><a href="https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm" target="_blank" rel="noopener noreferrer">Commitments of Traders</a></li>
+              <li><a href="https://www.barchart.com/futures/commitment-of-traders" target="_blank" rel="noopener noreferrer">COT Graphs</a></li>
+              <li><a href="https://www.dailyfx.com/sentiment-report" target="_blank" rel="noopener noreferrer">IG FX Sentiment</a></li>
+              <li><a href="http://www.market-risk-premia.com/us.html" target="_blank" rel="noopener noreferrer">Equity Risk Premium</a></li>
+              <li><a href="https://www.wsj.com/market-data/stocks/peyields" target="_blank" rel="noopener noreferrer">US P/E (WSJ)</a></li>
+              <li><a href="https://www.investing.com/indices/cboe-skew" target="_blank" rel="noopener noreferrer">CBOE Skew</a></li>
+              <li><a href="https://www.longtermtrends.net/copper-gold-ratio/" target="_blank" rel="noopener noreferrer">Copper/Gold Ratio</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-currencies">
             <h3>Currencies</h3>
             <ul>
-              <li><a href="https://www.investing.com/currencies/us-dollar-index" target="_blank">DXY</a></li>
-              <li><a href="https://www.investing.com/currencies/aud-usd" target="_blank">AUD/USD</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-jpy" target="_blank">USD/JPY</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-cny" target="_blank">USD/CNY</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-cnh" target="_blank">USD/CNH</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-ils" target="_blank">USD/ILS</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-try" target="_blank">USD/TRY</a></li>
-              <li><a href="https://www.investing.com/currencies/eur-jpy" target="_blank">EUR/JPY</a></li>
-              <li><a href="https://www.investing.com/currencies/eur-chf" target="_blank">EUR/CHF</a></li>
-              <li><a href="https://www.investing.com/currencies/eur-gbp" target="_blank">EUR/GBP</a></li>
-              <li><a href="https://www.investing.com/currencies/eur-usd" target="_blank">EUR/USD</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-chf" target="_blank">USD/CHF</a></li>
-              <li><a href="https://www.investing.com/currencies/gbp-usd" target="_blank">GBP/USD</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-cad" target="_blank">USD/CAD</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-mxn" target="_blank">USD/MXN</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-brl" target="_blank">USD/BRL</a></li>
+              <li><a href="https://www.investing.com/currencies/us-dollar-index" target="_blank" rel="noopener noreferrer">DXY</a></li>
+              <li><a href="https://www.investing.com/currencies/aud-usd" target="_blank" rel="noopener noreferrer">AUD/USD</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-jpy" target="_blank" rel="noopener noreferrer">USD/JPY</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-cny" target="_blank" rel="noopener noreferrer">USD/CNY</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-cnh" target="_blank" rel="noopener noreferrer">USD/CNH</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-ils" target="_blank" rel="noopener noreferrer">USD/ILS</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-try" target="_blank" rel="noopener noreferrer">USD/TRY</a></li>
+              <li><a href="https://www.investing.com/currencies/eur-jpy" target="_blank" rel="noopener noreferrer">EUR/JPY</a></li>
+              <li><a href="https://www.investing.com/currencies/eur-chf" target="_blank" rel="noopener noreferrer">EUR/CHF</a></li>
+              <li><a href="https://www.investing.com/currencies/eur-gbp" target="_blank" rel="noopener noreferrer">EUR/GBP</a></li>
+              <li><a href="https://www.investing.com/currencies/eur-usd" target="_blank" rel="noopener noreferrer">EUR/USD</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-chf" target="_blank" rel="noopener noreferrer">USD/CHF</a></li>
+              <li><a href="https://www.investing.com/currencies/gbp-usd" target="_blank" rel="noopener noreferrer">GBP/USD</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-cad" target="_blank" rel="noopener noreferrer">USD/CAD</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-mxn" target="_blank" rel="noopener noreferrer">USD/MXN</a></li>
+              <li><a href="https://www.investing.com/currencies/usd-brl" target="_blank" rel="noopener noreferrer">USD/BRL</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-commodities">
             <h3>Commodities</h3>
             <ul>
-              <li><a href="https://www.investing.com/commodities/crude-oil-contracts" target="_blank">WTI</a></li>
-              <li><a href="https://www.investing.com/commodities/brent-oil-contracts" target="_blank">Brent</a></li>
-              <li><a href="https://www.investing.com/commodities/natural-gas-contracts" target="_blank">Natural Gas</a></li>
-              <li><a href="https://www.investing.com/commodities/copper-contracts" target="_blank">Copper</a></li>
-              <li><a href="https://www.investing.com/commodities/us-steel-coil-contracts" target="_blank">Steel</a></li>
-              <li><a href="https://www.investing.com/commodities/aluminum-contracts?cid=1178488" target="_blank">Aluminum</a></li>
-              <li><a href="https://www.investing.com/commodities/uranium-contracts" target="_blank">Uranium</a></li>
-              <li><a href="https://www.investing.com/commodities/gold-contracts" target="_blank">Gold</a></li>
-              <li><a href="https://www.investing.com/commodities/silver-contracts" target="_blank">Silver</a></li>
-              <li><a href="https://www.investing.com/commodities/platinum-contracts" target="_blank">Platinum</a></li>
+              <li><a href="https://www.investing.com/commodities/crude-oil-contracts" target="_blank" rel="noopener noreferrer">WTI</a></li>
+              <li><a href="https://www.investing.com/commodities/brent-oil-contracts" target="_blank" rel="noopener noreferrer">Brent</a></li>
+              <li><a href="https://www.investing.com/commodities/natural-gas-contracts" target="_blank" rel="noopener noreferrer">Natural Gas</a></li>
+              <li><a href="https://www.investing.com/commodities/copper-contracts" target="_blank" rel="noopener noreferrer">Copper</a></li>
+              <li><a href="https://www.investing.com/commodities/us-steel-coil-contracts" target="_blank" rel="noopener noreferrer">Steel</a></li>
+              <li><a href="https://www.investing.com/commodities/aluminum-contracts?cid=1178488" target="_blank" rel="noopener noreferrer">Aluminum</a></li>
+              <li><a href="https://www.investing.com/commodities/uranium-contracts" target="_blank" rel="noopener noreferrer">Uranium</a></li>
+              <li><a href="https://www.investing.com/commodities/gold-contracts" target="_blank" rel="noopener noreferrer">Gold</a></li>
+              <li><a href="https://www.investing.com/commodities/silver-contracts" target="_blank" rel="noopener noreferrer">Silver</a></li>
+              <li><a href="https://www.investing.com/commodities/platinum-contracts" target="_blank" rel="noopener noreferrer">Platinum</a></li>
             </ul>
             <div class="sub-header">Futures Dashboard</div>
             <ul>
-              <li><a href="https://finviz.com/futures.ashx" target="_blank">Finviz Futures (All Categories)</a></li>
-              <li><a href="https://www.barchart.com/futures/prices" target="_blank">Barchart Futures Prices</a></li>
-              <li><a href="https://www.cmegroup.com/markets/agriculture.html" target="_blank">CME Grains &amp; Softs</a></li>
-              <li><a href="https://www.cmegroup.com/markets/energy.html" target="_blank">CME Energy</a></li>
-              <li><a href="https://www.cmegroup.com/markets/metals.html" target="_blank">CME Metals</a></li>
-              <li><a href="https://www.cmegroup.com/markets/livestock.html" target="_blank">CME Livestock</a></li>
-              <li><a href="https://www.tradingview.com/markets/futures/" target="_blank">TradingView Futures</a></li>
+              <li><a href="https://finviz.com/futures.ashx" target="_blank" rel="noopener noreferrer">Finviz Futures (All Categories)</a></li>
+              <li><a href="https://www.barchart.com/futures/prices" target="_blank" rel="noopener noreferrer">Barchart Futures Prices</a></li>
+              <li><a href="https://www.cmegroup.com/markets/agriculture.html" target="_blank" rel="noopener noreferrer">CME Grains &amp; Softs</a></li>
+              <li><a href="https://www.cmegroup.com/markets/energy.html" target="_blank" rel="noopener noreferrer">CME Energy</a></li>
+              <li><a href="https://www.cmegroup.com/markets/metals.html" target="_blank" rel="noopener noreferrer">CME Metals</a></li>
+              <li><a href="https://www.cmegroup.com/markets/livestock.html" target="_blank" rel="noopener noreferrer">CME Livestock</a></li>
+              <li><a href="https://www.tradingview.com/markets/futures/" target="_blank" rel="noopener noreferrer">TradingView Futures</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-rates">
             <h3>Rates</h3>
             <ul>
-              <li><a href="https://www.investing.com/central-banks/" target="_blank">Central Banks</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/australia-government-bonds?maturity_from=40&maturity_to=290" target="_blank">Australia</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/japan-government-bonds?maturity_from=40&maturity_to=300" target="_blank">Japan</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/china-government-bonds?maturity_from=90&maturity_to=290" target="_blank">China</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/israel-government-bonds?maturity_from=10&maturity_to=310" target="_blank">Israel</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/germany-government-bonds?maturity_from=40&maturity_to=290" target="_blank">Germany</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/france-government-bonds?maturity_from=40&maturity_to=310" target="_blank">France</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/italy-government-bonds?maturity_from=40&maturity_to=310" target="_blank">Italy/Spain</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/switzerland-government-bonds?maturity_from=10&maturity_to=310" target="_blank">Switzerland</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/uk-government-bonds?maturity_from=40&maturity_to=310" target="_blank">UK</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/usa-government-bonds" target="_blank">US</a></li>
+              <li><a href="https://www.investing.com/central-banks/" target="_blank" rel="noopener noreferrer">Central Banks</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/australia-government-bonds?maturity_from=40&maturity_to=290" target="_blank" rel="noopener noreferrer">Australia</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/japan-government-bonds?maturity_from=40&maturity_to=300" target="_blank" rel="noopener noreferrer">Japan</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/china-government-bonds?maturity_from=90&maturity_to=290" target="_blank" rel="noopener noreferrer">China</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/israel-government-bonds?maturity_from=10&maturity_to=310" target="_blank" rel="noopener noreferrer">Israel</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/germany-government-bonds?maturity_from=40&maturity_to=290" target="_blank" rel="noopener noreferrer">Germany</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/france-government-bonds?maturity_from=40&maturity_to=310" target="_blank" rel="noopener noreferrer">France</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/italy-government-bonds?maturity_from=40&maturity_to=310" target="_blank" rel="noopener noreferrer">Italy/Spain</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/switzerland-government-bonds?maturity_from=10&maturity_to=310" target="_blank" rel="noopener noreferrer">Switzerland</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/uk-government-bonds?maturity_from=40&maturity_to=310" target="_blank" rel="noopener noreferrer">UK</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/usa-government-bonds" target="_blank" rel="noopener noreferrer">US</a></li>
             </ul>
             <div class="sub-header">US Rates &amp; Related</div>
             <ul>
-              <li><a href="https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics" target="_blank">Treasury.gov</a></li>
-              <li><a href="https://www.treasurydirect.gov/auctions/announcements-data-results/" target="_blank">US Treasury Auctions</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/SOFR90DAYAVG" target="_blank">US 3M SOFR</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/RIFLGFCY01NA" target="_blank">US 1Y</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/RIFLGFCY02NA" target="_blank">US 2Y</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/RIFLGFCY05NA" target="_blank">US 5Y</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/DGS10" target="_blank">US 10Y</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/T10Y2Y" target="_blank">US 10Y-2Y</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/DFII5" target="_blank">US 5Y Real</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/DFII10" target="_blank">US 10Y Real</a></li>
+              <li><a href="https://home.treasury.gov/policy-issues/financing-the-government/interest-rate-statistics" target="_blank" rel="noopener noreferrer">Treasury.gov</a></li>
+              <li><a href="https://www.treasurydirect.gov/auctions/announcements-data-results/" target="_blank" rel="noopener noreferrer">US Treasury Auctions</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/SOFR90DAYAVG" target="_blank" rel="noopener noreferrer">US 3M SOFR</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/RIFLGFCY01NA" target="_blank" rel="noopener noreferrer">US 1Y</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/RIFLGFCY02NA" target="_blank" rel="noopener noreferrer">US 2Y</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/RIFLGFCY05NA" target="_blank" rel="noopener noreferrer">US 5Y</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/DGS10" target="_blank" rel="noopener noreferrer">US 10Y</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/T10Y2Y" target="_blank" rel="noopener noreferrer">US 10Y-2Y</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/DFII5" target="_blank" rel="noopener noreferrer">US 5Y Real</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/DFII10" target="_blank" rel="noopener noreferrer">US 10Y Real</a></li>
             </ul>
             <div class="sub-header">Rate Probabilities</div>
             <ul>
-              <li><a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank">CME FedWatch Tool</a></li>
-              <li><a href="https://www.investing.com/central-banks/fed-rate-monitor" target="_blank">Investing.com Fed Rate Monitor</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/DFEDTARU" target="_blank">Fed Funds Target Rate (FRED)</a></li>
-              <li><a href="https://www.cmegroup.com/markets/interest-rates/stirs/30-day-federal-fund.html" target="_blank">Fed Funds Futures (CME)</a></li>
-              <li><a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/key_ecb_interest_rates/html/index.en.html" target="_blank">ECB Key Interest Rates</a></li>
-              <li><a href="https://www.boj.or.jp/en/statistics/boj/other/discount/index.htm" target="_blank">BoJ Policy Rate</a></li>
+              <li><a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener noreferrer">CME FedWatch Tool</a></li>
+              <li><a href="https://www.investing.com/central-banks/fed-rate-monitor" target="_blank" rel="noopener noreferrer">Investing.com Fed Rate Monitor</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/DFEDTARU" target="_blank" rel="noopener noreferrer">Fed Funds Target Rate (FRED)</a></li>
+              <li><a href="https://www.cmegroup.com/markets/interest-rates/stirs/30-day-federal-fund.html" target="_blank" rel="noopener noreferrer">Fed Funds Futures (CME)</a></li>
+              <li><a href="https://www.ecb.europa.eu/stats/policy_and_exchange_rates/key_ecb_interest_rates/html/index.en.html" target="_blank" rel="noopener noreferrer">ECB Key Interest Rates</a></li>
+              <li><a href="https://www.boj.or.jp/en/statistics/boj/other/discount/index.htm" target="_blank" rel="noopener noreferrer">BoJ Policy Rate</a></li>
             </ul>
             <div class="sub-header">Americas</div>
             <ul>
-              <li><a href="https://www.investing.com/rates-bonds/canada-government-bonds?maturity_from=40&maturity_to=290" target="_blank">Canada</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/mexico-government-bonds?maturity_from=10&maturity_to=290" target="_blank">Mexico</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/brazil-government-bonds?maturity_from=60&maturity_to=180" target="_blank">Brazil</a></li>
-              <li><a href="https://www.investing.com/rates-bonds/world-cds" target="_blank">Sovereign CDS</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/canada-government-bonds?maturity_from=40&maturity_to=290" target="_blank" rel="noopener noreferrer">Canada</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/mexico-government-bonds?maturity_from=10&maturity_to=290" target="_blank" rel="noopener noreferrer">Mexico</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/brazil-government-bonds?maturity_from=60&maturity_to=180" target="_blank" rel="noopener noreferrer">Brazil</a></li>
+              <li><a href="https://www.investing.com/rates-bonds/world-cds" target="_blank" rel="noopener noreferrer">Sovereign CDS</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-bonds">
             <h3>Bonds</h3>
             <ul>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A1CAAAEY" target="_blank">US AAA YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A1CAAA" target="_blank">US AAA OAS</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A2CAAEY" target="_blank">US AA YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A2CAA" target="_blank">US AA OAS</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A3CAEY" target="_blank">US A YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A3CA" target="_blank">US A OAS</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A4CBBBEY" target="_blank">US BBB YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A4CBBB" target="_blank">US BBB OAS</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2EY" target="_blank">US HY YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2" target="_blank">US HY OAS</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLH0A3HYCEY" target="_blank">US CCC YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLH0A3HYC" target="_blank">US CCC OAS</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC1A0C13YEY" target="_blank">US 1-3 YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC2A0C35YEY" target="_blank">US 3-5 YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC3A0C57YEY" target="_blank">US 5-7 YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC4A0C710YEY" target="_blank">US 7-10 YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC7A0C1015YEY" target="_blank">US 10-15 YTM</a></li>
-              <li><a href="https://fred.stlouisfed.org/series/BAMLC8A0C15PYEY" target="_blank">US 15+ YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A1CAAAEY" target="_blank" rel="noopener noreferrer">US AAA YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A1CAAA" target="_blank" rel="noopener noreferrer">US AAA OAS</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A2CAAEY" target="_blank" rel="noopener noreferrer">US AA YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A2CAA" target="_blank" rel="noopener noreferrer">US AA OAS</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A3CAEY" target="_blank" rel="noopener noreferrer">US A YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A3CA" target="_blank" rel="noopener noreferrer">US A OAS</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A4CBBBEY" target="_blank" rel="noopener noreferrer">US BBB YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC0A4CBBB" target="_blank" rel="noopener noreferrer">US BBB OAS</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2EY" target="_blank" rel="noopener noreferrer">US HY YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLH0A0HYM2" target="_blank" rel="noopener noreferrer">US HY OAS</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLH0A3HYCEY" target="_blank" rel="noopener noreferrer">US CCC YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLH0A3HYC" target="_blank" rel="noopener noreferrer">US CCC OAS</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC1A0C13YEY" target="_blank" rel="noopener noreferrer">US 1-3 YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC2A0C35YEY" target="_blank" rel="noopener noreferrer">US 3-5 YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC3A0C57YEY" target="_blank" rel="noopener noreferrer">US 5-7 YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC4A0C710YEY" target="_blank" rel="noopener noreferrer">US 7-10 YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC7A0C1015YEY" target="_blank" rel="noopener noreferrer">US 10-15 YTM</a></li>
+              <li><a href="https://fred.stlouisfed.org/series/BAMLC8A0C15PYEY" target="_blank" rel="noopener noreferrer">US 15+ YTM</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-equities">
             <h3>Equities</h3>
             <ul>
-              <li><a href="https://www.investing.com/indices/indices-futures" target="_blank">Index Futures</a></li>
+              <li><a href="https://www.investing.com/indices/indices-futures" target="_blank" rel="noopener noreferrer">Index Futures</a></li>
             </ul>
             <div class="sub-header">Global &amp; Region</div>
             <ul>
-              <li><a href="https://seekingalpha.com/symbol/ACWI" target="_blank">MSCI All Country World Index</a></li>
-              <li><a href="https://seekingalpha.com/symbol/URTH" target="_blank">MSCI World Index</a></li>
+              <li><a href="https://seekingalpha.com/symbol/ACWI" target="_blank" rel="noopener noreferrer">MSCI All Country World Index</a></li>
+              <li><a href="https://seekingalpha.com/symbol/URTH" target="_blank" rel="noopener noreferrer">MSCI World Index</a></li>
             </ul>
             <div class="sub-header">Country / Regional ETFs</div>
             <ul>
-              <li><a href="https://seekingalpha.com/symbol/SPY" target="_blank">US SPY</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWJ" target="_blank">Japan EWJ</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWG" target="_blank">Germany EWG</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWU" target="_blank">UK EWU</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWQ" target="_blank">France EWQ</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWI" target="_blank">Italy EWI</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWC" target="_blank">Canada EWC</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWA" target="_blank">Australia EWA</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWP" target="_blank">Spain EWP</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWN" target="_blank">The Netherlands EWN</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWL" target="_blank">Switzerland EWL</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWD" target="_blank">Sweden EWD</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWY" target="_blank">South Korea EWY</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWK" target="_blank">Belgium EWK</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWH" target="_blank">Hong Kong EWH</a></li>
-              <li><a href="https://seekingalpha.com/symbol/NORW" target="_blank">Norway NORW</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWS" target="_blank">Singapore EWS</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWO" target="_blank">Austria EWO</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EIS" target="_blank">Israel EIS</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EDEN" target="_blank">Denmark EDEN</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EFNL" target="_blank">Finland EFNL</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EIRL" target="_blank">Ireland EIRL</a></li>
-              <li><a href="https://seekingalpha.com/symbol/PGAL" target="_blank">Portugal PGAL</a></li>
+              <li><a href="https://seekingalpha.com/symbol/SPY" target="_blank" rel="noopener noreferrer">US SPY</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWJ" target="_blank" rel="noopener noreferrer">Japan EWJ</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWG" target="_blank" rel="noopener noreferrer">Germany EWG</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWU" target="_blank" rel="noopener noreferrer">UK EWU</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWQ" target="_blank" rel="noopener noreferrer">France EWQ</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWI" target="_blank" rel="noopener noreferrer">Italy EWI</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWC" target="_blank" rel="noopener noreferrer">Canada EWC</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWA" target="_blank" rel="noopener noreferrer">Australia EWA</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWP" target="_blank" rel="noopener noreferrer">Spain EWP</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWN" target="_blank" rel="noopener noreferrer">The Netherlands EWN</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWL" target="_blank" rel="noopener noreferrer">Switzerland EWL</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWD" target="_blank" rel="noopener noreferrer">Sweden EWD</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWY" target="_blank" rel="noopener noreferrer">South Korea EWY</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWK" target="_blank" rel="noopener noreferrer">Belgium EWK</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWH" target="_blank" rel="noopener noreferrer">Hong Kong EWH</a></li>
+              <li><a href="https://seekingalpha.com/symbol/NORW" target="_blank" rel="noopener noreferrer">Norway NORW</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWS" target="_blank" rel="noopener noreferrer">Singapore EWS</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWO" target="_blank" rel="noopener noreferrer">Austria EWO</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EIS" target="_blank" rel="noopener noreferrer">Israel EIS</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EDEN" target="_blank" rel="noopener noreferrer">Denmark EDEN</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EFNL" target="_blank" rel="noopener noreferrer">Finland EFNL</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EIRL" target="_blank" rel="noopener noreferrer">Ireland EIRL</a></li>
+              <li><a href="https://seekingalpha.com/symbol/PGAL" target="_blank" rel="noopener noreferrer">Portugal PGAL</a></li>
             </ul>
             <div class="sub-header">US Sector ETFs</div>
             <ul>
-              <li><a href="https://seekingalpha.com/symbol/XLK" target="_blank">Technology XLK</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLF" target="_blank">Financials XLF</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLV" target="_blank">Health Care XLV</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLY" target="_blank">Consumer Discretionary XLY</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLP" target="_blank">Consumer Staples XLP</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLE" target="_blank">Energy XLE</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLI" target="_blank">Industrials XLI</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLB" target="_blank">Materials XLB</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLRE" target="_blank">Real Estate XLRE</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLU" target="_blank">Utilities XLU</a></li>
-              <li><a href="https://seekingalpha.com/symbol/XLC" target="_blank">Communication Services XLC</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLK" target="_blank" rel="noopener noreferrer">Technology XLK</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLF" target="_blank" rel="noopener noreferrer">Financials XLF</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLV" target="_blank" rel="noopener noreferrer">Health Care XLV</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLY" target="_blank" rel="noopener noreferrer">Consumer Discretionary XLY</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLP" target="_blank" rel="noopener noreferrer">Consumer Staples XLP</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLE" target="_blank" rel="noopener noreferrer">Energy XLE</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLI" target="_blank" rel="noopener noreferrer">Industrials XLI</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLB" target="_blank" rel="noopener noreferrer">Materials XLB</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLRE" target="_blank" rel="noopener noreferrer">Real Estate XLRE</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLU" target="_blank" rel="noopener noreferrer">Utilities XLU</a></li>
+              <li><a href="https://seekingalpha.com/symbol/XLC" target="_blank" rel="noopener noreferrer">Communication Services XLC</a></li>
             </ul>
             <div class="sub-header">Insider Trading</div>
             <ul>
-              <li><a href="https://finviz.com/insidertrading.ashx" target="_blank">Finviz Insider Trading</a></li>
-              <li><a href="http://openinsider.com" target="_blank">OpenInsider</a></li>
-              <li><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=4&dateb=&owner=include&count=40" target="_blank">SEC Form 4 Filings</a></li>
-              <li><a href="https://www.dataroma.com/m/home.php" target="_blank">Dataroma (Superinvestors)</a></li>
-              <li><a href="https://whalewisdom.com" target="_blank">WhaleWisdom (13F Filings)</a></li>
-              <li><a href="https://www.gurufocus.com/insider/summary" target="_blank">GuruFocus Insider Summary</a></li>
+              <li><a href="https://finviz.com/insidertrading.ashx" target="_blank" rel="noopener noreferrer">Finviz Insider Trading</a></li>
+              <li><a href="http://openinsider.com" target="_blank" rel="noopener noreferrer">OpenInsider</a></li>
+              <li><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=4&dateb=&owner=include&count=40" target="_blank" rel="noopener noreferrer">SEC Form 4 Filings</a></li>
+              <li><a href="https://www.dataroma.com/m/home.php" target="_blank" rel="noopener noreferrer">Dataroma (Superinvestors)</a></li>
+              <li><a href="https://whalewisdom.com" target="_blank" rel="noopener noreferrer">WhaleWisdom (13F Filings)</a></li>
+              <li><a href="https://www.gurufocus.com/insider/summary" target="_blank" rel="noopener noreferrer">GuruFocus Insider Summary</a></li>
             </ul>
             <div class="sub-header">Emerging Markets</div>
             <ul>
-              <li><a href="https://seekingalpha.com/symbol/EEM" target="_blank">MSCI Emerging Markets</a></li>
-              <li><a href="https://seekingalpha.com/symbol/GXC" target="_blank">China GXC</a></li>
-              <li><a href="https://seekingalpha.com/symbol/PIN" target="_blank">India PIN</a></li>
-              <li><a href="https://seekingalpha.com/symbol/IDX" target="_blank">Indonesia IDX</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWZ" target="_blank">Brazil EWZ</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWW" target="_blank">Mexico EWW</a></li>
-              <li><a href="https://seekingalpha.com/symbol/TUR" target="_blank">Turkey TUR</a></li>
-              <li><a href="https://seekingalpha.com/symbol/ERUS" target="_blank">Russia ERUS</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWY" target="_blank">South Korea EWY</a></li>
-              <li><a href="https://seekingalpha.com/symbol/KSA" target="_blank">Saudi Arabia KSA</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EGPT" target="_blank">Egypt EGPT</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EPOL" target="_blank">Poland EPOL</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWT" target="_blank">Taiwan EWT</a></li>
-              <li><a href="https://seekingalpha.com/symbol/THD" target="_blank">Thailand THD</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EPHE" target="_blank">Philippines EPHE</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EWM" target="_blank">Malaysia EWM</a></li>
-              <li><a href="https://seekingalpha.com/symbol/GXG" target="_blank">Colombia GXG</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EZA" target="_blank">South Africa EZA</a></li>
-              <li><a href="https://seekingalpha.com/symbol/UAE" target="_blank">United Arab Emirates UAE</a></li>
-              <li><a href="https://seekingalpha.com/symbol/ECH" target="_blank">Chile ECH</a></li>
-              <li><a href="https://seekingalpha.com/symbol/EPU" target="_blank">Peru EPU</a></li>
-              <li><a href="https://seekingalpha.com/symbol/NQCZ" target="_blank">Czech Republic NQCZ</a></li>
-              <li><a href="https://seekingalpha.com/symbol/NQHU" target="_blank">Hungary NQHU</a></li>
-              <li><a href="https://seekingalpha.com/symbol/GREK" target="_blank">Greece GREK</a></li>
-              <li><a href="https://seekingalpha.com/symbol/QAT" target="_blank">Qatar QAT</a></li>
-              <li><a href="https://seekingalpha.com/symbol/KWT" target="_blank">Kuwait KWT</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EEM" target="_blank" rel="noopener noreferrer">MSCI Emerging Markets</a></li>
+              <li><a href="https://seekingalpha.com/symbol/GXC" target="_blank" rel="noopener noreferrer">China GXC</a></li>
+              <li><a href="https://seekingalpha.com/symbol/PIN" target="_blank" rel="noopener noreferrer">India PIN</a></li>
+              <li><a href="https://seekingalpha.com/symbol/IDX" target="_blank" rel="noopener noreferrer">Indonesia IDX</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWZ" target="_blank" rel="noopener noreferrer">Brazil EWZ</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWW" target="_blank" rel="noopener noreferrer">Mexico EWW</a></li>
+              <li><a href="https://seekingalpha.com/symbol/TUR" target="_blank" rel="noopener noreferrer">Turkey TUR</a></li>
+              <li><a href="https://seekingalpha.com/symbol/ERUS" target="_blank" rel="noopener noreferrer">Russia ERUS</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWY" target="_blank" rel="noopener noreferrer">South Korea EWY</a></li>
+              <li><a href="https://seekingalpha.com/symbol/KSA" target="_blank" rel="noopener noreferrer">Saudi Arabia KSA</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EGPT" target="_blank" rel="noopener noreferrer">Egypt EGPT</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EPOL" target="_blank" rel="noopener noreferrer">Poland EPOL</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWT" target="_blank" rel="noopener noreferrer">Taiwan EWT</a></li>
+              <li><a href="https://seekingalpha.com/symbol/THD" target="_blank" rel="noopener noreferrer">Thailand THD</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EPHE" target="_blank" rel="noopener noreferrer">Philippines EPHE</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EWM" target="_blank" rel="noopener noreferrer">Malaysia EWM</a></li>
+              <li><a href="https://seekingalpha.com/symbol/GXG" target="_blank" rel="noopener noreferrer">Colombia GXG</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EZA" target="_blank" rel="noopener noreferrer">South Africa EZA</a></li>
+              <li><a href="https://seekingalpha.com/symbol/UAE" target="_blank" rel="noopener noreferrer">United Arab Emirates UAE</a></li>
+              <li><a href="https://seekingalpha.com/symbol/ECH" target="_blank" rel="noopener noreferrer">Chile ECH</a></li>
+              <li><a href="https://seekingalpha.com/symbol/EPU" target="_blank" rel="noopener noreferrer">Peru EPU</a></li>
+              <li><a href="https://seekingalpha.com/symbol/NQCZ" target="_blank" rel="noopener noreferrer">Czech Republic NQCZ</a></li>
+              <li><a href="https://seekingalpha.com/symbol/NQHU" target="_blank" rel="noopener noreferrer">Hungary NQHU</a></li>
+              <li><a href="https://seekingalpha.com/symbol/GREK" target="_blank" rel="noopener noreferrer">Greece GREK</a></li>
+              <li><a href="https://seekingalpha.com/symbol/QAT" target="_blank" rel="noopener noreferrer">Qatar QAT</a></li>
+              <li><a href="https://seekingalpha.com/symbol/KWT" target="_blank" rel="noopener noreferrer">Kuwait KWT</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-derivatives">
             <h3>Derivatives</h3>
             <ul>
-              <li><a href="https://keyinvest-ch-en.ubs.com" target="_blank">UBS KeyInvest</a></li>
-              <li><a href="https://markets.vontobel.com/en-ch" target="_blank">Vontobel Derinet</a></li>
-              <li><a href="https://www.nasdaq.com/market-activity/quotes/option-chain" target="_blank">Nasdaq Options Chain</a></li>
-              <li><a href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank">Eurex Options Chain</a></li>
-              <li><a href="https://www.cboe.com/market_data_services/us/options/" target="_blank">CBOE</a></li>
-              <li><a href="https://www.cmegroup.com/markets.html" target="_blank">CME</a></li>
-              <li><a href="https://www.stockoptionschannel.com" target="_blank">OptionChannel</a></li>
-              <li><a href="https://www.optionseducation.org" target="_blank">OptionsEducation</a></li>
+              <li><a href="https://keyinvest-ch-en.ubs.com" target="_blank" rel="noopener noreferrer">UBS KeyInvest</a></li>
+              <li><a href="https://markets.vontobel.com/en-ch" target="_blank" rel="noopener noreferrer">Vontobel Derinet</a></li>
+              <li><a href="https://www.nasdaq.com/market-activity/quotes/option-chain" target="_blank" rel="noopener noreferrer">Nasdaq Options Chain</a></li>
+              <li><a href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank" rel="noopener noreferrer">Eurex Options Chain</a></li>
+              <li><a href="https://www.cboe.com/market_data_services/us/options/" target="_blank" rel="noopener noreferrer">CBOE</a></li>
+              <li><a href="https://www.cmegroup.com/markets.html" target="_blank" rel="noopener noreferrer">CME</a></li>
+              <li><a href="https://www.stockoptionschannel.com" target="_blank" rel="noopener noreferrer">OptionChannel</a></li>
+              <li><a href="https://www.optionseducation.org" target="_blank" rel="noopener noreferrer">OptionsEducation</a></li>
             </ul>
           </article>
         </div>
@@ -553,152 +586,152 @@
           <article class="card" id="card-general">
             <h3>General</h3>
             <ul>
-              <li><a href="https://www.ft.com/news-feed" target="_blank">FT News Feed</a></li>
-              <li><a href="https://www.bloomberg.com/europe" target="_blank">Bloomberg</a></li>
-              <li><a href="https://www.cnbc.com/world/?region=world" target="_blank">CNBC</a></li>
-              <li><a href="https://www.wsj.com" target="_blank">Wall Street Journal</a></li>
-              <li><a href="https://www.barrons.com" target="_blank">Barrons</a></li>
-              <li><a href="https://www.reuters.com" target="_blank">Reuters</a></li>
-              <li><a href="https://finance.yahoo.com/news/" target="_blank">Yahoo Finance</a></li>
-              <li><a href="https://www.economist.com" target="_blank">The Economist</a></li>
-              <li><a href="https://www.finews.com/news/english-news" target="_blank">FinNews</a></li>
-              <li><a href="https://www.investing.com/news/latest-news" target="_blank">Investing.com</a></li>
-              <li><a href="https://twitter.com" target="_blank">X</a></li>
-              <li><a href="https://www.japantimes.co.jp" target="_blank">Japan Times</a></li>
-              <li><a href="https://mainichi.jp/english/" target="_blank">Mainichi</a></li>
-              <li><a href="https://www.asahi.com/ajw/" target="_blank">Asahi Shimbun</a></li>
-              <li><a href="https://www3.nhk.or.jp/nhkworld/en/news/" target="_blank">NHK World</a></li>
-              <li><a href="https://www.scmp.com" target="_blank">South China Morning Post</a></li>
-              <li><a href="https://www.chinadaily.com.cn" target="_blank">China Daily</a></li>
-              <li><a href="https://www.globaltimes.cn" target="_blank">Global Times</a></li>
-              <li><a href="https://www.straitstimes.com/global" target="_blank">The Strait Times</a></li>
-              <li><a href="https://timesofindia.indiatimes.com" target="_blank">The Times of India</a></li>
+              <li><a href="https://www.ft.com/news-feed" target="_blank" rel="noopener noreferrer">FT News Feed</a></li>
+              <li><a href="https://www.bloomberg.com/europe" target="_blank" rel="noopener noreferrer">Bloomberg</a></li>
+              <li><a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener noreferrer">CNBC</a></li>
+              <li><a href="https://www.wsj.com" target="_blank" rel="noopener noreferrer">Wall Street Journal</a></li>
+              <li><a href="https://www.barrons.com" target="_blank" rel="noopener noreferrer">Barrons</a></li>
+              <li><a href="https://www.reuters.com" target="_blank" rel="noopener noreferrer">Reuters</a></li>
+              <li><a href="https://finance.yahoo.com/news/" target="_blank" rel="noopener noreferrer">Yahoo Finance</a></li>
+              <li><a href="https://www.economist.com" target="_blank" rel="noopener noreferrer">The Economist</a></li>
+              <li><a href="https://www.finews.com/news/english-news" target="_blank" rel="noopener noreferrer">FinNews</a></li>
+              <li><a href="https://www.investing.com/news/latest-news" target="_blank" rel="noopener noreferrer">Investing.com</a></li>
+              <li><a href="https://twitter.com" target="_blank" rel="noopener noreferrer">X</a></li>
+              <li><a href="https://www.japantimes.co.jp" target="_blank" rel="noopener noreferrer">Japan Times</a></li>
+              <li><a href="https://mainichi.jp/english/" target="_blank" rel="noopener noreferrer">Mainichi</a></li>
+              <li><a href="https://www.asahi.com/ajw/" target="_blank" rel="noopener noreferrer">Asahi Shimbun</a></li>
+              <li><a href="https://www3.nhk.or.jp/nhkworld/en/news/" target="_blank" rel="noopener noreferrer">NHK World</a></li>
+              <li><a href="https://www.scmp.com" target="_blank" rel="noopener noreferrer">South China Morning Post</a></li>
+              <li><a href="https://www.chinadaily.com.cn" target="_blank" rel="noopener noreferrer">China Daily</a></li>
+              <li><a href="https://www.globaltimes.cn" target="_blank" rel="noopener noreferrer">Global Times</a></li>
+              <li><a href="https://www.straitstimes.com/global" target="_blank" rel="noopener noreferrer">The Strait Times</a></li>
+              <li><a href="https://timesofindia.indiatimes.com" target="_blank" rel="noopener noreferrer">The Times of India</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-regional">
             <h3>Regional &amp; Local</h3>
             <ul>
-              <li><a href="https://en.globes.co.il/en/" target="_blank">Globes</a></li>
-              <li><a href="https://www.jpost.com" target="_blank">Jerusalem Post</a></li>
-              <li><a href="https://www.haaretz.com" target="_blank">Haaretz</a></li>
-              <li><a href="https://www.ynetnews.com/category/3083" target="_blank">yNet</a></li>
-              <li><a href="https://www.i24news.tv/en" target="_blank">i24</a></li>
-              <li><a href="https://www.swissinfo.ch/eng" target="_blank">SwissInfo</a></li>
-              <li><a href="https://www.srf.ch/" target="_blank">SRF</a></li>
-              <li><a href="https://www.nzz.ch/" target="_blank">NZZ</a></li>
-              <li><a href="https://www.tagesanzeiger.ch/" target="_blank">Tagesanzeiger</a></li>
-              <li><a href="https://www.20min.ch/" target="_blank">20min</a></li>
-              <li><a href="https://insideparadeplatz.ch/" target="_blank">InsideParadeplatz</a></li>
-              <li><a href="https://www.euronews.com" target="_blank">EuroNews</a></li>
-              <li><a href="https://www.standaard.be/" target="_blank">De Standaard</a></li>
-              <li><a href="https://www.vrt.be/nl/over-de-vrt/nieuws/" target="_blank">VRT</a></li>
-              <li><a href="https://trends.knack.be/kanaal-z/" target="_blank">Trends</a></li>
-              <li><a href="https://www.tijd.be" target="_blank">De Tijd</a></li>
-              <li><a href="https://fd.nl" target="_blank">Financieel Dagblad</a></li>
-              <li><a href="https://www.france24.com/fr/" target="_blank">France24</a></li>
-              <li><a href="https://www.lemonde.fr/" target="_blank">Le Monde</a></li>
-              <li><a href="https://www.lesechos.fr/" target="_blank">Les Echos</a></li>
-              <li><a href="https://www.bbc.com" target="_blank">BBC</a></li>
+              <li><a href="https://en.globes.co.il/en/" target="_blank" rel="noopener noreferrer">Globes</a></li>
+              <li><a href="https://www.jpost.com" target="_blank" rel="noopener noreferrer">Jerusalem Post</a></li>
+              <li><a href="https://www.haaretz.com" target="_blank" rel="noopener noreferrer">Haaretz</a></li>
+              <li><a href="https://www.ynetnews.com/category/3083" target="_blank" rel="noopener noreferrer">yNet</a></li>
+              <li><a href="https://www.i24news.tv/en" target="_blank" rel="noopener noreferrer">i24</a></li>
+              <li><a href="https://www.swissinfo.ch/eng" target="_blank" rel="noopener noreferrer">SwissInfo</a></li>
+              <li><a href="https://www.srf.ch/" target="_blank" rel="noopener noreferrer">SRF</a></li>
+              <li><a href="https://www.nzz.ch/" target="_blank" rel="noopener noreferrer">NZZ</a></li>
+              <li><a href="https://www.tagesanzeiger.ch/" target="_blank" rel="noopener noreferrer">Tagesanzeiger</a></li>
+              <li><a href="https://www.20min.ch/" target="_blank" rel="noopener noreferrer">20min</a></li>
+              <li><a href="https://insideparadeplatz.ch/" target="_blank" rel="noopener noreferrer">InsideParadeplatz</a></li>
+              <li><a href="https://www.euronews.com" target="_blank" rel="noopener noreferrer">EuroNews</a></li>
+              <li><a href="https://www.standaard.be/" target="_blank" rel="noopener noreferrer">De Standaard</a></li>
+              <li><a href="https://www.vrt.be/nl/over-de-vrt/nieuws/" target="_blank" rel="noopener noreferrer">VRT</a></li>
+              <li><a href="https://trends.knack.be/kanaal-z/" target="_blank" rel="noopener noreferrer">Trends</a></li>
+              <li><a href="https://www.tijd.be" target="_blank" rel="noopener noreferrer">De Tijd</a></li>
+              <li><a href="https://fd.nl" target="_blank" rel="noopener noreferrer">Financieel Dagblad</a></li>
+              <li><a href="https://www.france24.com/fr/" target="_blank" rel="noopener noreferrer">France24</a></li>
+              <li><a href="https://www.lemonde.fr/" target="_blank" rel="noopener noreferrer">Le Monde</a></li>
+              <li><a href="https://www.lesechos.fr/" target="_blank" rel="noopener noreferrer">Les Echos</a></li>
+              <li><a href="https://www.bbc.com" target="_blank" rel="noopener noreferrer">BBC</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-us-global">
             <h3>US &amp; Global Press</h3>
             <ul>
-              <li><a href="https://www.nytimes.com/section/business" target="_blank">NY Times (Business)</a></li>
-              <li><a href="https://edition.cnn.com/business" target="_blank">CNN Business</a></li>
-              <li><a href="https://apnews.com" target="_blank">AP News</a></li>
-              <li><a href="https://www.finma.ch/en/news/" target="_blank">FINMA</a></li>
-              <li><a href="https://www.thetimes.co.uk" target="_blank">The Times</a></li>
-              <li><a href="https://gulfnews.com" target="_blank">Gulf News</a></li>
-              <li><a href="https://www.arabnews.com" target="_blank">Arab News</a></li>
-              <li><a href="https://dailystar.com.lb/news/" target="_blank">Daily Star Lebanon</a></li>
+              <li><a href="https://www.nytimes.com/section/business" target="_blank" rel="noopener noreferrer">NY Times (Business)</a></li>
+              <li><a href="https://edition.cnn.com/business" target="_blank" rel="noopener noreferrer">CNN Business</a></li>
+              <li><a href="https://apnews.com" target="_blank" rel="noopener noreferrer">AP News</a></li>
+              <li><a href="https://www.finma.ch/en/news/" target="_blank" rel="noopener noreferrer">FINMA</a></li>
+              <li><a href="https://www.thetimes.co.uk" target="_blank" rel="noopener noreferrer">The Times</a></li>
+              <li><a href="https://gulfnews.com" target="_blank" rel="noopener noreferrer">Gulf News</a></li>
+              <li><a href="https://www.arabnews.com" target="_blank" rel="noopener noreferrer">Arab News</a></li>
+              <li><a href="https://dailystar.com.lb/news/" target="_blank" rel="noopener noreferrer">Daily Star Lebanon</a></li>
             </ul>
             <div class="sub-header">Africa / Latin America / Sports</div>
             <ul>
-              <li><a href="https://www.bbc.com/news/world/africa" target="_blank">BBC Africa</a></li>
-              <li><a href="https://edition.cnn.com/world/africa" target="_blank">CNN Africa</a></li>
-              <li><a href="https://www.panapress.com/lang2-index.html" target="_blank">Pan African Press</a></li>
-              <li><a href="https://www.bostonglobe.com" target="_blank">Boston Globe</a></li>
-              <li><a href="https://www.nytimes.com" target="_blank">NY Times</a></li>
-              <li><a href="https://www.nbcnews.com" target="_blank">NBC News</a></li>
-              <li><a href="https://www.washingtonpost.com" target="_blank">Washington Post</a></li>
-              <li><a href="https://www.chicagotribune.com" target="_blank">Chicago Tribune</a></li>
-              <li><a href="https://www.denverpost.com" target="_blank">Denver Post</a></li>
-              <li><a href="https://www.sfchronicle.com" target="_blank">San Francisco Chronicle</a></li>
-              <li><a href="https://edition.cnn.com/us" target="_blank">CNN US</a></li>
-              <li><a href="https://www.foxnews.com/us" target="_blank">Fox News</a></li>
-              <li><a href="https://apnews.com/hub/latin-america" target="_blank">AP Latin America</a></li>
-              <li><a href="https://english.elpais.com/news/latinoamerica/" target="_blank">El Pais Latam</a></li>
-              <li><a href="https://www.npr.org/sections/latin-america/" target="_blank">NPR Latam</a></li>
-              <li><a href="https://www.bbc.com/sport" target="_blank">BBC Sport</a></li>
-              <li><a href="https://sporza.be/nl/" target="_blank">Sporza</a></li>
-              <li><a href="https://www.espn.com" target="_blank">ESPN</a></li>
-              <li><a href="https://www.mlb.com" target="_blank">MLB</a></li>
-              <li><a href="https://www.nfl.com" target="_blank">NFL</a></li>
-              <li><a href="https://www.nba.com" target="_blank">NBA</a></li>
-              <li><a href="https://www.nhl.com" target="_blank">NHL</a></li>
+              <li><a href="https://www.bbc.com/news/world/africa" target="_blank" rel="noopener noreferrer">BBC Africa</a></li>
+              <li><a href="https://edition.cnn.com/world/africa" target="_blank" rel="noopener noreferrer">CNN Africa</a></li>
+              <li><a href="https://www.panapress.com/lang2-index.html" target="_blank" rel="noopener noreferrer">Pan African Press</a></li>
+              <li><a href="https://www.bostonglobe.com" target="_blank" rel="noopener noreferrer">Boston Globe</a></li>
+              <li><a href="https://www.nytimes.com" target="_blank" rel="noopener noreferrer">NY Times</a></li>
+              <li><a href="https://www.nbcnews.com" target="_blank" rel="noopener noreferrer">NBC News</a></li>
+              <li><a href="https://www.washingtonpost.com" target="_blank" rel="noopener noreferrer">Washington Post</a></li>
+              <li><a href="https://www.chicagotribune.com" target="_blank" rel="noopener noreferrer">Chicago Tribune</a></li>
+              <li><a href="https://www.denverpost.com" target="_blank" rel="noopener noreferrer">Denver Post</a></li>
+              <li><a href="https://www.sfchronicle.com" target="_blank" rel="noopener noreferrer">San Francisco Chronicle</a></li>
+              <li><a href="https://edition.cnn.com/us" target="_blank" rel="noopener noreferrer">CNN US</a></li>
+              <li><a href="https://www.foxnews.com/us" target="_blank" rel="noopener noreferrer">Fox News</a></li>
+              <li><a href="https://apnews.com/hub/latin-america" target="_blank" rel="noopener noreferrer">AP Latin America</a></li>
+              <li><a href="https://english.elpais.com/news/latinoamerica/" target="_blank" rel="noopener noreferrer">El Pais Latam</a></li>
+              <li><a href="https://www.npr.org/sections/latin-america/" target="_blank" rel="noopener noreferrer">NPR Latam</a></li>
+              <li><a href="https://www.bbc.com/sport" target="_blank" rel="noopener noreferrer">BBC Sport</a></li>
+              <li><a href="https://sporza.be/nl/" target="_blank" rel="noopener noreferrer">Sporza</a></li>
+              <li><a href="https://www.espn.com" target="_blank" rel="noopener noreferrer">ESPN</a></li>
+              <li><a href="https://www.mlb.com" target="_blank" rel="noopener noreferrer">MLB</a></li>
+              <li><a href="https://www.nfl.com" target="_blank" rel="noopener noreferrer">NFL</a></li>
+              <li><a href="https://www.nba.com" target="_blank" rel="noopener noreferrer">NBA</a></li>
+              <li><a href="https://www.nhl.com" target="_blank" rel="noopener noreferrer">NHL</a></li>
             </ul>
             <div class="sub-header">GeoPolitics</div>
             <ul>
-              <li><a href="https://en.wikipedia.org/wiki/2026_national_electoral_calendar" target="_blank">2026 Election Calendar</a></li>
-              <li><a href="https://www.predictit.org" target="_blank">PredictIt</a></li>
-              <li><a href="https://polymarket.com" target="_blank">PolyMarket</a></li>
-              <li><a href="https://www.politico.com/news/elections" target="_blank">Politico Elections</a></li>
-              <li><a href="https://www.ft.com/geopolitics" target="_blank">FT Geopolitics</a></li>
-              <li><a href="https://www.cfr.org" target="_blank">Council on Foreign Relations</a></li>
-              <li><a href="https://worldview.stratfor.com" target="_blank">Stratfor</a></li>
-              <li><a href="https://zeihan.com" target="_blank">Zeihan</a></li>
+              <li><a href="https://en.wikipedia.org/wiki/2026_national_electoral_calendar" target="_blank" rel="noopener noreferrer">2026 Election Calendar</a></li>
+              <li><a href="https://www.predictit.org" target="_blank" rel="noopener noreferrer">PredictIt</a></li>
+              <li><a href="https://polymarket.com" target="_blank" rel="noopener noreferrer">PolyMarket</a></li>
+              <li><a href="https://www.politico.com/news/elections" target="_blank" rel="noopener noreferrer">Politico Elections</a></li>
+              <li><a href="https://www.ft.com/geopolitics" target="_blank" rel="noopener noreferrer">FT Geopolitics</a></li>
+              <li><a href="https://www.cfr.org" target="_blank" rel="noopener noreferrer">Council on Foreign Relations</a></li>
+              <li><a href="https://worldview.stratfor.com" target="_blank" rel="noopener noreferrer">Stratfor</a></li>
+              <li><a href="https://zeihan.com" target="_blank" rel="noopener noreferrer">Zeihan</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-economic-calendar">
             <h3>Economic Calendar</h3>
             <ul>
-              <li><a href="https://www.investing.com/economic-calendar/" target="_blank">Investing.com Economic Calendar</a></li>
-              <li><a href="https://www.dailyfx.com/economic-calendar#next-fourteen-days" target="_blank">DailyFX Economic Calendar</a></li>
-              <li><a href="https://app.koyfin.com/ecal" target="_blank">KoyFin Economic Calendar</a></li>
-              <li><a href="https://tradingeconomics.com/calendar" target="_blank">Trading Economics Calendar</a></li>
-              <li><a href="https://www.marketwatch.com/economy-politics/calendar" target="_blank">MarketWatch Economic Calendar</a></li>
-              <li><a href="https://www.forexfactory.com/calendar" target="_blank">Forex Factory Calendar</a></li>
+              <li><a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener noreferrer">Investing.com Economic Calendar</a></li>
+              <li><a href="https://www.dailyfx.com/economic-calendar#next-fourteen-days" target="_blank" rel="noopener noreferrer">DailyFX Economic Calendar</a></li>
+              <li><a href="https://app.koyfin.com/ecal" target="_blank" rel="noopener noreferrer">KoyFin Economic Calendar</a></li>
+              <li><a href="https://tradingeconomics.com/calendar" target="_blank" rel="noopener noreferrer">Trading Economics Calendar</a></li>
+              <li><a href="https://www.marketwatch.com/economy-politics/calendar" target="_blank" rel="noopener noreferrer">MarketWatch Economic Calendar</a></li>
+              <li><a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer">Forex Factory Calendar</a></li>
             </ul>
             <div class="sub-header">Data Releases &amp; Nowcasts</div>
             <ul>
-              <li><a href="https://fred.stlouisfed.org/releases/calendar" target="_blank">FRED Release Calendar</a></li>
-              <li><a href="https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting" target="_blank">Inflation Nowcasting (Cleveland Fed)</a></li>
-              <li><a href="https://www.atlantafed.org/cqer/research/gdpnow" target="_blank">GDPNow (Atlanta Fed)</a></li>
-              <li><a href="https://www.newyorkfed.org/research/policy/nowcast" target="_blank">NY Fed Nowcast</a></li>
-              <li><a href="https://www.bls.gov/schedule/news_release.htm" target="_blank">BLS Release Schedule (CPI, NFP)</a></li>
-              <li><a href="https://www.census.gov/economic-indicators/" target="_blank">Census Bureau Economic Indicators</a></li>
-              <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datacurrent.html" target="_blank">Damodaran Data</a></li>
+              <li><a href="https://fred.stlouisfed.org/releases/calendar" target="_blank" rel="noopener noreferrer">FRED Release Calendar</a></li>
+              <li><a href="https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting" target="_blank" rel="noopener noreferrer">Inflation Nowcasting (Cleveland Fed)</a></li>
+              <li><a href="https://www.atlantafed.org/cqer/research/gdpnow" target="_blank" rel="noopener noreferrer">GDPNow (Atlanta Fed)</a></li>
+              <li><a href="https://www.newyorkfed.org/research/policy/nowcast" target="_blank" rel="noopener noreferrer">NY Fed Nowcast</a></li>
+              <li><a href="https://www.bls.gov/schedule/news_release.htm" target="_blank" rel="noopener noreferrer">BLS Release Schedule (CPI, NFP)</a></li>
+              <li><a href="https://www.census.gov/economic-indicators/" target="_blank" rel="noopener noreferrer">Census Bureau Economic Indicators</a></li>
+              <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datacurrent.html" target="_blank" rel="noopener noreferrer">Damodaran Data</a></li>
             </ul>
             <div class="sub-header">Central Bank Calendars</div>
             <ul>
-              <li><a href="https://www.federalreserve.gov/newsevents/calendar.htm" target="_blank">Fed Calendar (FOMC)</a></li>
-              <li><a href="https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html" target="_blank">ECB Governing Council</a></li>
-              <li><a href="https://www.boj.or.jp/en/mopo/mpmdeci/index.htm" target="_blank">BoJ Policy Decisions</a></li>
-              <li><a href="https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes" target="_blank">BoE MPC</a></li>
-              <li><a href="https://www.snb.ch/en/the-snb/mandates-goals/monetary-policy/monetary-policy-decisions" target="_blank">SNB Monetary Policy</a></li>
+              <li><a href="https://www.federalreserve.gov/newsevents/calendar.htm" target="_blank" rel="noopener noreferrer">Fed Calendar (FOMC)</a></li>
+              <li><a href="https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html" target="_blank" rel="noopener noreferrer">ECB Governing Council</a></li>
+              <li><a href="https://www.boj.or.jp/en/mopo/mpmdeci/index.htm" target="_blank" rel="noopener noreferrer">BoJ Policy Decisions</a></li>
+              <li><a href="https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes" target="_blank" rel="noopener noreferrer">BoE MPC</a></li>
+              <li><a href="https://www.snb.ch/en/the-snb/mandates-goals/monetary-policy/monetary-policy-decisions" target="_blank" rel="noopener noreferrer">SNB Monetary Policy</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-earnings-calendar">
             <h3>Earnings Calendar</h3>
             <ul>
-              <li><a href="https://www.investing.com/earnings-calendar/" target="_blank">Investing.com Earnings Calendar</a></li>
-              <li><a href="https://app.koyfin.com/earc" target="_blank">KoyFin Earnings Calendar</a></li>
-              <li><a href="https://www.nasdaq.com/market-activity/earnings" target="_blank">Nasdaq Earnings</a></li>
-              <li><a href="https://finance.yahoo.com/calendar/earnings/" target="_blank">Yahoo Finance Earnings</a></li>
-              <li><a href="https://www.earningswhispers.com/calendar" target="_blank">Earnings Whispers</a></li>
-              <li><a href="https://www.zacks.com/earnings/earnings-calendar" target="_blank">Zacks Earnings Calendar</a></li>
+              <li><a href="https://www.investing.com/earnings-calendar/" target="_blank" rel="noopener noreferrer">Investing.com Earnings Calendar</a></li>
+              <li><a href="https://app.koyfin.com/earc" target="_blank" rel="noopener noreferrer">KoyFin Earnings Calendar</a></li>
+              <li><a href="https://www.nasdaq.com/market-activity/earnings" target="_blank" rel="noopener noreferrer">Nasdaq Earnings</a></li>
+              <li><a href="https://finance.yahoo.com/calendar/earnings/" target="_blank" rel="noopener noreferrer">Yahoo Finance Earnings</a></li>
+              <li><a href="https://www.earningswhispers.com/calendar" target="_blank" rel="noopener noreferrer">Earnings Whispers</a></li>
+              <li><a href="https://www.zacks.com/earnings/earnings-calendar" target="_blank" rel="noopener noreferrer">Zacks Earnings Calendar</a></li>
             </ul>
             <div class="sub-header">Estimates &amp; Transcripts</div>
             <ul>
-              <li><a href="https://seekingalpha.com/earnings/earnings-calendar" target="_blank">Seeking Alpha Earnings</a></li>
-              <li><a href="https://www.estimize.com" target="_blank">Estimize (Crowdsourced Estimates)</a></li>
-              <li><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-Q&dateb=&owner=include&count=40" target="_blank">SEC 10-Q Filings</a></li>
-              <li><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-K&dateb=&owner=include&count=40" target="_blank">SEC 10-K Filings</a></li>
+              <li><a href="https://seekingalpha.com/earnings/earnings-calendar" target="_blank" rel="noopener noreferrer">Seeking Alpha Earnings</a></li>
+              <li><a href="https://www.estimize.com" target="_blank" rel="noopener noreferrer">Estimize (Crowdsourced Estimates)</a></li>
+              <li><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-Q&dateb=&owner=include&count=40" target="_blank" rel="noopener noreferrer">SEC 10-Q Filings</a></li>
+              <li><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-K&dateb=&owner=include&count=40" target="_blank" rel="noopener noreferrer">SEC 10-K Filings</a></li>
             </ul>
           </article>
 
@@ -706,28 +739,28 @@
             <h3>Data &amp; Market News</h3>
             <div class="sub-header">Currencies</div>
             <ul>
-              <li><a href="https://www.ft.com/currencies" target="_blank">FT - Currencies</a></li>
-              <li><a href="https://www.bloomberg.com/fx-center" target="_blank">Bloomberg FX Center</a></li>
-              <li><a href="https://www.investing.com/news/forex-news" target="_blank">Investing.com FX</a></li>
-              <li><a href="https://www.dailyfx.com/market-news" target="_blank">Daily FX</a></li>
+              <li><a href="https://www.ft.com/currencies" target="_blank" rel="noopener noreferrer">FT - Currencies</a></li>
+              <li><a href="https://www.bloomberg.com/fx-center" target="_blank" rel="noopener noreferrer">Bloomberg FX Center</a></li>
+              <li><a href="https://www.investing.com/news/forex-news" target="_blank" rel="noopener noreferrer">Investing.com FX</a></li>
+              <li><a href="https://www.dailyfx.com/market-news" target="_blank" rel="noopener noreferrer">Daily FX</a></li>
             </ul>
             <div class="sub-header">Commodities</div>
             <ul>
-              <li><a href="https://www.ft.com/commodities" target="_blank">FT - Commodities</a></li>
-              <li><a href="https://www.bloomberg.com/commodities" target="_blank">Bloomberg Commodities</a></li>
-              <li><a href="https://www.wsj.com/finance/commodities-futures" target="_blank">WSJ Commodities</a></li>
-              <li><a href="https://www.investing.com/news/commodities-news" target="_blank">Investing.com Commodities</a></li>
-              <li><a href="https://www.reuters.com/markets/commodities/" target="_blank">Reuters Commodities</a></li>
-              <li><a href="https://seekingalpha.com/market-news/commodities" target="_blank">Seeking Alpha Commodities</a></li>
-              <li><a href="https://asia.nikkei.com/Business/Markets/Commodities" target="_blank">Nikkei Asia Commodities</a></li>
-              <li><a href="https://www.spglobal.com/commodityinsights/en" target="_blank">S&P Global Commodity Insights</a></li>
-              <li><a href="https://www.cftc.gov" target="_blank">CFTC</a></li>
-              <li><a href="https://oilprice.com/Latest-Energy-News/World-News/" target="_blank">OilPrice.com</a></li>
-              <li><a href="https://www.worldbank.org/en/research/commodity-markets" target="_blank">World Bank Commodity Markets</a></li>
+              <li><a href="https://www.ft.com/commodities" target="_blank" rel="noopener noreferrer">FT - Commodities</a></li>
+              <li><a href="https://www.bloomberg.com/commodities" target="_blank" rel="noopener noreferrer">Bloomberg Commodities</a></li>
+              <li><a href="https://www.wsj.com/finance/commodities-futures" target="_blank" rel="noopener noreferrer">WSJ Commodities</a></li>
+              <li><a href="https://www.investing.com/news/commodities-news" target="_blank" rel="noopener noreferrer">Investing.com Commodities</a></li>
+              <li><a href="https://www.reuters.com/markets/commodities/" target="_blank" rel="noopener noreferrer">Reuters Commodities</a></li>
+              <li><a href="https://seekingalpha.com/market-news/commodities" target="_blank" rel="noopener noreferrer">Seeking Alpha Commodities</a></li>
+              <li><a href="https://asia.nikkei.com/Business/Markets/Commodities" target="_blank" rel="noopener noreferrer">Nikkei Asia Commodities</a></li>
+              <li><a href="https://www.spglobal.com/commodityinsights/en" target="_blank" rel="noopener noreferrer">S&P Global Commodity Insights</a></li>
+              <li><a href="https://www.cftc.gov" target="_blank" rel="noopener noreferrer">CFTC</a></li>
+              <li><a href="https://oilprice.com/Latest-Energy-News/World-News/" target="_blank" rel="noopener noreferrer">OilPrice.com</a></li>
+              <li><a href="https://www.worldbank.org/en/research/commodity-markets" target="_blank" rel="noopener noreferrer">World Bank Commodity Markets</a></li>
             </ul>
             <div class="sub-header">Equities</div>
             <ul>
-              <li><a href="https://app.koyfin.com/mov" target="_blank">Koyfin Movers</a></li>
+              <li><a href="https://app.koyfin.com/mov" target="_blank" rel="noopener noreferrer">Koyfin Movers</a></li>
             </ul>
           </article>
         </div>
@@ -741,71 +774,71 @@
           <article class="card" id="card-charts">
             <h3>Charts</h3>
             <ul>
-              <li><a href="https://www.barchart.com" target="_blank">BarChart</a></li>
-              <li><a href="https://www.tradingview.com" target="_blank">TradingView</a></li>
-              <li><a href="https://stockcharts.com" target="_blank">StockCharts</a></li>
+              <li><a href="https://www.barchart.com" target="_blank" rel="noopener noreferrer">BarChart</a></li>
+              <li><a href="https://www.tradingview.com" target="_blank" rel="noopener noreferrer">TradingView</a></li>
+              <li><a href="https://stockcharts.com" target="_blank" rel="noopener noreferrer">StockCharts</a></li>
             </ul>
             <div class="sub-header">Heatmaps &amp; Market Maps</div>
             <ul>
-              <li><a href="https://finviz.com/map.ashx" target="_blank">Finviz S&amp;P 500 Map</a></li>
-              <li><a href="https://finviz.com/map.ashx?t=geo" target="_blank">Finviz World Map</a></li>
-              <li><a href="https://finviz.com/map.ashx?t=etf" target="_blank">Finviz ETF Map</a></li>
-              <li><a href="https://www.tradingview.com/heatmap/stock/" target="_blank">TradingView Stock Heatmap</a></li>
-              <li><a href="https://www.tradingview.com/heatmap/etf/" target="_blank">TradingView ETF Heatmap</a></li>
-              <li><a href="https://www.tradingview.com/heatmap/crypto/" target="_blank">TradingView Crypto Heatmap</a></li>
-              <li><a href="https://stockcharts.com/freecharts/rrg/" target="_blank">StockCharts Relative Rotation Graph</a></li>
+              <li><a href="https://finviz.com/map.ashx" target="_blank" rel="noopener noreferrer">Finviz S&amp;P 500 Map</a></li>
+              <li><a href="https://finviz.com/map.ashx?t=geo" target="_blank" rel="noopener noreferrer">Finviz World Map</a></li>
+              <li><a href="https://finviz.com/map.ashx?t=etf" target="_blank" rel="noopener noreferrer">Finviz ETF Map</a></li>
+              <li><a href="https://www.tradingview.com/heatmap/stock/" target="_blank" rel="noopener noreferrer">TradingView Stock Heatmap</a></li>
+              <li><a href="https://www.tradingview.com/heatmap/etf/" target="_blank" rel="noopener noreferrer">TradingView ETF Heatmap</a></li>
+              <li><a href="https://www.tradingview.com/heatmap/crypto/" target="_blank" rel="noopener noreferrer">TradingView Crypto Heatmap</a></li>
+              <li><a href="https://stockcharts.com/freecharts/rrg/" target="_blank" rel="noopener noreferrer">StockCharts Relative Rotation Graph</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-screener">
             <h3>Screener</h3>
             <ul>
-              <li><a href="https://finviz.com" target="_blank">FinViz</a></li>
-              <li><a href="https://app.koyfin.com/ms" target="_blank">Koyfin</a></li>
-              <li><a href="https://etfdb.com/tool/etf-stock-exposure-tool/" target="_blank">ETF Stock Exposure</a></li>
-              <li><a href="https://finance.yahoo.com/screener/" target="_blank">Yahoo Screener</a></li>
-              <li><a href="https://www.gurufocus.com/screener" target="_blank">GuruFocus</a></li>
-              <li><a href="https://www.screeningtale.com" target="_blank">ScreeningTale</a></li>
+              <li><a href="https://finviz.com" target="_blank" rel="noopener noreferrer">FinViz</a></li>
+              <li><a href="https://app.koyfin.com/ms" target="_blank" rel="noopener noreferrer">Koyfin</a></li>
+              <li><a href="https://etfdb.com/tool/etf-stock-exposure-tool/" target="_blank" rel="noopener noreferrer">ETF Stock Exposure</a></li>
+              <li><a href="https://finance.yahoo.com/screener/" target="_blank" rel="noopener noreferrer">Yahoo Screener</a></li>
+              <li><a href="https://www.gurufocus.com/screener" target="_blank" rel="noopener noreferrer">GuruFocus</a></li>
+              <li><a href="https://www.screeningtale.com" target="_blank" rel="noopener noreferrer">ScreeningTale</a></li>
             </ul>
             <div class="sub-header">Sector &amp; Industry Groups</div>
             <ul>
-              <li><a href="https://finviz.com/groups.ashx?g=sector&v=110&o=name" target="_blank">Finviz Sectors Overview</a></li>
-              <li><a href="https://finviz.com/groups.ashx?g=industry&v=110&o=name" target="_blank">Finviz Industries Overview</a></li>
-              <li><a href="https://finviz.com/groups.ashx?g=country&v=110&o=name" target="_blank">Finviz Countries Overview</a></li>
-              <li><a href="https://finviz.com/groups.ashx?g=sector&v=140&o=name" target="_blank">Finviz Sector Performance</a></li>
-              <li><a href="https://www.barchart.com/stocks/sectors/rankings" target="_blank">Barchart Sector Rankings</a></li>
-              <li><a href="https://app.koyfin.com/g" target="_blank">Koyfin Groups</a></li>
+              <li><a href="https://finviz.com/groups.ashx?g=sector&v=110&o=name" target="_blank" rel="noopener noreferrer">Finviz Sectors Overview</a></li>
+              <li><a href="https://finviz.com/groups.ashx?g=industry&v=110&o=name" target="_blank" rel="noopener noreferrer">Finviz Industries Overview</a></li>
+              <li><a href="https://finviz.com/groups.ashx?g=country&v=110&o=name" target="_blank" rel="noopener noreferrer">Finviz Countries Overview</a></li>
+              <li><a href="https://finviz.com/groups.ashx?g=sector&v=140&o=name" target="_blank" rel="noopener noreferrer">Finviz Sector Performance</a></li>
+              <li><a href="https://www.barchart.com/stocks/sectors/rankings" target="_blank" rel="noopener noreferrer">Barchart Sector Rankings</a></li>
+              <li><a href="https://app.koyfin.com/g" target="_blank" rel="noopener noreferrer">Koyfin Groups</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-etfs">
             <h3>ETFs</h3>
             <ul>
-              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/global_and_regions" target="_blank">Global &amp; Regional</a></li>
-              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/countries" target="_blank">Countries</a></li>
-              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/emerging_markets" target="_blank">Emerging Markets</a></li>
-              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/sectors" target="_blank">Sectors</a></li>
-              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/themes_and_subsectors" target="_blank">Subsectors &amp; Themes</a></li>
-              <li><a href="https://etfdb.com/compare/market-cap/" target="_blank">US Ranked by AuM</a></li>
-              <li><a href="https://etfdb.com/compare/volume/" target="_blank">US Ranked by Volume</a></li>
-              <li><a href="https://etfdb.com/compare/lowest-expense-ratio/" target="_blank">US Lowest TER</a></li>
-              <li><a href="https://www.ishares.com/us" target="_blank">iShares</a></li>
-              <li><a href="https://www.ubs.com/ch/en/assetmanagement/funds/etf.html" target="_blank">UBS ETFs</a></li>
-              <li><a href="https://www.etfchannel.com" target="_blank">ETF Channel</a></li>
-              <li><a href="https://www.morningstar.com/etfs" target="_blank">Morningstar</a></li>
+              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/global_and_regions" target="_blank" rel="noopener noreferrer">Global &amp; Regional</a></li>
+              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/countries" target="_blank" rel="noopener noreferrer">Countries</a></li>
+              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/emerging_markets" target="_blank" rel="noopener noreferrer">Emerging Markets</a></li>
+              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/sectors" target="_blank" rel="noopener noreferrer">Sectors</a></li>
+              <li><a href="https://seekingalpha.com/etfs-and-funds/etf-tables/themes_and_subsectors" target="_blank" rel="noopener noreferrer">Subsectors &amp; Themes</a></li>
+              <li><a href="https://etfdb.com/compare/market-cap/" target="_blank" rel="noopener noreferrer">US Ranked by AuM</a></li>
+              <li><a href="https://etfdb.com/compare/volume/" target="_blank" rel="noopener noreferrer">US Ranked by Volume</a></li>
+              <li><a href="https://etfdb.com/compare/lowest-expense-ratio/" target="_blank" rel="noopener noreferrer">US Lowest TER</a></li>
+              <li><a href="https://www.ishares.com/us" target="_blank" rel="noopener noreferrer">iShares</a></li>
+              <li><a href="https://www.ubs.com/ch/en/assetmanagement/funds/etf.html" target="_blank" rel="noopener noreferrer">UBS ETFs</a></li>
+              <li><a href="https://www.etfchannel.com" target="_blank" rel="noopener noreferrer">ETF Channel</a></li>
+              <li><a href="https://www.morningstar.com/etfs" target="_blank" rel="noopener noreferrer">Morningstar</a></li>
             </ul>
           </article>
 
           <article class="card" id="card-research">
             <h3>Research</h3>
             <ul>
-              <li><a href="https://neo.ubs.com/static/login.html?origin=%2finsight" target="_blank">UBS Investment Bank (login)</a></li>
-              <li><a href="https://www.ubs.com/global/en/wealth-management/insights.html" target="_blank">UBS Wealth Management</a></li>
-              <li><a href="https://www.ishares.com/us/insights#market-insights" target="_blank">BlackRock Market Insights</a></li>
-              <li><a href="https://www.tipranks.com/dashboard" target="_blank">TipRanks</a></li>
-              <li><a href="https://www.tandfonline.com/journals/ufaj20" target="_blank">Financial Analyst Journal</a></li>
-              <li><a href="https://rpc.cfainstitute.org/en/research" target="_blank">CFA Research &amp; Policy</a></li>
-              <li><a href="https://my.cfainstitute.org/Refresher-Readings-Collection" target="_blank">CFA Refresher Readings</a></li>
+              <li><a href="https://neo.ubs.com/static/login.html?origin=%2finsight" target="_blank" rel="noopener noreferrer">UBS Investment Bank (login)</a></li>
+              <li><a href="https://www.ubs.com/global/en/wealth-management/insights.html" target="_blank" rel="noopener noreferrer">UBS Wealth Management</a></li>
+              <li><a href="https://www.ishares.com/us/insights#market-insights" target="_blank" rel="noopener noreferrer">BlackRock Market Insights</a></li>
+              <li><a href="https://www.tipranks.com/dashboard" target="_blank" rel="noopener noreferrer">TipRanks</a></li>
+              <li><a href="https://www.tandfonline.com/journals/ufaj20" target="_blank" rel="noopener noreferrer">Financial Analyst Journal</a></li>
+              <li><a href="https://rpc.cfainstitute.org/en/research" target="_blank" rel="noopener noreferrer">CFA Research &amp; Policy</a></li>
+              <li><a href="https://my.cfainstitute.org/Refresher-Readings-Collection" target="_blank" rel="noopener noreferrer">CFA Refresher Readings</a></li>
             </ul>
           </article>
         </div>
@@ -894,7 +927,9 @@
           if(entry.isIntersecting){
             const id = entry.target.id;
             navLinks.forEach(link => {
-              link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+              const isActive = link.getAttribute('href') === '#' + id;
+              link.classList.toggle('active', isActive);
+              link.setAttribute('aria-current', isActive ? 'page' : 'false');
             });
           }
         });
