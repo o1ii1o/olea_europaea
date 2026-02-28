@@ -102,7 +102,7 @@
       margin:0 auto;
       padding:20px 20px 60px;
       display:grid;
-      grid-template-columns: 1fr 300px;
+      grid-template-columns: 1fr 340px;
       gap:24px;
       align-items:start;
     }
@@ -138,6 +138,9 @@
       font-size:13px;
     }
     .sidebar-panel li a:hover{ color:var(--accent-hover); text-decoration:underline; }
+    .snapshot-panel{ padding:16px 0 0 0; overflow:hidden; }
+    .snapshot-panel h4{ padding:0 16px; }
+    .snapshot-panel .tradingview-widget-container{ width:100%; }
 
     /* ── Sections ── */
     .section-block{ }
@@ -685,35 +688,96 @@
       </div>
     </section>
 
-    <!-- Sidebar -->
+    <!-- Sidebar: Market Snapshot -->
     <aside class="sidebar">
-      <div class="sidebar-panel">
-        <h4>Quick Access</h4>
-        <ul>
-          <li><a href="https://www.barchart.com" target="_blank">BarChart</a></li>
-          <li><a href="https://www.tradingview.com" target="_blank">TradingView</a></li>
-          <li><a href="https://finviz.com" target="_blank">FinViz</a></li>
-          <li><a href="https://app.koyfin.com/ms" target="_blank">Koyfin</a></li>
-          <li><a href="https://www.ft.com/news-feed" target="_blank">FT News Feed</a></li>
-          <li><a href="https://www.bloomberg.com/europe" target="_blank">Bloomberg</a></li>
-        </ul>
-      </div>
-
-      <div class="sidebar-panel">
-        <h4>Notebooks</h4>
-        <ul>
-          <li><a href="https://onedrive.live.com/view.aspx?resid=1FE8B0EC508EAAEA%21634&id=documents" target="_blank">Olea Europaea (OneNote)</a></li>
-        </ul>
-      </div>
-
-      <div class="sidebar-panel">
-        <h4>Data &amp; Calendars</h4>
-        <ul>
-          <li><a href="https://fred.stlouisfed.org/releases/calendar" target="_blank">FRED Release Calendar</a></li>
-          <li><a href="https://app.koyfin.com/ecal" target="_blank">KoyFin Econ Calendar</a></li>
-          <li><a href="https://app.koyfin.com/earc" target="_blank">KoyFin Earnings</a></li>
-          <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datacurrent.html" target="_blank">Damodaran Data</a></li>
-        </ul>
+      <div class="sidebar-panel snapshot-panel">
+        <h4>Market Snapshot</h4>
+        <div class="tradingview-widget-container">
+          <div class="tradingview-widget-container__widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js" async>
+          {
+            "colorTheme": "light",
+            "dateRange": "1D",
+            "showChart": false,
+            "locale": "en",
+            "largeChartUrl": "",
+            "isTransparent": true,
+            "showSymbolLogo": false,
+            "showFloatingTooltip": true,
+            "width": "100%",
+            "height": "660",
+            "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
+            "plotLineColorFalling": "rgba(255, 59, 59, 1)",
+            "gridLineColor": "rgba(240, 243, 250, 0)",
+            "scaleFontColor": "rgba(91, 107, 125, 1)",
+            "belowLineFillColorGrowing": "rgba(41, 98, 255, 0.12)",
+            "belowLineFillColorFalling": "rgba(255, 59, 59, 0.12)",
+            "belowLineFillColorGrowingBottom": "rgba(41, 98, 255, 0)",
+            "belowLineFillColorFallingBottom": "rgba(255, 59, 59, 0)",
+            "symbolActiveColor": "rgba(41, 98, 255, 0.06)",
+            "tabs": [
+              {
+                "title": "Indices",
+                "symbols": [
+                  { "s": "FOREXCOM:SPXUSD", "d": "S&P 500" },
+                  { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
+                  { "s": "FOREXCOM:DJI", "d": "Dow 30" },
+                  { "s": "INDEX:SX5E", "d": "Euro Stoxx 50" },
+                  { "s": "FOREXCOM:UKXGBP", "d": "FTSE 100" },
+                  { "s": "INDEX:NKY", "d": "Nikkei 225" },
+                  { "s": "INDEX:DAX", "d": "DAX" },
+                  { "s": "INDEX:SMI", "d": "SMI" }
+                ]
+              },
+              {
+                "title": "FX",
+                "symbols": [
+                  { "s": "FX_IDC:USDXUSD", "d": "DXY" },
+                  { "s": "FX:EURUSD", "d": "EUR/USD" },
+                  { "s": "FX:GBPUSD", "d": "GBP/USD" },
+                  { "s": "FX:USDJPY", "d": "USD/JPY" },
+                  { "s": "FX:AUDUSD", "d": "AUD/USD" },
+                  { "s": "FX:USDCHF", "d": "USD/CHF" },
+                  { "s": "FX:USDCAD", "d": "USD/CAD" },
+                  { "s": "FX:USDCNH", "d": "USD/CNH" },
+                  { "s": "FX:USDILS", "d": "USD/ILS" },
+                  { "s": "FX:EURCHF", "d": "EUR/CHF" },
+                  { "s": "FX:EURJPY", "d": "EUR/JPY" },
+                  { "s": "FX:USDMXN", "d": "USD/MXN" },
+                  { "s": "FX:USDTRY", "d": "USD/TRY" }
+                ]
+              },
+              {
+                "title": "Commodities",
+                "symbols": [
+                  { "s": "TVC:GOLD", "d": "Gold" },
+                  { "s": "TVC:SILVER", "d": "Silver" },
+                  { "s": "TVC:PLATINUM", "d": "Platinum" },
+                  { "s": "NYMEX:CL1!", "d": "WTI Crude" },
+                  { "s": "NYMEX:BZ1!", "d": "Brent Crude" },
+                  { "s": "NYMEX:NG1!", "d": "Natural Gas" },
+                  { "s": "COMEX:HG1!", "d": "Copper" },
+                  { "s": "COMEX:ALI1!", "d": "Aluminum" }
+                ]
+              },
+              {
+                "title": "Rates",
+                "symbols": [
+                  { "s": "TVC:US02Y", "d": "US 2Y" },
+                  { "s": "TVC:US05Y", "d": "US 5Y" },
+                  { "s": "TVC:US10Y", "d": "US 10Y" },
+                  { "s": "TVC:US30Y", "d": "US 30Y" },
+                  { "s": "TVC:DE10Y", "d": "Germany 10Y" },
+                  { "s": "TVC:GB10Y", "d": "UK 10Y" },
+                  { "s": "TVC:JP10Y", "d": "Japan 10Y" },
+                  { "s": "TVC:CH10Y", "d": "Swiss 10Y" },
+                  { "s": "CBOE:VIX", "d": "VIX" }
+                ]
+              }
+            ]
+          }
+          </script>
+        </div>
       </div>
     </aside>
   </div>
