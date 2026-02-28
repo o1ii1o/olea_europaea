@@ -705,7 +705,7 @@
             "showSymbolLogo": false,
             "showFloatingTooltip": true,
             "width": "100%",
-            "height": "660",
+            "height": "750",
             "plotLineColorGrowing": "rgba(41, 98, 255, 1)",
             "plotLineColorFalling": "rgba(255, 59, 59, 1)",
             "gridLineColor": "rgba(240, 243, 250, 0)",
@@ -717,61 +717,67 @@
             "symbolActiveColor": "rgba(41, 98, 255, 0.06)",
             "tabs": [
               {
-                "title": "Indices",
-                "symbols": [
-                  { "s": "FOREXCOM:SPXUSD", "d": "S&P 500" },
-                  { "s": "FOREXCOM:NSXUSD", "d": "Nasdaq 100" },
-                  { "s": "FOREXCOM:DJI", "d": "Dow 30" },
-                  { "s": "INDEX:SX5E", "d": "Euro Stoxx 50" },
-                  { "s": "FOREXCOM:UKXGBP", "d": "FTSE 100" },
-                  { "s": "INDEX:NKY", "d": "Nikkei 225" },
-                  { "s": "INDEX:DAX", "d": "DAX" },
-                  { "s": "INDEX:SMI", "d": "SMI" }
-                ]
-              },
-              {
                 "title": "FX",
                 "symbols": [
-                  { "s": "FX_IDC:USDXUSD", "d": "DXY" },
-                  { "s": "FX:EURUSD", "d": "EUR/USD" },
-                  { "s": "FX:GBPUSD", "d": "GBP/USD" },
-                  { "s": "FX:USDJPY", "d": "USD/JPY" },
+                  { "s": "TVC:DXY", "d": "US Dollar Index" },
                   { "s": "FX:AUDUSD", "d": "AUD/USD" },
+                  { "s": "FX:USDJPY", "d": "USD/JPY" },
+                  { "s": "FX:USDHKD", "d": "USD/HKD" },
                   { "s": "FX:USDCHF", "d": "USD/CHF" },
-                  { "s": "FX:USDCAD", "d": "USD/CAD" },
-                  { "s": "FX:USDCNH", "d": "USD/CNH" },
                   { "s": "FX:USDILS", "d": "USD/ILS" },
+                  { "s": "FX:EURILS", "d": "EUR/ILS" },
                   { "s": "FX:EURCHF", "d": "EUR/CHF" },
-                  { "s": "FX:EURJPY", "d": "EUR/JPY" },
-                  { "s": "FX:USDMXN", "d": "USD/MXN" },
-                  { "s": "FX:USDTRY", "d": "USD/TRY" }
-                ]
-              },
-              {
-                "title": "Commodities",
-                "symbols": [
-                  { "s": "TVC:GOLD", "d": "Gold" },
-                  { "s": "TVC:SILVER", "d": "Silver" },
-                  { "s": "TVC:PLATINUM", "d": "Platinum" },
-                  { "s": "NYMEX:CL1!", "d": "WTI Crude" },
-                  { "s": "NYMEX:BZ1!", "d": "Brent Crude" },
-                  { "s": "NYMEX:NG1!", "d": "Natural Gas" },
-                  { "s": "COMEX:HG1!", "d": "Copper" },
-                  { "s": "COMEX:ALI1!", "d": "Aluminum" }
+                  { "s": "FX:EURUSD", "d": "EUR/USD" },
+                  { "s": "FX:EURGBP", "d": "EUR/GBP" },
+                  { "s": "FX:GBPCHF", "d": "GBP/CHF" },
+                  { "s": "FX:GBPUSD", "d": "GBP/USD" },
+                  { "s": "TVC:GOLD", "d": "XAU/USD" },
+                  { "s": "TVC:SILVER", "d": "XAG/USD" },
+                  { "s": "BITSTAMP:BTCUSD", "d": "BTC/USD" },
+                  { "s": "BITSTAMP:ETHUSD", "d": "ETH/USD" },
+                  { "s": "NYMEX:CL1!", "d": "Crude Oil WTI" },
+                  { "s": "NYMEX:BZ1!", "d": "Brent Oil" }
                 ]
               },
               {
                 "title": "Rates",
                 "symbols": [
-                  { "s": "TVC:US02Y", "d": "US 2Y" },
-                  { "s": "TVC:US05Y", "d": "US 5Y" },
-                  { "s": "TVC:US10Y", "d": "US 10Y" },
-                  { "s": "TVC:US30Y", "d": "US 30Y" },
-                  { "s": "TVC:DE10Y", "d": "Germany 10Y" },
-                  { "s": "TVC:GB10Y", "d": "UK 10Y" },
-                  { "s": "TVC:JP10Y", "d": "Japan 10Y" },
-                  { "s": "TVC:CH10Y", "d": "Swiss 10Y" },
-                  { "s": "CBOE:VIX", "d": "VIX" }
+                  { "s": "TVC:US01MY", "d": "U.S. 1M" },
+                  { "s": "TVC:US03MY", "d": "U.S. 3M" },
+                  { "s": "TVC:US06MY", "d": "U.S. 6M" },
+                  { "s": "TVC:US01Y", "d": "U.S. 1Y" },
+                  { "s": "TVC:US02Y", "d": "U.S. 2Y" },
+                  { "s": "TVC:US05Y", "d": "U.S. 5Y" },
+                  { "s": "TVC:US10Y", "d": "U.S. 10Y" },
+                  { "s": "TVC:US20Y", "d": "U.S. 20Y" },
+                  { "s": "TVC:US30Y", "d": "U.S. 30Y" },
+                  { "s": "NASDAQ:GOVT", "d": "GOVT" },
+                  { "s": "AMEX:BIL", "d": "BIL" },
+                  { "s": "NASDAQ:SHY", "d": "SHY" },
+                  { "s": "NASDAQ:IEF", "d": "IEF" },
+                  { "s": "NASDAQ:TLT", "d": "TLT" },
+                  { "s": "AMEX:TBT", "d": "TBT" },
+                  { "s": "AMEX:ZROZ", "d": "ZROZ" }
+                ]
+              },
+              {
+                "title": "Equities",
+                "symbols": [
+                  { "s": "AMEX:URTH", "d": "MSCI World" },
+                  { "s": "TVC:NI225", "d": "Nikkei 225" },
+                  { "s": "SSE:000001", "d": "Shanghai" },
+                  { "s": "TVC:HSI", "d": "Hang Seng" },
+                  { "s": "NSE:NIFTY", "d": "Nifty 50" },
+                  { "s": "TASE:TA35", "d": "TA 35" },
+                  { "s": "TVC:SX5E", "d": "Euro Stoxx 50" },
+                  { "s": "TVC:SMI", "d": "SMI" },
+                  { "s": "XETR:DAX", "d": "DAX" },
+                  { "s": "INDEX:CAC40", "d": "CAC 40" },
+                  { "s": "VANTAGE:SP500", "d": "US 500" },
+                  { "s": "SP:SPX", "d": "S&P 500" },
+                  { "s": "TVC:DJI", "d": "Dow Jones" },
+                  { "s": "NASDAQ:NDX", "d": "Nasdaq 100" },
+                  { "s": "CBOE:VIX", "d": "S&P 500 VIX" }
                 ]
               }
             ]
