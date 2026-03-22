@@ -2,6 +2,7 @@
 """Fetch live market data via yfinance and update the Market Snapshot in index.html."""
 
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 import yfinance as yf
@@ -146,14 +147,26 @@ def build_tbody(results):
 
 
 def update_html(tbody_html):
-    """Replace everything between <tbody> and </tbody> in index.html."""
+    """Replace everything between <tbody> and </tbody> in index.html,
+    and update the snapshot-live-status span with the current UTC time."""
     content = HTML_FILE.read_text()
+
+    # Update tbody
     start_tag = "<tbody>"
     end_tag = "</tbody>"
     i = content.index(start_tag) + len(start_tag)
     j = content.index(end_tag)
-    new_content = content[:i] + "\n" + tbody_html + "\n            " + content[j:]
-    HTML_FILE.write_text(new_content)
+    content = content[:i] + "\n" + tbody_html + "\n            " + content[j:]
+
+    # Update the status span with the current UTC timestamp
+    now_utc = datetime.now(timezone.utc).strftime("%d %b %H:%M UTC")
+    content = re.sub(
+        r'(<span[^>]*id="snapshot-live-status"[^>]*>)[^<]*(</span>)',
+        rf"\1Updated {now_utc}\2",
+        content,
+    )
+
+    HTML_FILE.write_text(content)
     print(f"Wrote {HTML_FILE}")
 
 

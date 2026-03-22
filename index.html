@@ -159,8 +159,6 @@
       letter-spacing:0.3px;
       color:var(--muted);
     }
-    .snapshot-live-status.live{ color:#16a34a; }
-    .snapshot-live-status.error{ color:#dc2626; }
     .snapshot-table-wrap{ overflow:visible; }
     .snapshot-table{ width:100%; border-collapse:collapse; font-size:11px; line-height:1.3; }
     .snapshot-table th{
@@ -950,14 +948,10 @@
       sections.forEach(s => observer.observe(s));
     })();
 
-    (function(){
-      const symbolByName = {
-        'US Dollar Index': 'DX-Y.NYB',
-        'AUD/USD': 'AUDUSD=X',
-        'USD/JPY': 'USDJPY=X',
-        'USD/HKD': 'USDHKD=X',
-        'USD/CHF': 'USDCHF=X',
-        'USD/ILS': 'USDILS=X',
+    /* Client-side live feed removed – Yahoo Finance v7 API blocks
+       browser requests (CORS).  Data is updated server-side every hour
+       via GitHub Actions (update_snapshot.py → yfinance).
+       The status span is set by the Python script at build time. */
         'EUR/ILS': 'EURILS=X',
         'EUR/CHF': 'EURCHF=X',
         'EUR/USD': 'EURUSD=X',
@@ -984,107 +978,6 @@
         'Nikkei 225': '^N225',
         'Shanghai': '000001.SS',
         'Hang Seng': '^HSI',
-        'Nifty 50': '^NSEI',
-        'Euro Stoxx 50': '^STOXX50E',
-        'SMI': '^SSMI',
-        'DAX': '^GDAXI',
-        'CAC 40': '^FCHI',
-        'US 500': '^GSPC',
-        'S&P 500': '^GSPC',
-        'Dow Jones': '^DJI',
-        'Nasdaq 100': '^NDX',
-        'S&P 500 VIX': '^VIX'
-      };
-
-      const statusEl = document.getElementById('snapshot-live-status');
-      const rows = Array.from(document.querySelectorAll('.snapshot-table tbody tr:not(.section-header)'))
-        .map(row => ({ row, name: row.cells[0]?.textContent.trim(), symbol: symbolByName[row.cells[0]?.textContent.trim()] }))
-        .filter(item => item.symbol);
-
-      if(!rows.length) return;
-
-      const uniqueSymbols = [...new Set(rows.map(item => item.symbol))];
-
-      const openStates = new Set(['REGULAR', 'PRE', 'POST', 'PREPRE', 'POSTPOST']);
-      const isOpenState = state => openStates.has(state);
-      const formatLast = value => {
-        if(!Number.isFinite(value)) return '—';
-        if(Math.abs(value) >= 1000) return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
-        if(Math.abs(value) >= 1) return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        return value.toLocaleString(undefined, { minimumFractionDigits: 4, maximumFractionDigits: 4 });
-      };
-      const formatSigned = (value, digits = 2) => {
-        if(!Number.isFinite(value)) return '—';
-        const absValue = Math.abs(value).toLocaleString(undefined, { minimumFractionDigits: digits, maximumFractionDigits: digits });
-        return `${value >= 0 ? '+' : '-'}${absValue}`;
-      };
-      const formatPct = value => `${formatSigned(value, 2)}%`;
-      const formatTime = epochSeconds => {
-        if(!Number.isFinite(epochSeconds)) return '—';
-        return new Date(epochSeconds * 1000).toLocaleTimeString([], { hour12: false });
-      };
-
-      const renderStatus = (text, type = '') => {
-        if(!statusEl) return;
-        statusEl.textContent = text;
-        statusEl.classList.remove('live', 'error');
-        if(type) statusEl.classList.add(type);
-      };
-
-      const applyChangeClass = (cell, value) => {
-        cell.classList.remove('chg-pos', 'chg-neg');
-        if(!Number.isFinite(value)) return;
-        if(value > 0) cell.classList.add('chg-pos');
-        if(value < 0) cell.classList.add('chg-neg');
-      };
-
-      async function refreshSnapshot(){
-        try {
-          const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${encodeURIComponent(uniqueSymbols.join(','))}`;
-          const response = await fetch(url, { cache: 'no-store' });
-          if(!response.ok) throw new Error(`Quote request failed: ${response.status}`);
-          const payload = await response.json();
-          const quotes = new Map((payload.quoteResponse?.result || []).map(item => [item.symbol, item]));
-
-          let updated = 0;
-          let openCount = 0;
-          rows.forEach(({ row, symbol }) => {
-            const quote = quotes.get(symbol);
-            if(!quote) return;
-
-            const last = Number(quote.regularMarketPrice);
-            const chg = Number(quote.regularMarketChange);
-            const chgPct = Number(quote.regularMarketChangePercent);
-            const epoch = Number(quote.regularMarketTime);
-            const marketState = quote.marketState || '';
-
-            if(!Number.isFinite(last) || !Number.isFinite(chg) || !Number.isFinite(chgPct)) return;
-
-            row.cells[1].textContent = formatLast(last);
-            row.cells[2].textContent = formatSigned(chg, Math.abs(chg) < 1 ? 4 : 2);
-            row.cells[3].textContent = formatPct(chgPct);
-            row.cells[4].textContent = formatTime(epoch);
-            applyChangeClass(row.cells[2], chg);
-            applyChangeClass(row.cells[3], chgPct);
-            if(isOpenState(marketState)) openCount += 1;
-            updated += 1;
-          });
-
-          if(updated === 0){
-            renderStatus('Closed / no live feed');
-          } else if(openCount > 0){
-            renderStatus(`Live (${openCount}/${updated} open)`, 'live');
-          } else {
-            renderStatus(`Delayed (${updated} updated)`);
-          }
-        } catch (error){
-          console.error(error);
-          renderStatus('Live feed unavailable', 'error');
-        }
-      }
-
-      refreshSnapshot();
-      setInterval(refreshSnapshot, 60000);
     })();
   </script>
 </body>
