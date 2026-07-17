@@ -11,7 +11,7 @@ HTML_FILE = Path(__file__).parent / "index.html"
 
 # Each section: (html_escaped_title, [(display_name, yfinance_ticker), ...])
 SECTIONS = [
-    ("Currencies &amp; Commodities", [
+    ("Currencies", [
         ("US Dollar Index", "DX-Y.NYB"),
         ("AUD/USD", "AUDUSD=X"),
         ("USD/JPY", "JPY=X"),
@@ -24,12 +24,20 @@ SECTIONS = [
         ("EUR/GBP", "EURGBP=X"),
         ("GBP/CHF", "GBPCHF=X"),
         ("GBP/USD", "GBPUSD=X"),
-        ("XAU/USD", "GC=F"),
-        ("XAG/USD", "SI=F"),
         ("BTC/USD", "BTC-USD"),
         ("ETH/USD", "ETH-USD"),
+    ]),
+    ("Commodities", [
+        ("XAU/USD", "GC=F"),
+        ("XAG/USD", "SI=F"),
+        ("Platinum", "PL=F"),
         ("Crude Oil WTI", "CL=F"),
         ("Brent Oil", "BZ=F"),
+        ("Natural Gas", "NG=F"),
+        ("Copper", "HG=F"),
+        ("Aluminum", "ALI=F"),
+        ("Steel", "SRU=F"),
+        ("Uranium", "UX=F"),
     ]),
     ("U.S. Treasury Yields &amp; ETFs", [
         ("U.S. 3M", "^IRX"),
@@ -79,8 +87,14 @@ URLS = {
     "XAG/USD": "https://www.investing.com/commodities/silver",
     "BTC/USD": "https://www.investing.com/crypto/bitcoin",
     "ETH/USD": "https://www.investing.com/crypto/ethereum",
+    "Platinum": "https://www.investing.com/commodities/platinum",
     "Crude Oil WTI": "https://www.investing.com/commodities/crude-oil",
     "Brent Oil": "https://www.investing.com/commodities/brent-oil",
+    "Natural Gas": "https://www.investing.com/commodities/natural-gas",
+    "Copper": "https://www.investing.com/commodities/copper",
+    "Aluminum": "https://www.investing.com/commodities/aluminum",
+    "Steel": "https://www.investing.com/commodities/us-steel-coil",
+    "Uranium": "https://www.investing.com/commodities/uranium",
     "U.S. 3M": "https://www.investing.com/rates-bonds/u.s.-3-month-bond-yield",
     "U.S. 5Y": "https://www.investing.com/rates-bonds/u.s.-5-year-bond-yield",
     "U.S. 10Y": "https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield",
