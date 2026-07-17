@@ -170,6 +170,8 @@
     .snapshot-table th:first-child{ text-align:left; }
     .snapshot-table td{ padding:4px 6px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--divider); color:var(--text); }
     .snapshot-table td:first-child{ text-align:left; font-weight:500; white-space:normal; min-width:100px; }
+    .snapshot-table td:first-child a{ color:var(--text); text-decoration:none; }
+    .snapshot-table td:first-child a:hover{ color:var(--accent); text-decoration:underline; }
     .snapshot-table td:last-child{ color:var(--muted); }
     .snapshot-table tr.section-header td{
       background:var(--surface); font-weight:700; font-size:11px; text-transform:uppercase;
@@ -304,7 +306,6 @@
         <a href="#markets-section" class="active" aria-haspopup="true">Markets</a>
         <div class="dropdown-menu">
           <a href="#card-sentiment">Sentiment / Positioning</a>
-          <a href="#card-currencies">Currencies</a>
           <a href="#card-commodities">Commodities</a>
           <a href="#card-rates">Rates</a>
           <a href="#card-bonds">Bonds</a>
@@ -365,40 +366,14 @@
             </ul>
           </article>
 
-          <article class="card" id="card-currencies">
-            <h3>Currencies</h3>
-            <ul>
-              <li><a href="https://www.investing.com/currencies/us-dollar-index" target="_blank" rel="noopener noreferrer">DXY</a></li>
-              <li><a href="https://www.investing.com/currencies/aud-usd" target="_blank" rel="noopener noreferrer">AUD/USD</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-jpy" target="_blank" rel="noopener noreferrer">USD/JPY</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-cny" target="_blank" rel="noopener noreferrer">USD/CNY</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-cnh" target="_blank" rel="noopener noreferrer">USD/CNH</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-ils" target="_blank" rel="noopener noreferrer">USD/ILS</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-try" target="_blank" rel="noopener noreferrer">USD/TRY</a></li>
-              <li><a href="https://www.investing.com/currencies/eur-jpy" target="_blank" rel="noopener noreferrer">EUR/JPY</a></li>
-              <li><a href="https://www.investing.com/currencies/eur-chf" target="_blank" rel="noopener noreferrer">EUR/CHF</a></li>
-              <li><a href="https://www.investing.com/currencies/eur-gbp" target="_blank" rel="noopener noreferrer">EUR/GBP</a></li>
-              <li><a href="https://www.investing.com/currencies/eur-usd" target="_blank" rel="noopener noreferrer">EUR/USD</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-chf" target="_blank" rel="noopener noreferrer">USD/CHF</a></li>
-              <li><a href="https://www.investing.com/currencies/gbp-usd" target="_blank" rel="noopener noreferrer">GBP/USD</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-cad" target="_blank" rel="noopener noreferrer">USD/CAD</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-mxn" target="_blank" rel="noopener noreferrer">USD/MXN</a></li>
-              <li><a href="https://www.investing.com/currencies/usd-brl" target="_blank" rel="noopener noreferrer">USD/BRL</a></li>
-            </ul>
-          </article>
-
           <article class="card" id="card-commodities">
             <h3>Commodities</h3>
             <ul>
-              <li><a href="https://www.investing.com/commodities/crude-oil-contracts" target="_blank" rel="noopener noreferrer">WTI</a></li>
-              <li><a href="https://www.investing.com/commodities/brent-oil-contracts" target="_blank" rel="noopener noreferrer">Brent</a></li>
               <li><a href="https://www.investing.com/commodities/natural-gas-contracts" target="_blank" rel="noopener noreferrer">Natural Gas</a></li>
               <li><a href="https://www.investing.com/commodities/copper-contracts" target="_blank" rel="noopener noreferrer">Copper</a></li>
               <li><a href="https://www.investing.com/commodities/us-steel-coil-contracts" target="_blank" rel="noopener noreferrer">Steel</a></li>
               <li><a href="https://www.investing.com/commodities/aluminum-contracts?cid=1178488" target="_blank" rel="noopener noreferrer">Aluminum</a></li>
               <li><a href="https://www.investing.com/commodities/uranium-contracts" target="_blank" rel="noopener noreferrer">Uranium</a></li>
-              <li><a href="https://www.investing.com/commodities/gold-contracts" target="_blank" rel="noopener noreferrer">Gold</a></li>
-              <li><a href="https://www.investing.com/commodities/silver-contracts" target="_blank" rel="noopener noreferrer">Silver</a></li>
               <li><a href="https://www.investing.com/commodities/platinum-contracts" target="_blank" rel="noopener noreferrer">Platinum</a></li>
             </ul>
             <div class="sub-header">Futures Dashboard</div>
@@ -873,52 +848,52 @@
             <tbody>
               <!-- ── Currencies &amp; Commodities ── -->
               <tr class="section-header"><td colspan="5">Currencies &amp; Commodities</td></tr>
-              <tr><td>US Dollar Index</td><td>100.77</td><td class="chg-pos">+0.27</td><td class="chg-pos">+0.26%</td><td>16/07</td></tr>
-              <tr><td>AUD/USD</td><td>0.6996</td><td class="chg-pos">+0.0020</td><td class="chg-pos">+0.29%</td><td>16/07</td></tr>
-              <tr><td>USD/JPY</td><td>162.40</td><td class="chg-pos">+0.21</td><td class="chg-pos">+0.13%</td><td>16/07</td></tr>
-              <tr><td>USD/HKD</td><td>7.839</td><td class="chg-pos">+0.002</td><td class="chg-pos">+0.03%</td><td>16/07</td></tr>
-              <tr><td>USD/CHF</td><td>0.8090</td><td class="chg-neg">-0.0001</td><td class="chg-neg">-0.01%</td><td>16/07</td></tr>
-              <tr><td>USD/ILS</td><td>3.021</td><td class="chg-pos">+0.023</td><td class="chg-pos">+0.78%</td><td>16/07</td></tr>
-              <tr><td>EUR/ILS</td><td>3.454</td><td class="chg-pos">+0.023</td><td class="chg-pos">+0.66%</td><td>16/07</td></tr>
-              <tr><td>EUR/CHF</td><td>0.9252</td><td class="chg-pos">+0.0009</td><td class="chg-pos">+0.10%</td><td>16/07</td></tr>
-              <tr><td>EUR/USD</td><td>1.144</td><td class="chg-pos">+0.002</td><td class="chg-pos">+0.14%</td><td>16/07</td></tr>
-              <tr><td>EUR/GBP</td><td>0.8491</td><td class="chg-neg">-0.0037</td><td class="chg-neg">-0.43%</td><td>16/07</td></tr>
-              <tr><td>GBP/CHF</td><td>1.090</td><td class="chg-pos">+0.006</td><td class="chg-pos">+0.53%</td><td>16/07</td></tr>
-              <tr><td>GBP/USD</td><td>1.347</td><td class="chg-pos">+0.007</td><td class="chg-pos">+0.54%</td><td>16/07</td></tr>
-              <tr><td>XAU/USD</td><td>3,986.20</td><td class="chg-neg">-57.80</td><td class="chg-neg">-1.43%</td><td>16/07</td></tr>
-              <tr><td>XAG/USD</td><td>55.84</td><td class="chg-neg">-1.27</td><td class="chg-neg">-2.22%</td><td>16/07</td></tr>
-              <tr><td>BTC/USD</td><td>64,181.10</td><td class="chg-neg">-531.27</td><td class="chg-neg">-0.82%</td><td>16/07</td></tr>
-              <tr><td>ETH/USD</td><td>1,872.88</td><td class="chg-neg">-44.06</td><td class="chg-neg">-2.30%</td><td>16/07</td></tr>
-              <tr><td>Crude Oil WTI</td><td>78.38</td><td class="chg-neg">-1.22</td><td class="chg-neg">-1.53%</td><td>16/07</td></tr>
-              <tr><td>Brent Oil</td><td>84.33</td><td class="chg-neg">-0.62</td><td class="chg-neg">-0.73%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/us-dollar-index" target="_blank">US Dollar Index</a></td><td>100.77</td><td class="chg-pos">+0.27</td><td class="chg-pos">+0.26%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/aud-usd" target="_blank">AUD/USD</a></td><td>0.6996</td><td class="chg-pos">+0.0020</td><td class="chg-pos">+0.29%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/usd-jpy" target="_blank">USD/JPY</a></td><td>162.40</td><td class="chg-pos">+0.21</td><td class="chg-pos">+0.13%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/usd-hkd" target="_blank">USD/HKD</a></td><td>7.839</td><td class="chg-pos">+0.002</td><td class="chg-pos">+0.03%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/usd-chf" target="_blank">USD/CHF</a></td><td>0.8090</td><td class="chg-neg">-0.0001</td><td class="chg-neg">-0.01%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/usd-ils" target="_blank">USD/ILS</a></td><td>3.021</td><td class="chg-pos">+0.023</td><td class="chg-pos">+0.78%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/eur-ils" target="_blank">EUR/ILS</a></td><td>3.454</td><td class="chg-pos">+0.023</td><td class="chg-pos">+0.66%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/eur-chf" target="_blank">EUR/CHF</a></td><td>0.9252</td><td class="chg-pos">+0.0009</td><td class="chg-pos">+0.10%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/eur-usd" target="_blank">EUR/USD</a></td><td>1.144</td><td class="chg-pos">+0.002</td><td class="chg-pos">+0.14%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/eur-gbp" target="_blank">EUR/GBP</a></td><td>0.8491</td><td class="chg-neg">-0.0037</td><td class="chg-neg">-0.43%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/gbp-chf" target="_blank">GBP/CHF</a></td><td>1.090</td><td class="chg-pos">+0.006</td><td class="chg-pos">+0.53%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/currencies/gbp-usd" target="_blank">GBP/USD</a></td><td>1.347</td><td class="chg-pos">+0.007</td><td class="chg-pos">+0.54%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/commodities/gold" target="_blank">XAU/USD</a></td><td>3,986.20</td><td class="chg-neg">-57.80</td><td class="chg-neg">-1.43%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/commodities/silver" target="_blank">XAG/USD</a></td><td>55.84</td><td class="chg-neg">-1.27</td><td class="chg-neg">-2.22%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/crypto/bitcoin" target="_blank">BTC/USD</a></td><td>64,181.10</td><td class="chg-neg">-531.27</td><td class="chg-neg">-0.82%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/crypto/ethereum" target="_blank">ETH/USD</a></td><td>1,872.88</td><td class="chg-neg">-44.06</td><td class="chg-neg">-2.30%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/commodities/crude-oil" target="_blank">Crude Oil WTI</a></td><td>78.38</td><td class="chg-neg">-1.22</td><td class="chg-neg">-1.53%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/commodities/brent-oil" target="_blank">Brent Oil</a></td><td>84.33</td><td class="chg-neg">-0.62</td><td class="chg-neg">-0.73%</td><td>16/07</td></tr>
               <!-- ── U.S. Treasury Yields &amp; ETFs ── -->
               <tr class="section-header"><td colspan="5">U.S. Treasury Yields &amp; ETFs</td></tr>
-              <tr><td>U.S. 3M</td><td>3.697</td><td class="chg-pos">+0.009</td><td class="chg-pos">+0.24%</td><td>16/07</td></tr>
-              <tr><td>U.S. 5Y</td><td>4.282</td><td class="chg-pos">+0.027</td><td class="chg-pos">+0.63%</td><td>16/07</td></tr>
-              <tr><td>U.S. 10Y</td><td>4.569</td><td class="chg-pos">+0.024</td><td class="chg-pos">+0.53%</td><td>16/07</td></tr>
-              <tr><td>U.S. 30Y</td><td>5.098</td><td class="chg-pos">+0.015</td><td class="chg-pos">+0.30%</td><td>16/07</td></tr>
-              <tr><td>iShares US Treasury</td><td>22.59</td><td class="chg-neg">-0.02</td><td class="chg-neg">-0.07%</td><td>16/07</td></tr>
-              <tr><td>SPDR 1-3M T-Bill</td><td>91.53</td><td class="chg-pos">+0.01</td><td class="chg-pos">+0.01%</td><td>16/07</td></tr>
-              <tr><td>iShares 1-3Y Treasury</td><td>82.00</td><td class="chg-neg">-0.00</td><td class="chg-neg">-0.00%</td><td>16/07</td></tr>
-              <tr><td>iShares 7-10Y Treasury</td><td>93.71</td><td class="chg-neg">-0.07</td><td class="chg-neg">-0.08%</td><td>16/07</td></tr>
-              <tr><td>iShares 20+Y Treasury</td><td>84.12</td><td class="chg-neg">-0.12</td><td class="chg-neg">-0.14%</td><td>16/07</td></tr>
-              <tr><td>ProShares Ultra Short 20+Y</td><td>36.69</td><td class="chg-pos">+0.10</td><td class="chg-pos">+0.29%</td><td>16/07</td></tr>
-              <tr><td>PIMCO 25+Y Zero Coupon</td><td>60.46</td><td class="chg-neg">-0.22</td><td class="chg-neg">-0.36%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-3-month-bond-yield" target="_blank">U.S. 3M</a></td><td>3.697</td><td class="chg-pos">+0.009</td><td class="chg-pos">+0.24%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-5-year-bond-yield" target="_blank">U.S. 5Y</a></td><td>4.282</td><td class="chg-pos">+0.027</td><td class="chg-pos">+0.63%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield" target="_blank">U.S. 10Y</a></td><td>4.569</td><td class="chg-pos">+0.024</td><td class="chg-pos">+0.53%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield" target="_blank">U.S. 30Y</a></td><td>5.098</td><td class="chg-pos">+0.015</td><td class="chg-pos">+0.30%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/etfs/ishares-us-treasury-bond-etf" target="_blank">iShares US Treasury</a></td><td>22.59</td><td class="chg-neg">-0.02</td><td class="chg-neg">-0.07%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/etfs/spdr-bloomberg-1-3-month-t-bill" target="_blank">SPDR 1-3M T-Bill</a></td><td>91.53</td><td class="chg-pos">+0.01</td><td class="chg-pos">+0.01%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/etfs/ishares-1-3-year-treasury-bond" target="_blank">iShares 1-3Y Treasury</a></td><td>82.00</td><td class="chg-neg">-0.00</td><td class="chg-neg">-0.00%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/etfs/ishares-7-10-year-treasury-bond" target="_blank">iShares 7-10Y Treasury</a></td><td>93.71</td><td class="chg-neg">-0.07</td><td class="chg-neg">-0.08%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/etfs/ishares-20-year-treasury-bond" target="_blank">iShares 20+Y Treasury</a></td><td>84.12</td><td class="chg-neg">-0.12</td><td class="chg-neg">-0.14%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/etfs/proshares-ultrashort-20-year-treasury" target="_blank">ProShares Ultra Short 20+Y</a></td><td>36.69</td><td class="chg-pos">+0.10</td><td class="chg-pos">+0.29%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/etfs/pimco-25-year-zero-coupon-us-treas" target="_blank">PIMCO 25+Y Zero Coupon</a></td><td>60.46</td><td class="chg-neg">-0.22</td><td class="chg-neg">-0.36%</td><td>16/07</td></tr>
               <!-- ── Global Market Indices ── -->
               <tr class="section-header"><td colspan="5">Global Market Indices</td></tr>
-              <tr><td>MSCI World</td><td>203.35</td><td class="chg-neg">-1.40</td><td class="chg-neg">-0.68%</td><td>16/07</td></tr>
-              <tr><td>Nikkei 225</td><td>68,751.51</td><td class="chg-pos">+1,008.01</td><td class="chg-pos">+1.49%</td><td>15/07</td></tr>
-              <tr><td>Shanghai</td><td>3,955.58</td><td class="chg-neg">-11.55</td><td class="chg-neg">-0.29%</td><td>15/07</td></tr>
-              <tr><td>Hang Seng</td><td>24,681.10</td><td class="chg-pos">+340.37</td><td class="chg-pos">+1.40%</td><td>15/07</td></tr>
-              <tr><td>Nifty 50</td><td>24,078.50</td><td class="chg-pos">+26.45</td><td class="chg-pos">+0.11%</td><td>15/07</td></tr>
-              <tr><td>Euro Stoxx 50</td><td>6,283.61</td><td class="chg-pos">+18.03</td><td class="chg-pos">+0.29%</td><td>16/07</td></tr>
-              <tr><td>SMI</td><td>14,267.19</td><td class="chg-neg">-40.12</td><td class="chg-neg">-0.28%</td><td>16/07</td></tr>
-              <tr><td>DAX</td><td>24,915.49</td><td class="chg-neg">-84.04</td><td class="chg-neg">-0.34%</td><td>16/07</td></tr>
-              <tr><td>CAC 40</td><td>8,377.86</td><td class="chg-neg">-4.57</td><td class="chg-neg">-0.05%</td><td>16/07</td></tr>
-              <tr><td>S&amp;P 500</td><td>7,523.36</td><td class="chg-neg">-49.04</td><td class="chg-neg">-0.65%</td><td>16/07</td></tr>
-              <tr><td>Dow Jones</td><td>52,476.84</td><td class="chg-neg">-181.80</td><td class="chg-neg">-0.35%</td><td>16/07</td></tr>
-              <tr><td>Nasdaq 100</td><td>28,965.77</td><td class="chg-neg">-536.83</td><td class="chg-neg">-1.82%</td><td>16/07</td></tr>
-              <tr><td>S&amp;P 500 VIX</td><td>16.57</td><td class="chg-pos">+0.90</td><td class="chg-pos">+5.74%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/etfs/ishares-msci-world" target="_blank">MSCI World</a></td><td>203.35</td><td class="chg-neg">-1.40</td><td class="chg-neg">-0.68%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/japan-ni225" target="_blank">Nikkei 225</a></td><td>68,751.51</td><td class="chg-pos">+1,008.01</td><td class="chg-pos">+1.49%</td><td>15/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/shanghai-composite" target="_blank">Shanghai</a></td><td>3,955.58</td><td class="chg-neg">-11.55</td><td class="chg-neg">-0.29%</td><td>15/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/hang-sen-40" target="_blank">Hang Seng</a></td><td>24,681.10</td><td class="chg-pos">+340.37</td><td class="chg-pos">+1.40%</td><td>15/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/s-p-cnx-nifty" target="_blank">Nifty 50</a></td><td>24,078.50</td><td class="chg-pos">+26.45</td><td class="chg-pos">+0.11%</td><td>15/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/eu-stoxx50" target="_blank">Euro Stoxx 50</a></td><td>6,283.61</td><td class="chg-pos">+18.03</td><td class="chg-pos">+0.29%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/switzerland-20" target="_blank">SMI</a></td><td>14,267.19</td><td class="chg-neg">-40.12</td><td class="chg-neg">-0.28%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/germany-30" target="_blank">DAX</a></td><td>24,915.49</td><td class="chg-neg">-84.04</td><td class="chg-neg">-0.34%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/france-40" target="_blank">CAC 40</a></td><td>8,377.86</td><td class="chg-neg">-4.57</td><td class="chg-neg">-0.05%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/us-spx-500" target="_blank">S&amp;P 500</a></td><td>7,523.36</td><td class="chg-neg">-49.04</td><td class="chg-neg">-0.65%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/us-30" target="_blank">Dow Jones</a></td><td>52,476.84</td><td class="chg-neg">-181.80</td><td class="chg-neg">-0.35%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/nq-100" target="_blank">Nasdaq 100</a></td><td>28,965.77</td><td class="chg-neg">-536.83</td><td class="chg-neg">-1.82%</td><td>16/07</td></tr>
+              <tr><td><a href="https://www.investing.com/indices/volatility-s-p-500" target="_blank">S&amp;P 500 VIX</a></td><td>16.57</td><td class="chg-pos">+0.90</td><td class="chg-pos">+5.74%</td><td>16/07</td></tr>
             </tbody>
           </table>
         </div>
