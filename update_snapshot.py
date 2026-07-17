@@ -11,7 +11,7 @@ HTML_FILE = Path(__file__).parent / "index.html"
 
 # Each section: (html_escaped_title, [(display_name, yfinance_ticker), ...])
 SECTIONS = [
-    ("Currencies &amp; Commodities", [
+    ("Currencies", [
         ("US Dollar Index", "DX-Y.NYB"),
         ("AUD/USD", "AUDUSD=X"),
         ("USD/JPY", "JPY=X"),
@@ -24,12 +24,20 @@ SECTIONS = [
         ("EUR/GBP", "EURGBP=X"),
         ("GBP/CHF", "GBPCHF=X"),
         ("GBP/USD", "GBPUSD=X"),
-        ("XAU/USD", "GC=F"),
-        ("XAG/USD", "SI=F"),
         ("BTC/USD", "BTC-USD"),
         ("ETH/USD", "ETH-USD"),
+    ]),
+    ("Commodities", [
+        ("XAU/USD", "GC=F"),
+        ("XAG/USD", "SI=F"),
+        ("Platinum", "PL=F"),
         ("Crude Oil WTI", "CL=F"),
         ("Brent Oil", "BZ=F"),
+        ("Natural Gas", "NG=F"),
+        ("Copper", "HG=F"),
+        ("Aluminum", "ALI=F"),
+        ("Steel", "SRU=F"),
+        ("Uranium", "UX=F"),
     ]),
     ("U.S. Treasury Yields &amp; ETFs", [
         ("U.S. 3M", "^IRX"),
@@ -61,6 +69,58 @@ SECTIONS = [
         ("S&amp;P 500 VIX", "^VIX"),
     ]),
 ]
+
+URLS = {
+    "US Dollar Index": "https://www.investing.com/currencies/us-dollar-index",
+    "AUD/USD": "https://www.investing.com/currencies/aud-usd",
+    "USD/JPY": "https://www.investing.com/currencies/usd-jpy",
+    "USD/HKD": "https://www.investing.com/currencies/usd-hkd",
+    "USD/CHF": "https://www.investing.com/currencies/usd-chf",
+    "USD/ILS": "https://www.investing.com/currencies/usd-ils",
+    "EUR/ILS": "https://www.investing.com/currencies/eur-ils",
+    "EUR/CHF": "https://www.investing.com/currencies/eur-chf",
+    "EUR/USD": "https://www.investing.com/currencies/eur-usd",
+    "EUR/GBP": "https://www.investing.com/currencies/eur-gbp",
+    "GBP/CHF": "https://www.investing.com/currencies/gbp-chf",
+    "GBP/USD": "https://www.investing.com/currencies/gbp-usd",
+    "XAU/USD": "https://www.investing.com/commodities/gold",
+    "XAG/USD": "https://www.investing.com/commodities/silver",
+    "BTC/USD": "https://www.investing.com/crypto/bitcoin",
+    "ETH/USD": "https://www.investing.com/crypto/ethereum",
+    "Platinum": "https://www.investing.com/commodities/platinum",
+    "Crude Oil WTI": "https://www.investing.com/commodities/crude-oil",
+    "Brent Oil": "https://www.investing.com/commodities/brent-oil",
+    "Natural Gas": "https://www.investing.com/commodities/natural-gas",
+    "Copper": "https://www.investing.com/commodities/copper",
+    "Aluminum": "https://www.investing.com/commodities/aluminum",
+    "Steel": "https://www.investing.com/commodities/us-steel-coil",
+    "Uranium": "https://www.investing.com/commodities/uranium",
+    "U.S. 3M": "https://www.investing.com/rates-bonds/u.s.-3-month-bond-yield",
+    "U.S. 5Y": "https://www.investing.com/rates-bonds/u.s.-5-year-bond-yield",
+    "U.S. 10Y": "https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield",
+    "U.S. 30Y": "https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield",
+    "iShares US Treasury": "https://www.investing.com/etfs/ishares-us-treasury-bond-etf",
+    "SPDR 1-3M T-Bill": "https://www.investing.com/etfs/spdr-bloomberg-1-3-month-t-bill",
+    "iShares 1-3Y Treasury": "https://www.investing.com/etfs/ishares-1-3-year-treasury-bond",
+    "iShares 7-10Y Treasury": "https://www.investing.com/etfs/ishares-7-10-year-treasury-bond",
+    "iShares 20+Y Treasury": "https://www.investing.com/etfs/ishares-20-year-treasury-bond",
+    "ProShares Ultra Short 20+Y": "https://www.investing.com/etfs/proshares-ultrashort-20-year-treasury",
+    "PIMCO 25+Y Zero Coupon": "https://www.investing.com/etfs/pimco-25-year-zero-coupon-us-treas",
+    "MSCI World": "https://www.investing.com/etfs/ishares-msci-world",
+    "Nikkei 225": "https://www.investing.com/indices/japan-ni225",
+    "Shanghai": "https://www.investing.com/indices/shanghai-composite",
+    "Hang Seng": "https://www.investing.com/indices/hang-sen-40",
+    "Nifty 50": "https://www.investing.com/indices/s-p-cnx-nifty",
+    "TA 35": "https://www.investing.com/indices/ta-35",
+    "Euro Stoxx 50": "https://www.investing.com/indices/eu-stoxx50",
+    "SMI": "https://www.investing.com/indices/switzerland-20",
+    "DAX": "https://www.investing.com/indices/germany-30",
+    "CAC 40": "https://www.investing.com/indices/france-40",
+    "S&amp;P 500": "https://www.investing.com/indices/us-spx-500",
+    "Dow Jones": "https://www.investing.com/indices/us-30",
+    "Nasdaq 100": "https://www.investing.com/indices/nq-100",
+    "S&amp;P 500 VIX": "https://www.investing.com/indices/volatility-s-p-500",
+}
 
 
 def fetch_data():
@@ -134,9 +194,13 @@ def build_tbody(results):
                 continue
             d = results[ticker]
             cls = "chg-pos" if d["chg"] >= 0 else "chg-neg"
+            url = URLS.get(name)
+            name_cell = (
+                f'<a href="{url}" target="_blank">{name}</a>' if url else name
+            )
             lines.append(
                 f'              <tr>'
-                f'<td>{name}</td>'
+                f'<td>{name_cell}</td>'
                 f'<td>{fmt_price(d["last"])}</td>'
                 f'<td class="{cls}">{fmt_change(d["chg"], d["last"])}</td>'
                 f'<td class="{cls}">{fmt_change(d["chg_pct"], 100)}%</td>'
