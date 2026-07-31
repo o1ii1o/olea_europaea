@@ -178,51 +178,57 @@ def fmt_time(dt):
 
 # ── HTML generation ───────────────────────────────────────────────────────────
 
-def build_tbody(results):
-    """Return the inner HTML of <tbody> for the snapshot table."""
+# Section title -> tbody id in the 2x2 snapshot grid.
+SECTION_TBODY = {
+    "U.S. Treasury Yields &amp; ETFs": "snap-rates",
+    "Commodities": "snap-commodities",
+    "Global Market Indices": "snap-equities",
+    "Currencies": "snap-currencies",
+}
+
+
+def build_rows(instruments, results):
+    """Return the inner HTML rows (4 columns, no Time) for one grid table."""
     lines = []
-    for section_title, instruments in SECTIONS:
-        lines.append(
-            f'              <!-- ── {section_title} ── -->'
+    for name, ticker in instruments:
+        if ticker not in results:
+            continue
+        d = results[ticker]
+        cls = "chg-pos" if d["chg"] >= 0 else "chg-neg"
+        url = URLS.get(name)
+        name_cell = (
+            f'<a href="{url}" target="_blank">{name}</a>' if url else name
         )
         lines.append(
-            f'              <tr class="section-header">'
-            f'<td colspan="5">{section_title}</td></tr>'
+            f'                <tr>'
+            f'<td>{name_cell}</td>'
+            f'<td>{fmt_price(d["last"])}</td>'
+            f'<td class="{cls}">{fmt_change(d["chg"], d["last"])}</td>'
+            f'<td class="{cls}">{fmt_change(d["chg_pct"], 100)}%</td>'
+            f'</tr>'
         )
-        for name, ticker in instruments:
-            if ticker not in results:
-                continue
-            d = results[ticker]
-            cls = "chg-pos" if d["chg"] >= 0 else "chg-neg"
-            url = URLS.get(name)
-            name_cell = (
-                f'<a href="{url}" target="_blank">{name}</a>' if url else name
-            )
-            lines.append(
-                f'              <tr>'
-                f'<td>{name_cell}</td>'
-                f'<td>{fmt_price(d["last"])}</td>'
-                f'<td class="{cls}">{fmt_change(d["chg"], d["last"])}</td>'
-                f'<td class="{cls}">{fmt_change(d["chg_pct"], 100)}%</td>'
-                f'<td>{fmt_time(d["time"])}</td>'
-                f'</tr>'
-            )
     return "\n".join(lines)
 
 
-def update_html(tbody_html):
-    """Replace everything between <tbody> and </tbody> in index.html,
-    and update the snapshot-live-status span with the current UTC time."""
+def replace_tbody(content, tbody_id, rows_html):
+    """Replace the inner HTML of <tbody id="tbody_id"> ... </tbody>."""
+    open_tag = f'<tbody id="{tbody_id}">'
+    i = content.index(open_tag) + len(open_tag)
+    j = content.index("</tbody>", i)
+    return content[:i] + "\n" + rows_html + "\n              " + content[j:]
+
+
+def update_html(results):
+    """Update each grid table and the snapshot-live-status timestamp."""
     content = HTML_FILE.read_text()
 
-    # Update tbody
-    start_tag = "<tbody>"
-    end_tag = "</tbody>"
-    i = content.index(start_tag) + len(start_tag)
-    j = content.index(end_tag)
-    content = content[:i] + "\n" + tbody_html + "\n            " + content[j:]
+    for section_title, instruments in SECTIONS:
+        tbody_id = SECTION_TBODY.get(section_title)
+        if not tbody_id:
+            continue
+        rows = build_rows(instruments, results)
+        content = replace_tbody(content, tbody_id, rows)
 
-    # Update the status span with the current UTC timestamp
     now_utc = datetime.now(timezone.utc).strftime("%d %b %H:%M UTC")
     content = re.sub(
         r'(<span[^>]*id="snapshot-live-status"[^>]*>)[^<]*(</span>)',
@@ -243,8 +249,7 @@ def main():
     if not results:
         print("No data fetched – index.html left unchanged.")
         return
-    tbody = build_tbody(results)
-    update_html(tbody)
+    update_html(results)
     print("Done – open index.html in a browser to see the update.")
 
 
