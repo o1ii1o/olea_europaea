@@ -423,7 +423,7 @@
       <summary>Symbol Research — technical chart &amp; fundamentals</summary>
       <div class="research-body">
         <form class="research-controls" id="research-form">
-          <input id="research-input" type="text" value="META" aria-label="Ticker symbol" placeholder="Ticker" />
+          <input id="research-input" type="text" value="SPY" aria-label="Ticker symbol" placeholder="Ticker" />
           <button type="submit" class="go-btn">Go</button>
           <span class="research-links">
             <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
@@ -1118,7 +1118,7 @@
       function ensureLoaded(){
         if(loaded) return;
         loaded = true;
-        loadSymbol(input.value || 'META');
+        loadSymbol(input.value || 'SPY');
       }
 
       // Load widgets the first time the panel is opened (saves bandwidth when closed).
@@ -1130,7 +1130,7 @@
         loadSymbol(input.value);
       });
 
-      updateLinks(input.value || 'META');
+      updateLinks(input.value || 'SPY');
     })();
   </script>
 </body>
