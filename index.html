@@ -39,16 +39,16 @@
       z-index:40;
       display:flex;
       align-items:center;
-      justify-content:space-between;
+      justify-content:center;
       padding:0 24px;
       height:52px;
       background: linear-gradient(180deg, var(--header-bg), var(--header-bg-2));
       color:#fff;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .brand{ display:flex; gap:8px; align-items:center; }
-    .brand img{ width:44px; height:44px; border-radius:6px; object-fit:contain; background:#fff; padding:3px; }
-    .brand h1{ margin:0; font-family:'Bad Script', cursive; font-size:20px; line-height:1; color:#fff; letter-spacing:0.4px; }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .brand img{ width:40px; height:40px; border-radius:6px; object-fit:contain; background:#fff; padding:3px; }
+    .brand h1{ margin:0; font-family:'Bad Script', cursive; font-size:22px; line-height:1; color:#fff; letter-spacing:0.4px; }
 
     .header-nav{ display:flex; gap:2px; align-items:center; }
     .nav-dropdown{ position:relative; }
@@ -413,47 +413,8 @@
     <div class="brand">
       <img src="./assets/images/olea%20europaea.png" alt="Olive tree">
       <h1>Olea europaea</h1>
+      <img src="./assets/images/olea%20europaea.png" alt="Olive tree">
     </div>
-    <nav class="header-nav" aria-label="Main sections">
-      <div class="nav-dropdown">
-        <a href="#symbol-research">Research Tool</a>
-      </div>
-      <div class="nav-dropdown">
-        <a href="#markets-section" class="active" aria-haspopup="true">Markets</a>
-        <div class="dropdown-menu">
-          <a href="#card-sentiment">Sentiment / Positioning</a>
-          <a href="#card-rates">Rates</a>
-          <a href="#card-bonds">Bonds</a>
-          <a href="#card-equities">Equities</a>
-          <a href="#card-derivatives">Derivatives</a>
-        </div>
-      </div>
-      <div class="nav-dropdown">
-        <a href="#news-section" aria-haspopup="true">News</a>
-        <div class="dropdown-menu">
-          <a href="#card-financial">Financial</a>
-          <a href="#card-regional">Regional &amp; Local</a>
-          <a href="#card-us-global">US &amp; Global Press</a>
-          <a href="#card-economic-calendar">Economic Calendar</a>
-          <a href="#card-earnings-calendar">Earnings Calendar</a>
-          <a href="#card-data-news">Data &amp; Market News</a>
-        </div>
-      </div>
-      <div class="nav-dropdown">
-        <a href="#resources-section" aria-haspopup="true">Resources</a>
-        <div class="dropdown-menu">
-          <a href="#card-charts">Charts</a>
-          <a href="#card-screener">Screener</a>
-          <a href="#card-etfs">ETFs</a>
-          <a href="#card-research">Research</a>
-        </div>
-      </div>
-    </nav>
-    <nav class="mobile-nav" aria-label="Mobile sections">
-      <a href="#markets-section">Markets</a>
-      <a href="#news-section">News</a>
-      <a href="#resources-section">Resources</a>
-    </nav>
   </header>
 
   <!-- SYMBOL RESEARCH -->
