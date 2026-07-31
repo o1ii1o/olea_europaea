@@ -39,16 +39,16 @@
       z-index:40;
       display:flex;
       align-items:center;
-      justify-content:space-between;
+      justify-content:center;
       padding:0 24px;
       height:52px;
       background: linear-gradient(180deg, var(--header-bg), var(--header-bg-2));
       color:#fff;
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .brand{ display:flex; gap:8px; align-items:center; }
-    .brand img{ width:44px; height:44px; border-radius:6px; object-fit:contain; background:#fff; padding:3px; }
-    .brand h1{ margin:0; font-family:'Bad Script', cursive; font-size:20px; line-height:1; color:#fff; letter-spacing:0.4px; }
+    .brand{ display:flex; gap:12px; align-items:center; }
+    .brand img{ width:40px; height:40px; border-radius:6px; object-fit:contain; background:#fff; padding:3px; }
+    .brand h1{ margin:0; font-family:'Bad Script', cursive; font-size:22px; line-height:1; color:#fff; letter-spacing:0.4px; }
 
     .header-nav{ display:flex; gap:2px; align-items:center; }
     .nav-dropdown{ position:relative; }
@@ -110,7 +110,7 @@
       margin:0 auto;
       padding:20px 20px 60px;
       display:grid;
-      grid-template-columns: 1fr minmax(520px, 620px);
+      grid-template-columns: 1fr minmax(560px, 700px);
       gap:24px;
       align-items:start;
     }
@@ -180,6 +180,23 @@
     .snapshot-table .chg-pos{ color:#16a34a; }
     .snapshot-table .chg-neg{ color:#dc2626; }
     .snapshot-table tbody tr:hover{ background:rgba(0,0,0,0.02); }
+
+    /* 2×2 grid of mini snapshot tables */
+    .snapshot-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1px;
+      background:var(--divider);
+      border-top:1px solid var(--divider);
+    }
+    .snapshot-cell{ background:var(--surface); min-width:0; }
+    .snapshot-cell-title{
+      font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px;
+      color:var(--accent); padding:7px 10px; border-bottom:1px solid var(--divider);
+    }
+    .snapshot-cell .snapshot-table td{ padding:3px 8px; }
+    .snapshot-cell .snapshot-table td:first-child{ min-width:0; }
+    .snapshot-cell .snapshot-table th{ padding:5px 8px; }
 
     /* ── Sections ── */
     .section-block{ }
@@ -270,6 +287,87 @@
       border-top:1px solid #f0f3f7;
     }
 
+    /* ── Symbol Research ── */
+    .research-band{
+      max-width:var(--max-width);
+      margin:16px auto 0;
+      padding:0 20px;
+    }
+    details.research{
+      background:var(--surface);
+      border:1px solid var(--card-border);
+      border-radius:var(--radius);
+    }
+    details.research > summary{
+      font-size:14px;
+      font-weight:600;
+      color:var(--text);
+      padding:12px 16px;
+      cursor:pointer;
+      list-style:none;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+    }
+    details.research > summary::-webkit-details-marker{ display:none; }
+    details.research > summary::before{
+      content:'▸';
+      font-size:11px;
+      color:var(--muted);
+      transition: transform .15s ease;
+    }
+    details.research[open] > summary::before{ transform: rotate(90deg); }
+    details.research[open] > summary{ border-bottom:1px solid var(--divider); }
+    .research-body{ padding:14px 16px 16px; }
+    .research-controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-bottom:14px;
+    }
+    .research-controls input{
+      font-size:14px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      padding:8px 12px;
+      width:120px;
+      border:1px solid var(--card-border);
+      border-radius:var(--radius);
+      color:var(--text);
+      background:var(--page-bg);
+    }
+    .research-controls input:focus{ outline:2px solid var(--accent); outline-offset:-1px; }
+    .research-controls .go-btn{
+      font-size:13px;
+      font-weight:600;
+      padding:8px 16px;
+      border:none;
+      border-radius:var(--radius);
+      background:var(--accent);
+      color:#fff;
+      cursor:pointer;
+    }
+    .research-controls .go-btn:hover{ background:var(--accent-hover); }
+    .research-links{ display:flex; flex-wrap:wrap; gap:6px; margin-left:auto; }
+    .research-links a{
+      font-size:12px;
+      font-weight:500;
+      padding:7px 12px;
+      border:1px solid var(--card-border);
+      border-radius:var(--radius);
+      color:var(--accent);
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .research-links a:hover{ background:var(--page-bg); color:var(--accent-hover); }
+    .research-widgets{ display:flex; flex-direction:column; gap:14px; }
+    .research-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    @media (max-width: 860px){ .research-row{ grid-template-columns:1fr; } }
+    .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
+
     /* ── Footer ── */
     footer.site-footer{ max-width:var(--max-width); margin:0 auto; padding:20px; color:var(--muted); font-size:12px; text-align:center; }
 
@@ -315,45 +413,36 @@
     <div class="brand">
       <img src="./assets/images/olea%20europaea.png" alt="Olive tree">
       <h1>Olea europaea</h1>
+      <img src="./assets/images/olea%20europaea.png" alt="Olive tree">
     </div>
-    <nav class="header-nav" aria-label="Main sections">
-      <div class="nav-dropdown">
-        <a href="#markets-section" class="active" aria-haspopup="true">Markets</a>
-        <div class="dropdown-menu">
-          <a href="#card-sentiment">Sentiment / Positioning</a>
-          <a href="#card-rates">Rates</a>
-          <a href="#card-bonds">Bonds</a>
-          <a href="#card-equities">Equities</a>
-          <a href="#card-derivatives">Derivatives</a>
-        </div>
-      </div>
-      <div class="nav-dropdown">
-        <a href="#news-section" aria-haspopup="true">News</a>
-        <div class="dropdown-menu">
-          <a href="#card-financial">Financial</a>
-          <a href="#card-regional">Regional &amp; Local</a>
-          <a href="#card-us-global">US &amp; Global Press</a>
-          <a href="#card-economic-calendar">Economic Calendar</a>
-          <a href="#card-earnings-calendar">Earnings Calendar</a>
-          <a href="#card-data-news">Data &amp; Market News</a>
-        </div>
-      </div>
-      <div class="nav-dropdown">
-        <a href="#resources-section" aria-haspopup="true">Resources</a>
-        <div class="dropdown-menu">
-          <a href="#card-charts">Charts</a>
-          <a href="#card-screener">Screener</a>
-          <a href="#card-etfs">ETFs</a>
-          <a href="#card-research">Research</a>
-        </div>
-      </div>
-    </nav>
-    <nav class="mobile-nav" aria-label="Mobile sections">
-      <a href="#markets-section">Markets</a>
-      <a href="#news-section">News</a>
-      <a href="#resources-section">Resources</a>
-    </nav>
   </header>
+
+  <!-- SYMBOL RESEARCH -->
+  <div class="research-band">
+    <details class="research" id="symbol-research">
+      <summary>Symbol Research — technical chart &amp; fundamentals</summary>
+      <div class="research-body">
+        <form class="research-controls" id="research-form">
+          <input id="research-input" type="text" value="META" aria-label="Ticker symbol" placeholder="Ticker" />
+          <button type="submit" class="go-btn">Go</button>
+          <span class="research-links">
+            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
+            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
+            <a id="link-investing" href="#" target="_blank" rel="noopener noreferrer">Investing.com ↗</a>
+            <a id="link-swissquote" href="#" target="_blank" rel="noopener noreferrer">Swissquote Derivatives ↗</a>
+          </span>
+        </form>
+        <div class="research-widgets">
+          <div class="tv-box" id="tv-chart"></div>
+          <div class="research-row">
+            <div class="tv-box" id="tv-info"></div>
+            <div class="tv-box" id="tv-technicals"></div>
+          </div>
+          <div class="tv-box" id="tv-fundamentals"></div>
+        </div>
+      </div>
+    </details>
+  </div>
 
   <div class="page-wrap">
     <section class="content" id="main-content">
@@ -831,69 +920,86 @@
     <!-- Sidebar: Market Snapshot -->
     <aside class="sidebar">
       <div class="sidebar-panel snapshot-panel">
-        <h4><a href="https://www.investing.com/portfolio/?portfolioID=MzU%2Ba2U7MG42Y2Bvbz9mYg%3D%3D" target="_blank" rel="noopener noreferrer">Market Snapshot</a><span class="snapshot-live-status" id="snapshot-live-status" aria-live="polite">Updated 31 Jul 19:13 UTC</span></h4>
-        <div class="snapshot-table-wrap">
-          <table class="snapshot-table">
-            <thead>
-              <tr><th>Name</th><th>Last</th><th>Chg.</th><th>Chg.&nbsp;%</th><th>Time</th></tr>
-            </thead>
-            <tbody>
-              <!-- ── Currencies ── -->
-              <tr class="section-header"><td colspan="5">Currencies</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/us-dollar-index" target="_blank">US Dollar Index</a></td><td>99.90</td><td class="chg-neg">-0.11</td><td class="chg-neg">-0.11%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/aud-usd" target="_blank">AUD/USD</a></td><td>0.7041</td><td class="chg-pos">+0.0082</td><td class="chg-pos">+1.18%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/usd-jpy" target="_blank">USD/JPY</a></td><td>158.95</td><td class="chg-neg">-4.35</td><td class="chg-neg">-2.66%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/usd-hkd" target="_blank">USD/HKD</a></td><td>7.842</td><td class="chg-pos">+0.000</td><td class="chg-pos">+0.00%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/usd-chf" target="_blank">USD/CHF</a></td><td>0.8080</td><td class="chg-neg">-0.0054</td><td class="chg-neg">-0.66%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/usd-ils" target="_blank">USD/ILS</a></td><td>3.054</td><td class="chg-neg">-0.022</td><td class="chg-neg">-0.72%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/eur-ils" target="_blank">EUR/ILS</a></td><td>3.511</td><td class="chg-pos">+0.009</td><td class="chg-pos">+0.27%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/eur-chf" target="_blank">EUR/CHF</a></td><td>0.9319</td><td class="chg-neg">-0.0008</td><td class="chg-neg">-0.09%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/eur-usd" target="_blank">EUR/USD</a></td><td>1.154</td><td class="chg-pos">+0.007</td><td class="chg-pos">+0.61%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/eur-gbp" target="_blank">EUR/GBP</a></td><td>0.8553</td><td class="chg-neg">-0.0026</td><td class="chg-neg">-0.30%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/gbp-chf" target="_blank">GBP/CHF</a></td><td>1.089</td><td class="chg-pos">+0.002</td><td class="chg-pos">+0.21%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/currencies/gbp-usd" target="_blank">GBP/USD</a></td><td>1.349</td><td class="chg-pos">+0.012</td><td class="chg-pos">+0.88%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/crypto/bitcoin" target="_blank">BTC/USD</a></td><td>63,004.36</td><td class="chg-neg">-1,720.95</td><td class="chg-neg">-2.66%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/crypto/ethereum" target="_blank">ETH/USD</a></td><td>1,868.33</td><td class="chg-neg">-49.04</td><td class="chg-neg">-2.56%</td><td>31/07</td></tr>
-              <!-- ── Commodities ── -->
-              <tr class="section-header"><td colspan="5">Commodities</td></tr>
-              <tr><td><a href="https://www.investing.com/commodities/gold" target="_blank">XAU/USD</a></td><td>4,105.10</td><td class="chg-pos">+5.00</td><td class="chg-pos">+0.12%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/commodities/silver" target="_blank">XAG/USD</a></td><td>58.08</td><td class="chg-neg">-0.73</td><td class="chg-neg">-1.24%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/commodities/platinum" target="_blank">Platinum</a></td><td>1,667.70</td><td class="chg-pos">+15.80</td><td class="chg-pos">+0.96%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/commodities/crude-oil" target="_blank">Crude Oil WTI</a></td><td>84.64</td><td class="chg-pos">+1.05</td><td class="chg-pos">+1.26%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/commodities/brent-oil" target="_blank">Brent Oil</a></td><td>90.12</td><td class="chg-pos">+1.09</td><td class="chg-pos">+1.22%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/commodities/natural-gas" target="_blank">Natural Gas</a></td><td>2.747</td><td class="chg-neg">-0.011</td><td class="chg-neg">-0.40%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/commodities/copper" target="_blank">Copper</a></td><td>6.530</td><td class="chg-pos">+0.085</td><td class="chg-pos">+1.32%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/commodities/aluminum" target="_blank">Aluminum</a></td><td>3,364.25</td><td class="chg-neg">-1.50</td><td class="chg-neg">-0.04%</td><td>31/07</td></tr>
-              <!-- ── U.S. Treasury Yields &amp; ETFs ── -->
-              <tr class="section-header"><td colspan="5">U.S. Treasury Yields &amp; ETFs</td></tr>
-              <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-3-month-bond-yield" target="_blank">U.S. 3M</a></td><td>3.682</td><td class="chg-pos">+0.007</td><td class="chg-pos">+0.19%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-5-year-bond-yield" target="_blank">U.S. 5Y</a></td><td>4.460</td><td class="chg-pos">+0.085</td><td class="chg-pos">+1.94%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield" target="_blank">U.S. 10Y</a></td><td>4.745</td><td class="chg-pos">+0.082</td><td class="chg-pos">+1.76%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield" target="_blank">U.S. 30Y</a></td><td>5.276</td><td class="chg-pos">+0.068</td><td class="chg-pos">+1.31%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/etfs/ishares-us-treasury-bond-etf" target="_blank">iShares US Treasury</a></td><td>22.42</td><td class="chg-neg">-0.09</td><td class="chg-neg">-0.40%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/etfs/spdr-bloomberg-1-3-month-t-bill" target="_blank">SPDR 1-3M T-Bill</a></td><td>91.68</td><td class="chg-pos">+0.03</td><td class="chg-pos">+0.03%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/etfs/ishares-1-3-year-treasury-bond" target="_blank">iShares 1-3Y Treasury</a></td><td>81.96</td><td class="chg-neg">-0.05</td><td class="chg-neg">-0.06%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/etfs/ishares-7-10-year-treasury-bond" target="_blank">iShares 7-10Y Treasury</a></td><td>92.75</td><td class="chg-neg">-0.46</td><td class="chg-neg">-0.49%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/etfs/ishares-20-year-treasury-bond" target="_blank">iShares 20+Y Treasury</a></td><td>81.99</td><td class="chg-neg">-0.82</td><td class="chg-neg">-0.98%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/etfs/proshares-ultrashort-20-year-treasury" target="_blank">ProShares Ultra Short 20+Y</a></td><td>38.74</td><td class="chg-pos">+0.80</td><td class="chg-pos">+2.11%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/etfs/pimco-25-year-zero-coupon-us-treas" target="_blank">PIMCO 25+Y Zero Coupon</a></td><td>57.90</td><td class="chg-neg">-0.93</td><td class="chg-neg">-1.57%</td><td>31/07</td></tr>
-              <!-- ── Global Market Indices ── -->
-              <tr class="section-header"><td colspan="5">Global Market Indices</td></tr>
-              <tr><td><a href="https://www.investing.com/etfs/ishares-msci-world" target="_blank">MSCI World</a></td><td>203.40</td><td class="chg-pos">+0.42</td><td class="chg-pos">+0.21%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/japan-ni225" target="_blank">Nikkei 225</a></td><td>61,867.43</td><td class="chg-pos">+433.24</td><td class="chg-pos">+0.71%</td><td>30/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/shanghai-composite" target="_blank">Shanghai</a></td><td>3,804.69</td><td class="chg-neg">-23.78</td><td class="chg-neg">-0.62%</td><td>30/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/hang-sen-40" target="_blank">Hang Seng</a></td><td>25,858.88</td><td class="chg-pos">+50.96</td><td class="chg-pos">+0.20%</td><td>30/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/s-p-cnx-nifty" target="_blank">Nifty 50</a></td><td>24,317.15</td><td class="chg-pos">+66.95</td><td class="chg-pos">+0.28%</td><td>30/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/eu-stoxx50" target="_blank">Euro Stoxx 50</a></td><td>6,358.01</td><td class="chg-pos">+13.61</td><td class="chg-pos">+0.21%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/switzerland-20" target="_blank">SMI</a></td><td>14,346.14</td><td class="chg-neg">-46.35</td><td class="chg-neg">-0.32%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/germany-30" target="_blank">DAX</a></td><td>25,629.24</td><td class="chg-pos">+17.21</td><td class="chg-pos">+0.07%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/france-40" target="_blank">CAC 40</a></td><td>8,509.64</td><td class="chg-pos">+24.00</td><td class="chg-pos">+0.28%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/us-spx-500" target="_blank">S&amp;P 500</a></td><td>7,487.41</td><td class="chg-pos">+49.78</td><td class="chg-pos">+0.67%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/us-30" target="_blank">Dow Jones</a></td><td>52,536.98</td><td class="chg-pos">+328.92</td><td class="chg-pos">+0.63%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/nq-100" target="_blank">Nasdaq 100</a></td><td>28,313.86</td><td class="chg-pos">+207.51</td><td class="chg-pos">+0.74%</td><td>31/07</td></tr>
-              <tr><td><a href="https://www.investing.com/indices/volatility-s-p-500" target="_blank">S&amp;P 500 VIX</a></td><td>16.49</td><td class="chg-neg">-0.60</td><td class="chg-neg">-3.51%</td><td>31/07</td></tr>
-            </tbody>
-          </table>
+        <h4><a href="https://www.investing.com/portfolio/?portfolioID=MzU%2Ba2U7MG42Y2Bvbz9mYg%3D%3D" target="_blank" rel="noopener noreferrer">Market Snapshot</a><span class="snapshot-live-status" id="snapshot-live-status" aria-live="polite">Updated 31 Jul 17:27 UTC</span></h4>
+        <div class="snapshot-grid">
+          <div class="snapshot-cell">
+            <div class="snapshot-cell-title">Rates</div>
+            <table class="snapshot-table">
+              <thead><tr><th>Name</th><th>Last</th><th>Chg.</th><th>Chg.&nbsp;%</th></tr></thead>
+              <tbody id="snap-rates">
+                <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-3-month-bond-yield" target="_blank">U.S. 3M</a></td><td>3.688</td><td class="chg-pos">+0.013</td><td class="chg-pos">+0.35%</td></tr>
+                <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-5-year-bond-yield" target="_blank">U.S. 5Y</a></td><td>4.451</td><td class="chg-pos">+0.076</td><td class="chg-pos">+1.74%</td></tr>
+                <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield" target="_blank">U.S. 10Y</a></td><td>4.739</td><td class="chg-pos">+0.076</td><td class="chg-pos">+1.63%</td></tr>
+                <tr><td><a href="https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield" target="_blank">U.S. 30Y</a></td><td>5.274</td><td class="chg-pos">+0.066</td><td class="chg-pos">+1.27%</td></tr>
+                <tr><td><a href="https://www.investing.com/etfs/ishares-us-treasury-bond-etf" target="_blank">iShares US Treasury</a></td><td>22.42</td><td class="chg-neg">-0.09</td><td class="chg-neg">-0.38%</td></tr>
+                <tr><td><a href="https://www.investing.com/etfs/spdr-bloomberg-1-3-month-t-bill" target="_blank">SPDR 1-3M T-Bill</a></td><td>91.68</td><td class="chg-pos">+0.03</td><td class="chg-pos">+0.03%</td></tr>
+                <tr><td><a href="https://www.investing.com/etfs/ishares-1-3-year-treasury-bond" target="_blank">iShares 1-3Y Treasury</a></td><td>81.96</td><td class="chg-neg">-0.05</td><td class="chg-neg">-0.06%</td></tr>
+                <tr><td><a href="https://www.investing.com/etfs/ishares-7-10-year-treasury-bond" target="_blank">iShares 7-10Y Treasury</a></td><td>92.79</td><td class="chg-neg">-0.42</td><td class="chg-neg">-0.46%</td></tr>
+                <tr><td><a href="https://www.investing.com/etfs/ishares-20-year-treasury-bond" target="_blank">iShares 20+Y Treasury</a></td><td>82.00</td><td class="chg-neg">-0.81</td><td class="chg-neg">-0.97%</td></tr>
+                <tr><td><a href="https://www.investing.com/etfs/proshares-ultrashort-20-year-treasury" target="_blank">ProShares Ultra Short 20+Y</a></td><td>38.67</td><td class="chg-pos">+0.73</td><td class="chg-pos">+1.93%</td></tr>
+                <tr><td><a href="https://www.investing.com/etfs/pimco-25-year-zero-coupon-us-treas" target="_blank">PIMCO 25+Y Zero Coupon</a></td><td>57.86</td><td class="chg-neg">-0.97</td><td class="chg-neg">-1.65%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="snapshot-cell">
+            <div class="snapshot-cell-title">Commodities</div>
+            <table class="snapshot-table">
+              <thead><tr><th>Name</th><th>Last</th><th>Chg.</th><th>Chg.&nbsp;%</th></tr></thead>
+              <tbody id="snap-commodities">
+                <tr><td><a href="https://www.investing.com/commodities/gold" target="_blank">XAU/USD</a></td><td>4,102.10</td><td class="chg-pos">+2.00</td><td class="chg-pos">+0.05%</td></tr>
+                <tr><td><a href="https://www.investing.com/commodities/silver" target="_blank">XAG/USD</a></td><td>57.72</td><td class="chg-neg">-1.10</td><td class="chg-neg">-1.87%</td></tr>
+                <tr><td><a href="https://www.investing.com/commodities/platinum" target="_blank">Platinum</a></td><td>1,660.20</td><td class="chg-pos">+8.30</td><td class="chg-pos">+0.50%</td></tr>
+                <tr><td><a href="https://www.investing.com/commodities/crude-oil" target="_blank">Crude Oil WTI</a></td><td>84.78</td><td class="chg-pos">+1.19</td><td class="chg-pos">+1.42%</td></tr>
+                <tr><td><a href="https://www.investing.com/commodities/brent-oil" target="_blank">Brent Oil</a></td><td>90.01</td><td class="chg-pos">+0.98</td><td class="chg-pos">+1.10%</td></tr>
+                <tr><td><a href="https://www.investing.com/commodities/natural-gas" target="_blank">Natural Gas</a></td><td>2.730</td><td class="chg-neg">-0.028</td><td class="chg-neg">-1.02%</td></tr>
+                <tr><td><a href="https://www.investing.com/commodities/copper" target="_blank">Copper</a></td><td>6.470</td><td class="chg-pos">+0.025</td><td class="chg-pos">+0.40%</td></tr>
+                <tr><td><a href="https://www.investing.com/commodities/aluminum" target="_blank">Aluminum</a></td><td>3,364.25</td><td class="chg-neg">-1.50</td><td class="chg-neg">-0.04%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="snapshot-cell">
+            <div class="snapshot-cell-title">Equities</div>
+            <table class="snapshot-table">
+              <thead><tr><th>Name</th><th>Last</th><th>Chg.</th><th>Chg.&nbsp;%</th></tr></thead>
+              <tbody id="snap-equities">
+                <tr><td><a href="https://www.investing.com/etfs/ishares-msci-world" target="_blank">MSCI World</a></td><td>203.40</td><td class="chg-pos">+0.42</td><td class="chg-pos">+0.21%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/japan-ni225" target="_blank">Nikkei 225</a></td><td>61,867.43</td><td class="chg-pos">+433.24</td><td class="chg-pos">+0.71%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/shanghai-composite" target="_blank">Shanghai</a></td><td>3,804.69</td><td class="chg-neg">-23.78</td><td class="chg-neg">-0.62%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/hang-sen-40" target="_blank">Hang Seng</a></td><td>25,858.88</td><td class="chg-pos">+50.96</td><td class="chg-pos">+0.20%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/s-p-cnx-nifty" target="_blank">Nifty 50</a></td><td>24,383.60</td><td class="chg-pos">+66.45</td><td class="chg-pos">+0.27%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/eu-stoxx50" target="_blank">Euro Stoxx 50</a></td><td>6,358.01</td><td class="chg-pos">+13.61</td><td class="chg-pos">+0.21%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/switzerland-20" target="_blank">SMI</a></td><td>14,346.14</td><td class="chg-neg">-46.35</td><td class="chg-neg">-0.32%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/germany-30" target="_blank">DAX</a></td><td>25,629.24</td><td class="chg-pos">+17.21</td><td class="chg-pos">+0.07%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/france-40" target="_blank">CAC 40</a></td><td>8,509.64</td><td class="chg-pos">+24.00</td><td class="chg-pos">+0.28%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/us-spx-500" target="_blank">S&amp;P 500</a></td><td>7,484.95</td><td class="chg-pos">+47.32</td><td class="chg-pos">+0.64%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/us-30" target="_blank">Dow Jones</a></td><td>52,518.75</td><td class="chg-pos">+310.69</td><td class="chg-pos">+0.60%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/nq-100" target="_blank">Nasdaq 100</a></td><td>28,335.05</td><td class="chg-pos">+228.71</td><td class="chg-pos">+0.81%</td></tr>
+                <tr><td><a href="https://www.investing.com/indices/volatility-s-p-500" target="_blank">S&amp;P 500 VIX</a></td><td>16.70</td><td class="chg-neg">-0.39</td><td class="chg-neg">-2.28%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="snapshot-cell">
+            <div class="snapshot-cell-title">Currencies</div>
+            <table class="snapshot-table">
+              <thead><tr><th>Name</th><th>Last</th><th>Chg.</th><th>Chg.&nbsp;%</th></tr></thead>
+              <tbody id="snap-currencies">
+                <tr><td><a href="https://www.investing.com/currencies/us-dollar-index" target="_blank">US Dollar Index</a></td><td>100.02</td><td class="chg-pos">+0.01</td><td class="chg-pos">+0.01%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/aud-usd" target="_blank">AUD/USD</a></td><td>0.7036</td><td class="chg-pos">+0.0077</td><td class="chg-pos">+1.11%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/usd-jpy" target="_blank">USD/JPY</a></td><td>158.87</td><td class="chg-neg">-4.43</td><td class="chg-neg">-2.71%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/usd-hkd" target="_blank">USD/HKD</a></td><td>7.842</td><td class="chg-neg">-0.000</td><td class="chg-neg">-0.00%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/usd-chf" target="_blank">USD/CHF</a></td><td>0.8079</td><td class="chg-neg">-0.0055</td><td class="chg-neg">-0.67%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/usd-ils" target="_blank">USD/ILS</a></td><td>3.052</td><td class="chg-neg">-0.024</td><td class="chg-neg">-0.78%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/eur-ils" target="_blank">EUR/ILS</a></td><td>3.506</td><td class="chg-pos">+0.005</td><td class="chg-pos">+0.14%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/eur-chf" target="_blank">EUR/CHF</a></td><td>0.9312</td><td class="chg-neg">-0.0015</td><td class="chg-neg">-0.16%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/eur-usd" target="_blank">EUR/USD</a></td><td>1.153</td><td class="chg-pos">+0.006</td><td class="chg-pos">+0.54%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/eur-gbp" target="_blank">EUR/GBP</a></td><td>0.8553</td><td class="chg-neg">-0.0026</td><td class="chg-neg">-0.30%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/gbp-chf" target="_blank">GBP/CHF</a></td><td>1.089</td><td class="chg-pos">+0.002</td><td class="chg-pos">+0.14%</td></tr>
+                <tr><td><a href="https://www.investing.com/currencies/gbp-usd" target="_blank">GBP/USD</a></td><td>1.348</td><td class="chg-pos">+0.011</td><td class="chg-pos">+0.81%</td></tr>
+                <tr><td><a href="https://www.investing.com/crypto/bitcoin" target="_blank">BTC/USD</a></td><td>62,899.76</td><td class="chg-neg">-1,825.55</td><td class="chg-neg">-2.82%</td></tr>
+                <tr><td><a href="https://www.investing.com/crypto/ethereum" target="_blank">ETH/USD</a></td><td>1,868.50</td><td class="chg-neg">-48.87</td><td class="chg-neg">-2.55%</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </aside>
@@ -939,6 +1045,92 @@
       });
       window.addEventListener('hashchange', openTarget);
       openTarget();
+    })();
+
+    /* ── Symbol Research: TradingView widgets + external link-outs ── */
+    (function(){
+      const form  = document.getElementById('research-form');
+      const input = document.getElementById('research-input');
+      const details = document.getElementById('symbol-research');
+      if(!form || !input) return;
+
+      function makeWidget(containerId, src, config, height){
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        container.innerHTML = '';
+        // Canonical TradingView embed structure.
+        const wrap = document.createElement('div');
+        wrap.className = 'tradingview-widget-container';
+        const widgetDiv = document.createElement('div');
+        widgetDiv.className = 'tradingview-widget-container__widget';
+        widgetDiv.style.height = height + 'px';
+        wrap.appendChild(widgetDiv);
+        const s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.src = src;
+        s.async = true;
+        s.textContent = JSON.stringify(config);
+        wrap.appendChild(s);
+        container.appendChild(wrap);
+      }
+
+      function updateLinks(sym){
+        const t = encodeURIComponent(sym);
+        document.getElementById('link-stockcharts').href = 'https://stockcharts.com/sc3/ui/?s=' + t;
+        document.getElementById('link-finviz').href      = 'https://finviz.com/quote.ashx?t=' + t;
+        document.getElementById('link-investing').href   = 'https://www.investing.com/search/?q=' + t;
+        document.getElementById('link-swissquote').href  =
+          'https://www.swissquote.ch/sqi_web_search/market/equity/swissderivatives/SwissDerivativeSearch.action?asSearchEngine=true&l=e&xxx=' + t;
+      }
+
+      function loadSymbol(sym){
+        sym = (sym || '').trim().toUpperCase();
+        if(!sym) return;
+        updateLinks(sym);
+
+        // Technical chart (StockCharts-style)
+        makeWidget('tv-chart', 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js', {
+          symbol: sym, autosize: false, width: '100%', height: 520,
+          interval: 'D', timezone: 'Etc/UTC', theme: 'light', style: '1',
+          locale: 'en', allow_symbol_change: true, hide_side_toolbar: false,
+          studies: ['STD;SMA','STD;Volume'], support_host: 'https://www.tradingview.com'
+        }, 520);
+
+        // Quick key stats
+        makeWidget('tv-info', 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js', {
+          symbol: sym, width: '100%', locale: 'en', colorTheme: 'light', isTransparent: false
+        }, 220);
+
+        // Technical rating gauge
+        makeWidget('tv-technicals', 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js', {
+          symbol: sym, interval: '1D', width: '100%', height: 400, isTransparent: false,
+          showIntervalTabs: true, locale: 'en', colorTheme: 'light'
+        }, 400);
+
+        // Fundamentals (Finviz-style financials)
+        makeWidget('tv-fundamentals', 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
+          symbol: sym, colorTheme: 'light', displayMode: 'regular', width: '100%', height: 490,
+          locale: 'en', isTransparent: false, largeChartUrl: ''
+        }, 490);
+      }
+
+      let loaded = false;
+      function ensureLoaded(){
+        if(loaded) return;
+        loaded = true;
+        loadSymbol(input.value || 'META');
+      }
+
+      // Load widgets the first time the panel is opened (saves bandwidth when closed).
+      details.addEventListener('toggle', () => { if(details.open) ensureLoaded(); });
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        loaded = true;
+        loadSymbol(input.value);
+      });
+
+      updateLinks(input.value || 'META');
     })();
   </script>
 </body>
