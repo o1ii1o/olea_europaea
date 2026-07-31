@@ -1088,13 +1088,19 @@
         if(!sym) return;
         updateLinks(sym);
 
-        // Technical chart (StockCharts-style)
+        // Technical chart: 1-year daily, 50/100/200-day SMAs overlaid, RSI subpanel.
         makeWidget('tv-chart', 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js', {
-          symbol: sym, autosize: false, width: '100%', height: 520,
-          interval: 'D', timezone: 'Etc/UTC', theme: 'light', style: '1',
+          symbol: sym, autosize: false, width: '100%', height: 600,
+          interval: 'D', range: '12M', timezone: 'Etc/UTC', theme: 'light', style: '1',
           locale: 'en', allow_symbol_change: true, hide_side_toolbar: false,
-          studies: ['STD;SMA','STD;Volume'], support_host: 'https://www.tradingview.com'
-        }, 520);
+          studies: [
+            { id: 'MASimple@tv-basicstudies', inputs: { length: 50 } },
+            { id: 'MASimple@tv-basicstudies', inputs: { length: 100 } },
+            { id: 'MASimple@tv-basicstudies', inputs: { length: 200 } },
+            'STD;RSI'
+          ],
+          support_host: 'https://www.tradingview.com'
+        }, 600);
 
         // Quick key stats
         makeWidget('tv-info', 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js', {
