@@ -1062,13 +1062,21 @@
       function makeWidget(containerId, src, config, height){
         const container = document.getElementById(containerId);
         if(!container) return;
-        container.innerHTML = '<div class="tradingview-widget-container__widget" style="height:' + height + 'px"></div>';
+        container.innerHTML = '';
+        // Canonical TradingView embed structure.
+        const wrap = document.createElement('div');
+        wrap.className = 'tradingview-widget-container';
+        const widgetDiv = document.createElement('div');
+        widgetDiv.className = 'tradingview-widget-container__widget';
+        widgetDiv.style.height = height + 'px';
+        wrap.appendChild(widgetDiv);
         const s = document.createElement('script');
         s.type = 'text/javascript';
         s.src = src;
         s.async = true;
         s.textContent = JSON.stringify(config);
-        container.appendChild(s);
+        wrap.appendChild(s);
+        container.appendChild(wrap);
       }
 
       function updateLinks(sym){
