@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Olea europaea</title>
 
+  <!-- Home-screen icon (iOS Safari "Add to Home Screen") -->
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Olea europaea" />
+
+  <!-- Browser-tab favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="./assets/images/favicon-16x16.png" />
+  <link rel="icon" href="./assets/images/favicon.ico" sizes="any" />
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -434,10 +443,6 @@
         </form>
         <div class="research-widgets">
           <div class="tv-box" id="tv-chart"></div>
-          <div class="research-row">
-            <div class="tv-box" id="tv-info"></div>
-            <div class="tv-box" id="tv-technicals"></div>
-          </div>
           <div class="tv-box" id="tv-fundamentals"></div>
         </div>
       </div>
@@ -1088,36 +1093,27 @@
         if(!sym) return;
         updateLinks(sym);
 
-        // Technical chart: 1-year daily, 50/100/200-day SMAs overlaid, RSI subpanel.
+        // Technical chart: 3-year daily, 50/100/200-day SMAs overlaid,
+        // RSI pane above the volume bar at the bottom.
         makeWidget('tv-chart', 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js', {
-          symbol: sym, autosize: false, width: '100%', height: 600,
-          interval: 'D', range: '12M', timezone: 'Etc/UTC', theme: 'light', style: '1',
+          symbol: sym, autosize: false, width: '100%', height: 620,
+          interval: 'D', range: '36M', timezone: 'Etc/UTC', theme: 'light', style: '1',
           locale: 'en', allow_symbol_change: true, hide_side_toolbar: false,
           studies: [
             { id: 'MASimple@tv-basicstudies', inputs: { length: 50 } },
             { id: 'MASimple@tv-basicstudies', inputs: { length: 100 } },
             { id: 'MASimple@tv-basicstudies', inputs: { length: 200 } },
-            'STD;RSI'
+            'STD;RSI',
+            'STD;Volume'
           ],
           support_host: 'https://www.tradingview.com'
-        }, 600);
+        }, 620);
 
-        // Quick key stats
-        makeWidget('tv-info', 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js', {
-          symbol: sym, width: '100%', locale: 'en', colorTheme: 'light', isTransparent: false
-        }, 220);
-
-        // Technical rating gauge
-        makeWidget('tv-technicals', 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js', {
-          symbol: sym, interval: '1D', width: '100%', height: 400, isTransparent: false,
-          showIntervalTabs: true, locale: 'en', colorTheme: 'light'
-        }, 400);
-
-        // Fundamentals (Finviz-style financials)
+        // Fundamentals — compact overview, fits without scrolling.
         makeWidget('tv-fundamentals', 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
-          symbol: sym, colorTheme: 'light', displayMode: 'regular', width: '100%', height: 490,
+          symbol: sym, colorTheme: 'light', displayMode: 'compact', width: '100%', height: 400,
           locale: 'en', isTransparent: false, largeChartUrl: ''
-        }, 490);
+        }, 400);
       }
 
       let loaded = false;
