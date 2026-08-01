@@ -10,6 +10,7 @@ Each row shows Last, Chg, Chg% and YTD%.
 
 import json
 import os
+from zoneinfo import ZoneInfo
 import re
 import urllib.request
 from datetime import datetime, timezone
@@ -60,17 +61,11 @@ SECTIONS = [
         ("U.S. 5Y", "DGS5"),
         ("U.S. 10Y", "DGS10"),
         ("U.S. 30Y", "DGS30"),
-        ("Australia CB", "IRSTCB01AUM156N"),
-        ("Australia 10Y", "IRLTLT01AUM156N"),
         ("Japan CB", "IRSTCB01JPM156N"),
         ("Japan 10Y", "IRLTLT01JPM156N"),
-        ("China CB", "IRSTCB01CNM156N"),
-        ("China 10Y", "IRLTLT01CNM156N"),
-        ("Israel CB", "IRSTCB01ILM156N"),
-        ("Israel 10Y", "IRLTLT01ILM156N"),
         ("ECB Refi", "ECBMRRFR"),
         ("Euro 10Y", "IRLTLT01EZM156N"),
-        ("UK CB", "IRSTCB01GBM156N"),
+        ("BoE SONIA", "IUDSOIA"),
         ("UK 10Y", "IRLTLT01GBM156N"),
     ]),
     ("Global Market Indices", "yf", [
@@ -286,8 +281,8 @@ SECTION_TBODY = {
 }
 
 
-def build_rows(instruments, results):
-    """Return the inner HTML rows (Name, Last, Chg, Chg%, YTD%)."""
+def build_rows(instruments, results, stamp):
+    """Return the inner HTML rows (Name, Last, Chg, Chg%, YTD%, Time)."""
     lines = []
     for name, _key in instruments:
         d = results.get(name)
@@ -304,6 +299,7 @@ def build_rows(instruments, results):
             f'<td class="{cls}">{fmt_change(d["chg"], d["last"])}</td>'
             f'<td class="{cls}">{fmt_change(d["chg_pct"], 100)}%</td>'
             f'<td class="{ytd_cls}">{ytd_txt}</td>'
+            f'<td class="snap-time">{stamp}</td>'
             f'</tr>'
         )
     return "\n".join(lines)
@@ -318,18 +314,20 @@ def replace_tbody(content, tbody_id, rows_html):
 
 def update_html(results):
     content = HTML_FILE.read_text()
+    now_zurich = datetime.now(ZoneInfo("Europe/Zurich"))
+    stamp = now_zurich.strftime("%d/%m %H:%M")
+
     for section_title, _src, instruments in SECTIONS:
         tbody_id = SECTION_TBODY.get(section_title)
         if not tbody_id:
             continue
-        rows = build_rows(instruments, results)
+        rows = build_rows(instruments, results, stamp)
         if rows.strip():
             content = replace_tbody(content, tbody_id, rows)
 
-    now_utc = datetime.now(timezone.utc).strftime("%d %b %H:%M UTC")
     content = re.sub(
         r'(<span[^>]*id="snapshot-live-status"[^>]*>)[^<]*(</span>)',
-        rf"\1Updated {now_utc}\2",
+        rf"\1Updated {stamp} Zurich\2",
         content,
     )
     HTML_FILE.write_text(content)
