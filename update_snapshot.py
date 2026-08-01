@@ -63,8 +63,6 @@ SECTIONS = [
         ("U.S. 30Y", "DGS30"),
         ("Japan CB", "IRSTCB01JPM156N"),
         ("Japan 10Y", "IRLTLT01JPM156N"),
-        ("China CB", "IRSTCB01CNM156N"),
-        ("China 10Y", "IRLTLT01CNM156N"),
         ("ECB Refi", "ECBMRRFR"),
         ("Euro 10Y", "IRLTLT01EZM156N"),
         ("BoE SONIA", "IUDSOIA"),
