@@ -182,7 +182,10 @@ def fetch_yf(instruments):
             chg = last - prev
             chg_pct = (chg / prev) * 100 if prev else 0.0
             ytd = ytd_from_series(list(closes.index), [float(v) for v in closes])
-            out[name] = dict(last=last, chg=chg, chg_pct=chg_pct, ytd=ytd)
+            out[name] = dict(
+                last=last, chg=chg, chg_pct=chg_pct, ytd=ytd,
+                time=closes.index[-1].to_pydatetime(),
+            )
         except (KeyError, IndexError, TypeError) as exc:
             print(f"  skip {ticker} ({name}): {exc}")
     return out
@@ -240,7 +243,9 @@ def fetch_fred(instruments):
         chg = last - prev
         chg_pct = (chg / prev) * 100 if prev else 0.0
         ytd = ytd_from_series(dates, values)
-        out[name] = dict(last=last, chg=chg, chg_pct=chg_pct, ytd=ytd)
+        out[name] = dict(
+            last=last, chg=chg, chg_pct=chg_pct, ytd=ytd, time=dates[-1]
+        )
     return out
 
 
@@ -273,6 +278,19 @@ def fmt_pct(val):
     return f"{sign}{val:.2f}%", cls
 
 
+def fmt_data_time(dt):
+    """Format the date/time a data point is valid for.
+
+    Daily/EOD sources carry only a date (shown DD/MM); an intraday
+    timestamp adds HH:MM.
+    """
+    if dt is None:
+        return "—"
+    if getattr(dt, "hour", 0) or getattr(dt, "minute", 0):
+        return dt.strftime("%d/%m %H:%M")
+    return dt.strftime("%d/%m")
+
+
 # ── HTML generation ───────────────────────────────────────────────────────────
 
 SECTION_TBODY = {
@@ -283,8 +301,11 @@ SECTION_TBODY = {
 }
 
 
-def build_rows(instruments, results, stamp):
-    """Return the inner HTML rows (Name, Last, Chg, Chg%, YTD%, Time)."""
+def build_rows(instruments, results):
+    """Return the inner HTML rows (Name, Last, Chg, Chg%, YTD%, Time).
+
+    The Time cell is each data point's own valid date/time, not the run time.
+    """
     lines = []
     for name, _key in instruments:
         d = results.get(name)
@@ -301,7 +322,7 @@ def build_rows(instruments, results, stamp):
             f'<td class="{cls}">{fmt_change(d["chg"], d["last"])}</td>'
             f'<td class="{cls}">{fmt_change(d["chg_pct"], 100)}%</td>'
             f'<td class="{ytd_cls}">{ytd_txt}</td>'
-            f'<td class="snap-time">{stamp}</td>'
+            f'<td class="snap-time">{fmt_data_time(d.get("time"))}</td>'
             f'</tr>'
         )
     return "\n".join(lines)
@@ -323,7 +344,7 @@ def update_html(results):
         tbody_id = SECTION_TBODY.get(section_title)
         if not tbody_id:
             continue
-        rows = build_rows(instruments, results, stamp)
+        rows = build_rows(instruments, results)
         if rows.strip():
             content = replace_tbody(content, tbody_id, rows)
 
