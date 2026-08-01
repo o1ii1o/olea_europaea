@@ -67,7 +67,7 @@ SECTIONS = [
         ("China 10Y", "IRLTLT01CNM156N"),
         ("ECB Refi", "ECBMRRFR"),
         ("Euro 10Y", "IRLTLT01EZM156N"),
-        ("BoE Refi", "IR3TIB01GBM156N"),
+        ("BoE SONIA", "IUDSOIA"),
         ("UK 10Y", "IRLTLT01GBM156N"),
     ]),
     ("Global Market Indices", "yf", [
