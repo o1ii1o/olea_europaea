@@ -192,13 +192,19 @@ def fetch_yf(instruments):
 
 
 def fred_observations(series_id, limit=800):
-    """Return (dates, values) chronological for a FRED series, or ([], [])."""
+    """Return (dates, values) chronological for a FRED series, or ([], []).
+
+    Requests the most recent `limit` observations (sort_order=desc) so long
+    daily histories don't return an old first page, then sorts ascending.
+    `limit` (default 800) comfortably reaches back past the prior year-end
+    needed for YTD on daily, weekly, or monthly series.
+    """
     if not FRED_API_KEY:
         return [], []
     url = (
         "https://api.stlouisfed.org/fred/series/observations"
         f"?series_id={series_id}&api_key={FRED_API_KEY}&file_type=json"
-        f"&sort_order=asc&limit={limit}"
+        f"&sort_order=desc&limit={limit}"
     )
     try:
         with urllib.request.urlopen(url, timeout=30) as resp:
@@ -206,16 +212,18 @@ def fred_observations(series_id, limit=800):
     except Exception as exc:  # noqa: BLE001 - network/JSON errors all skip
         print(f"  FRED error {series_id}: {exc}")
         return [], []
-    dates, values = [], []
+    pairs = []
     for obs in payload.get("observations", []):
         raw = obs.get("value")
         if raw in (None, "", "."):
             continue
         try:
-            values.append(float(raw))
-            dates.append(datetime.strptime(obs["date"], "%Y-%m-%d"))
+            pairs.append((datetime.strptime(obs["date"], "%Y-%m-%d"), float(raw)))
         except (ValueError, KeyError):
             continue
+    pairs.sort(key=lambda p: p[0])  # chronological (oldest first)
+    dates = [d for d, _ in pairs]
+    values = [v for _, v in pairs]
     return dates, values
 
 
