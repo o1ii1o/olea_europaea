@@ -1,17 +1,30 @@
 #!/usr/bin/env python3
-"""Fetch live market data via yfinance and update the Market Snapshot in index.html."""
+"""Fetch live market data and update the Market Snapshot in index.html.
 
+Two data sources:
+  * yfinance  – currencies, commodities, equity indices (daily prices)
+  * FRED      – interest rates (SOFR, US Treasury curve, central-bank &
+                foreign 10-year rates).  Needs a free FRED_API_KEY env var.
+Each row shows Last, Chg, Chg% and YTD%.
+"""
+
+import json
+import os
 import re
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
 import yfinance as yf
 
 HTML_FILE = Path(__file__).parent / "index.html"
+FRED_API_KEY = os.environ.get("FRED_API_KEY", "")
 
-# Each section: (html_escaped_title, [(display_name, yfinance_ticker), ...])
+# Each section: (title, source, [(display_name, key), ...])
+#   source "yf"   -> key is a yfinance ticker
+#   source "fred" -> key is a FRED series id
 SECTIONS = [
-    ("Currencies", [
+    ("Currencies", "yf", [
         ("US Dollar Index", "DX-Y.NYB"),
         ("AUD/USD", "AUDUSD=X"),
         ("USD/JPY", "JPY=X"),
@@ -27,7 +40,7 @@ SECTIONS = [
         ("BTC/USD", "BTC-USD"),
         ("ETH/USD", "ETH-USD"),
     ]),
-    ("Commodities", [
+    ("Commodities", "yf", [
         ("XAU/USD", "GC=F"),
         ("XAG/USD", "SI=F"),
         ("Platinum", "PL=F"),
@@ -39,20 +52,28 @@ SECTIONS = [
         ("Steel", "SRU=F"),
         ("Uranium", "UX=F"),
     ]),
-    ("U.S. Treasury Yields &amp; ETFs", [
-        ("U.S. 3M", "^IRX"),
-        ("U.S. 5Y", "^FVX"),
-        ("U.S. 10Y", "^TNX"),
-        ("U.S. 30Y", "^TYX"),
-        ("iShares US Treasury", "GOVT"),
-        ("SPDR 1-3M T-Bill", "BIL"),
-        ("iShares 1-3Y Treasury", "SHY"),
-        ("iShares 7-10Y Treasury", "IEF"),
-        ("iShares 20+Y Treasury", "TLT"),
-        ("ProShares Ultra Short 20+Y", "TBT"),
-        ("PIMCO 25+Y Zero Coupon", "ZROZ"),
+    ("Rates", "fred", [
+        ("USD SOFR", "SOFR"),
+        ("U.S. 3M", "DGS3MO"),
+        ("U.S. 1Y", "DGS1"),
+        ("U.S. 2Y", "DGS2"),
+        ("U.S. 5Y", "DGS5"),
+        ("U.S. 10Y", "DGS10"),
+        ("U.S. 30Y", "DGS30"),
+        ("Australia CB", "IRSTCB01AUM156N"),
+        ("Australia 10Y", "IRLTLT01AUM156N"),
+        ("Japan CB", "IRSTCB01JPM156N"),
+        ("Japan 10Y", "IRLTLT01JPM156N"),
+        ("China CB", "IRSTCB01CNM156N"),
+        ("China 10Y", "IRLTLT01CNM156N"),
+        ("Israel CB", "IRSTCB01ILM156N"),
+        ("Israel 10Y", "IRLTLT01ILM156N"),
+        ("ECB Refi", "ECBMRRFR"),
+        ("Euro 10Y", "IRLTLT01EZM156N"),
+        ("UK CB", "IRSTCB01GBM156N"),
+        ("UK 10Y", "IRLTLT01GBM156N"),
     ]),
-    ("Global Market Indices", [
+    ("Global Market Indices", "yf", [
         ("MSCI World", "URTH"),
         ("Nikkei 225", "^N225"),
         ("Shanghai", "000001.SS"),
@@ -95,17 +116,6 @@ URLS = {
     "Aluminum": "https://www.investing.com/commodities/aluminum",
     "Steel": "https://www.investing.com/commodities/us-steel-coil",
     "Uranium": "https://www.investing.com/commodities/uranium",
-    "U.S. 3M": "https://www.investing.com/rates-bonds/u.s.-3-month-bond-yield",
-    "U.S. 5Y": "https://www.investing.com/rates-bonds/u.s.-5-year-bond-yield",
-    "U.S. 10Y": "https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield",
-    "U.S. 30Y": "https://www.investing.com/rates-bonds/u.s.-30-year-bond-yield",
-    "iShares US Treasury": "https://www.investing.com/etfs/ishares-us-treasury-bond-etf",
-    "SPDR 1-3M T-Bill": "https://www.investing.com/etfs/spdr-bloomberg-1-3-month-t-bill",
-    "iShares 1-3Y Treasury": "https://www.investing.com/etfs/ishares-1-3-year-treasury-bond",
-    "iShares 7-10Y Treasury": "https://www.investing.com/etfs/ishares-7-10-year-treasury-bond",
-    "iShares 20+Y Treasury": "https://www.investing.com/etfs/ishares-20-year-treasury-bond",
-    "ProShares Ultra Short 20+Y": "https://www.investing.com/etfs/proshares-ultrashort-20-year-treasury",
-    "PIMCO 25+Y Zero Coupon": "https://www.investing.com/etfs/pimco-25-year-zero-coupon-us-treas",
     "MSCI World": "https://www.investing.com/etfs/ishares-msci-world",
     "Nikkei 225": "https://www.investing.com/indices/japan-ni225",
     "Shanghai": "https://www.investing.com/indices/shanghai-composite",
@@ -122,36 +132,114 @@ URLS = {
     "S&amp;P 500 VIX": "https://www.investing.com/indices/volatility-s-p-500",
 }
 
-
-def fetch_data():
-    """Fetch market data for all tickers via yf.download (single batch call)."""
-    all_tickers = [t for _, instruments in SECTIONS for _, t in instruments]
-
-    print(f"Downloading data for {len(all_tickers)} tickers ...")
-    data = yf.download(all_tickers, period="5d", progress=False)
-
-    results = {}
-    for _, instruments in SECTIONS:
-        for name, ticker in instruments:
-            try:
-                closes = data["Close"][ticker].dropna()
-                if len(closes) < 2:
-                    print(f"  skip {ticker} ({name}): fewer than 2 data points")
-                    continue
-                last = float(closes.iloc[-1])
-                prev = float(closes.iloc[-2])
-                chg = last - prev
-                chg_pct = (chg / prev) * 100 if prev else 0.0
-                last_dt = closes.index[-1]
-                results[ticker] = dict(
-                    last=last, chg=chg, chg_pct=chg_pct, time=last_dt
-                )
-            except (KeyError, IndexError, TypeError) as exc:
-                print(f"  skip {ticker} ({name}): {exc}")
-    return results
+# FRED rate rows link to their FRED series page.
+for _section_title, _src, _instruments in SECTIONS:
+    if _src == "fred":
+        for _name, _series in _instruments:
+            URLS.setdefault(
+                _name, f"https://fred.stlouisfed.org/series/{_series}"
+            )
 
 
-# ── Formatting helpers ────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def ytd_from_series(dates, values):
+    """YTD % using the prior year's final value as the baseline.
+
+    dates/values are chronological (oldest first).  Returns None if no
+    prior-year baseline is available.
+    """
+    if not values:
+        return None
+    last = values[-1]
+    cur_year = dates[-1].year
+    baseline = None
+    for d, v in zip(dates, values):
+        if d.year < cur_year:
+            baseline = v  # keep the latest prior-year value
+    if baseline is None:
+        # No prior-year data: fall back to first value of the current year.
+        for d, v in zip(dates, values):
+            if d.year == cur_year:
+                baseline = v
+                break
+    if not baseline:
+        return None
+    return (last / baseline - 1) * 100
+
+
+def fetch_yf(instruments):
+    """Fetch yfinance instruments; return {name: dict(last, chg, chg_pct, ytd)}."""
+    tickers = [k for _, k in instruments]
+    print(f"Downloading {len(tickers)} yfinance tickers ...")
+    data = yf.download(tickers, period="2y", progress=False)
+    out = {}
+    for name, ticker in instruments:
+        try:
+            closes = data["Close"][ticker].dropna()
+            if len(closes) < 2:
+                print(f"  skip {ticker} ({name}): <2 points")
+                continue
+            last = float(closes.iloc[-1])
+            prev = float(closes.iloc[-2])
+            chg = last - prev
+            chg_pct = (chg / prev) * 100 if prev else 0.0
+            ytd = ytd_from_series(list(closes.index), [float(v) for v in closes])
+            out[name] = dict(last=last, chg=chg, chg_pct=chg_pct, ytd=ytd)
+        except (KeyError, IndexError, TypeError) as exc:
+            print(f"  skip {ticker} ({name}): {exc}")
+    return out
+
+
+def fred_observations(series_id, limit=800):
+    """Return (dates, values) chronological for a FRED series, or ([], [])."""
+    if not FRED_API_KEY:
+        return [], []
+    url = (
+        "https://api.stlouisfed.org/fred/series/observations"
+        f"?series_id={series_id}&api_key={FRED_API_KEY}&file_type=json"
+        f"&sort_order=asc&limit={limit}"
+    )
+    try:
+        with urllib.request.urlopen(url, timeout=30) as resp:
+            payload = json.load(resp)
+    except Exception as exc:  # noqa: BLE001 - network/JSON errors all skip
+        print(f"  FRED error {series_id}: {exc}")
+        return [], []
+    dates, values = [], []
+    for obs in payload.get("observations", []):
+        raw = obs.get("value")
+        if raw in (None, "", "."):
+            continue
+        try:
+            values.append(float(raw))
+            dates.append(datetime.strptime(obs["date"], "%Y-%m-%d"))
+        except (ValueError, KeyError):
+            continue
+    return dates, values
+
+
+def fetch_fred(instruments):
+    """Fetch FRED rate series; return {name: dict(last, chg, chg_pct, ytd)}."""
+    if not FRED_API_KEY:
+        print("  FRED_API_KEY not set – rates left unchanged.")
+        return {}
+    out = {}
+    for name, series_id in instruments:
+        dates, values = fred_observations(series_id)
+        if len(values) < 2:
+            print(f"  skip {series_id} ({name}): <2 observations")
+            continue
+        last = values[-1]
+        prev = values[-2]
+        chg = last - prev
+        chg_pct = (chg / prev) * 100 if prev else 0.0
+        ytd = ytd_from_series(dates, values)
+        out[name] = dict(last=last, chg=chg, chg_pct=chg_pct, ytd=ytd)
+    return out
+
+
+# ── Formatting ────────────────────────────────────────────────────────────────
 
 def fmt_price(val):
     a = abs(val)
@@ -172,15 +260,18 @@ def fmt_change(val, ref):
     return f"{sign}{val:.4f}"
 
 
-def fmt_time(dt):
-    return dt.strftime("%d/%m")
+def fmt_pct(val):
+    if val is None:
+        return "—", ""
+    cls = "chg-pos" if val >= 0 else "chg-neg"
+    sign = "+" if val >= 0 else ""
+    return f"{sign}{val:.2f}%", cls
 
 
 # ── HTML generation ───────────────────────────────────────────────────────────
 
-# Section title -> tbody id in the 2x2 snapshot grid.
 SECTION_TBODY = {
-    "U.S. Treasury Yields &amp; ETFs": "snap-rates",
+    "Rates": "snap-rates",
     "Commodities": "snap-commodities",
     "Global Market Indices": "snap-equities",
     "Currencies": "snap-currencies",
@@ -188,30 +279,29 @@ SECTION_TBODY = {
 
 
 def build_rows(instruments, results):
-    """Return the inner HTML rows (4 columns, no Time) for one grid table."""
+    """Return the inner HTML rows (Name, Last, Chg, Chg%, YTD%)."""
     lines = []
-    for name, ticker in instruments:
-        if ticker not in results:
+    for name, _key in instruments:
+        d = results.get(name)
+        if not d:
             continue
-        d = results[ticker]
         cls = "chg-pos" if d["chg"] >= 0 else "chg-neg"
+        ytd_txt, ytd_cls = fmt_pct(d.get("ytd"))
         url = URLS.get(name)
-        name_cell = (
-            f'<a href="{url}" target="_blank">{name}</a>' if url else name
-        )
+        name_cell = f'<a href="{url}" target="_blank">{name}</a>' if url else name
         lines.append(
             f'                <tr>'
             f'<td>{name_cell}</td>'
             f'<td>{fmt_price(d["last"])}</td>'
             f'<td class="{cls}">{fmt_change(d["chg"], d["last"])}</td>'
             f'<td class="{cls}">{fmt_change(d["chg_pct"], 100)}%</td>'
+            f'<td class="{ytd_cls}">{ytd_txt}</td>'
             f'</tr>'
         )
     return "\n".join(lines)
 
 
 def replace_tbody(content, tbody_id, rows_html):
-    """Replace the inner HTML of <tbody id="tbody_id"> ... </tbody>."""
     open_tag = f'<tbody id="{tbody_id}">'
     i = content.index(open_tag) + len(open_tag)
     j = content.index("</tbody>", i)
@@ -219,15 +309,14 @@ def replace_tbody(content, tbody_id, rows_html):
 
 
 def update_html(results):
-    """Update each grid table and the snapshot-live-status timestamp."""
     content = HTML_FILE.read_text()
-
-    for section_title, instruments in SECTIONS:
+    for section_title, _src, instruments in SECTIONS:
         tbody_id = SECTION_TBODY.get(section_title)
         if not tbody_id:
             continue
         rows = build_rows(instruments, results)
-        content = replace_tbody(content, tbody_id, rows)
+        if rows.strip():
+            content = replace_tbody(content, tbody_id, rows)
 
     now_utc = datetime.now(timezone.utc).strftime("%d %b %H:%M UTC")
     content = re.sub(
@@ -235,7 +324,6 @@ def update_html(results):
         rf"\1Updated {now_utc}\2",
         content,
     )
-
     HTML_FILE.write_text(content)
     print(f"Wrote {HTML_FILE}")
 
@@ -243,8 +331,14 @@ def update_html(results):
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    results = fetch_data()
-    total = sum(len(instr) for _, instr in SECTIONS)
+    results = {}
+    for _title, src, instruments in SECTIONS:
+        if src == "yf":
+            results.update(fetch_yf(instruments))
+        elif src == "fred":
+            results.update(fetch_fred(instruments))
+
+    total = sum(len(instr) for _, _, instr in SECTIONS)
     print(f"Fetched data for {len(results)} / {total} instruments.")
     if not results:
         print("No data fetched – index.html left unchanged.")
