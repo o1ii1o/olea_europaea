@@ -279,15 +279,9 @@ def fmt_pct(val):
 
 
 def fmt_data_time(dt):
-    """Format the date/time a data point is valid for.
-
-    Daily/EOD sources carry only a date (shown DD/MM); an intraday
-    timestamp adds HH:MM.
-    """
+    """Format the date a data point is valid for as DD/MM."""
     if dt is None:
         return "—"
-    if getattr(dt, "hour", 0) or getattr(dt, "minute", 0):
-        return dt.strftime("%d/%m %H:%M")
     return dt.strftime("%d/%m")
 
 
