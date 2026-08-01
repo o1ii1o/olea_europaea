@@ -67,6 +67,8 @@ SECTIONS = [
         ("Euro 10Y", "IRLTLT01EZM156N"),
         ("BoE SONIA", "IUDSOIA"),
         ("UK 10Y", "IRLTLT01GBM156N"),
+        ("SNB Rate", "IRSTCB01CHM156N"),
+        ("Swiss 10Y", "IRLTLT01CHM156N"),
     ]),
     ("Global Market Indices", "yf", [
         ("MSCI World", "URTH"),
