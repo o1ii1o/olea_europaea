@@ -375,6 +375,8 @@
     }
     .research-links a:hover{ background:var(--page-bg); color:var(--accent-hover); }
     .research-widgets{ display:flex; flex-direction:column; gap:14px; }
+    .fin-compare{ display:flex; flex-direction:column; gap:18px; }
+    .fin-label{ font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
     .research-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     @media (max-width: 860px){ .research-row{ grid-template-columns:1fr; } }
     .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
@@ -445,7 +447,11 @@
         </form>
         <div class="research-widgets">
           <div class="tv-box" id="tv-chart"></div>
-          <div class="tv-box" id="tv-fundamentals"></div>
+          <div class="fin-compare">
+            <div><div class="fin-label">Financials — Regular</div><div class="tv-box" id="tv-fund-regular"></div></div>
+            <div><div class="fin-label">Financials — Adaptive</div><div class="tv-box" id="tv-fund-adaptive"></div></div>
+            <div><div class="fin-label">Financials — Compact</div><div class="tv-box" id="tv-fund-compact"></div></div>
+          </div>
         </div>
       </div>
     </details>
@@ -1127,11 +1133,14 @@
           support_host: 'https://www.tradingview.com'
         }, 620);
 
-        // Fundamentals — compact overview, fits without scrolling.
-        makeWidget('tv-fundamentals', 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
-          symbol: sym, colorTheme: 'light', displayMode: 'compact', width: '100%', height: 400,
-          locale: 'en', isTransparent: false, largeChartUrl: ''
-        }, 400);
+        // Fundamentals — render all three display modes so we can compare
+        // which one scrolls least, then keep the winner.
+        const finSrc = 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js';
+        [['tv-fund-regular','regular'],['tv-fund-adaptive','adaptive'],['tv-fund-compact','compact']]
+          .forEach(([box, mode]) => makeWidget(box, finSrc, {
+            symbol: sym, colorTheme: 'light', displayMode: mode, width: '100%', height: 460,
+            locale: 'en', isTransparent: false, largeChartUrl: ''
+          }, 460));
       }
 
       let loaded = false;
