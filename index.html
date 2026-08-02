@@ -430,7 +430,7 @@
 
   <!-- SYMBOL RESEARCH -->
   <div class="research-band">
-    <details class="research" id="symbol-research">
+    <details class="research" id="symbol-research" open>
       <summary>Chart &amp; Fundamentals</summary>
       <div class="research-body">
         <form class="research-controls" id="research-form">
@@ -1141,8 +1141,10 @@
         loadSymbol(input.value || 'SPY');
       }
 
-      // Load widgets the first time the panel is opened (saves bandwidth when closed).
+      // Panel is open by default: load the widgets on page load, and also
+      // whenever it is re-opened after being collapsed.
       details.addEventListener('toggle', () => { if(details.open) ensureLoaded(); });
+      if(details.open) ensureLoaded();
 
       form.addEventListener('submit', e => {
         e.preventDefault();
