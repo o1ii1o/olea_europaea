@@ -420,7 +420,7 @@
       <div class="research-title">Chart &amp; Fundamentals</div>
       <div class="research-body">
         <form class="research-controls" id="research-form">
-          <input id="research-input" type="text" value="SPY" aria-label="Ticker symbol" placeholder="Enter a ticker…" />
+          <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
           <button type="submit" class="go-btn">Go</button>
           <span class="research-links">
             <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
@@ -1129,7 +1129,8 @@
         loadSymbol(sym);
       });
 
-      updateLinks(input.value || 'SPY');
+      // Keep the external link-outs in sync with what's typed.
+      input.addEventListener('input', () => updateLinks(input.value.trim()));
     })();
   </script>
 </body>
