@@ -198,6 +198,10 @@
       background:var(--divider);
       border-top:1px solid var(--divider);
     }
+    /* Narrow screens: stack blocks Rates → Currencies → Equities → Commodities */
+    @media (max-width:720px){
+      .snapshot-grid{ grid-template-columns:1fr; }
+    }
     .snapshot-cell{ background:var(--surface); min-width:0; }
     .snapshot-cell-title{
       font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px;
