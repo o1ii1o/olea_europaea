@@ -224,6 +224,7 @@
       align-items:center;
       gap:10px;
     }
+    h2.section-title::before,
     h2.section-title::after{
       content:'';
       flex:1;
@@ -366,6 +367,10 @@
     }
     .research-links a:hover{ background:var(--page-bg); color:var(--accent-hover); }
     .research-widgets{ display:flex; flex-direction:column; gap:14px; }
+    .tv-fallback{
+      padding:20px; font-size:13px; line-height:1.5; color:var(--muted);
+      background:var(--page-bg); border-radius:var(--radius); text-align:center;
+    }
     .research-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     @media (max-width: 860px){ .research-row{ grid-template-columns:1fr; } }
     .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
@@ -422,7 +427,6 @@
   <!-- SYMBOL RESEARCH -->
   <div class="research-band">
     <div class="research" id="symbol-research">
-      <div class="research-title">Chart &amp; Fundamentals</div>
       <div class="research-body">
         <form class="research-controls" id="research-form">
           <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
@@ -837,6 +841,10 @@
             <ul>
               <li><a href="https://keyinvest-ch-en.ubs.com" target="_blank" rel="noopener noreferrer">UBS KeyInvest</a></li>
               <li><a href="https://markets.vontobel.com/en-ch" target="_blank" rel="noopener noreferrer">Vontobel Derinet</a></li>
+              <li><a href="https://structuredproducts-ch.leonteq.com" target="_blank" rel="noopener noreferrer">Leonteq</a></li>
+              <li><a href="https://www.swissquote.ch/trading-platform/#scanner" target="_blank" rel="noopener noreferrer">Swissquote</a></li>
+              <li><a href="https://sspa.ch/en/products/" target="_blank" rel="noopener noreferrer">SSPA Product Finder</a></li>
+              <li><a href="https://www.six-structured-products.com/en/search/underlyings" target="_blank" rel="noopener noreferrer">SIX Product Finder</a></li>
               <li><a href="https://www.nasdaq.com/market-activity/quotes/option-chain" target="_blank" rel="noopener noreferrer">Nasdaq Options Chain</a></li>
               <li><a href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank" rel="noopener noreferrer">Eurex Options Chain</a></li>
               <li><a href="https://www.cboe.com/market_data_services/us/options/" target="_blank" rel="noopener noreferrer">CBOE</a></li>
@@ -1069,6 +1077,15 @@
       const widgetsBox = document.getElementById('research-widgets');
       if(!form || !input) return;
 
+      function showFallback(container){
+        if(container.querySelector('.tv-fallback')) return;
+        container.innerHTML =
+          '<div class="tv-fallback">This chart/financials widget could not load. ' +
+          'It is served by TradingView, which some networks (e.g. corporate ' +
+          'firewalls) block. Try the StockCharts / Finviz / Investing.com links ' +
+          'above, or open the site on another network.</div>';
+      }
+
       function makeWidget(containerId, src, config, height){
         const container = document.getElementById(containerId);
         if(!container) return;
@@ -1085,8 +1102,14 @@
         s.src = src;
         s.async = true;
         s.textContent = JSON.stringify(config);
+        // If TradingView is blocked/unreachable, show a helpful message
+        // instead of a blank box.
+        s.onerror = () => showFallback(container);
         wrap.appendChild(s);
         container.appendChild(wrap);
+        setTimeout(() => {
+          if(!container.querySelector('iframe')) showFallback(container);
+        }, 8000);
       }
 
       function updateLinks(sym){
