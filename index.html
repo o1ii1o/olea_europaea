@@ -198,6 +198,10 @@
       background:var(--divider);
       border-top:1px solid var(--divider);
     }
+    /* Narrow screens: stack blocks Rates → Currencies → Equities → Commodities */
+    @media (max-width:720px){
+      .snapshot-grid{ grid-template-columns:1fr; }
+    }
     .snapshot-cell{ background:var(--surface); min-width:0; }
     .snapshot-cell-title{
       font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.4px;
@@ -453,17 +457,29 @@
         <h2 class="section-title">Calendars</h2>
 
         <div class="cards" id="calendars">
-<details class="card" id="card-economic-calendar">
+          <details class="card" id="card-central-bank">
+            <summary>Central Bank</summary>
+            <ul>
+              <li><a href="https://www.federalreserve.gov/newsevents/calendar.htm" target="_blank" rel="noopener noreferrer">Fed Calendar (FOMC)</a></li>
+              <li><a href="https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html" target="_blank" rel="noopener noreferrer">ECB Governing Council</a></li>
+              <li><a href="https://www.boj.or.jp/en/mopo/mpmdeci/index.htm" target="_blank" rel="noopener noreferrer">BoJ Policy Decisions</a></li>
+              <li><a href="https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes" target="_blank" rel="noopener noreferrer">BoE MPC</a></li>
+              <li><a href="https://www.snb.ch/en/the-snb/mandates-goals/monetary-policy/monetary-policy-decisions" target="_blank" rel="noopener noreferrer">SNB Monetary Policy</a></li>
+            </ul>
+          </details>
+
+          <details class="card" id="card-economic-calendar">
             <summary>Economic Calendar</summary>
             <ul>
-              <li><a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener noreferrer">Investing.com Economic Calendar</a></li>
-              <li><a href="https://www.dailyfx.com/economic-calendar#next-fourteen-days" target="_blank" rel="noopener noreferrer">DailyFX Economic Calendar</a></li>
-              <li><a href="https://app.koyfin.com/ecal" target="_blank" rel="noopener noreferrer">KoyFin Economic Calendar</a></li>
-              <li><a href="https://tradingeconomics.com/calendar" target="_blank" rel="noopener noreferrer">Trading Economics Calendar</a></li>
-              <li><a href="https://www.marketwatch.com/economy-politics/calendar" target="_blank" rel="noopener noreferrer">MarketWatch Economic Calendar</a></li>
-              <li><a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer">Forex Factory Calendar</a></li>
+              <li><a href="https://www.investing.com/economic-calendar/" target="_blank" rel="noopener noreferrer">Investing.com</a></li>
+              <li><a href="https://app.koyfin.com/ecal" target="_blank" rel="noopener noreferrer">KoyFin</a></li>
+              <li><a href="https://tradingeconomics.com/calendar" target="_blank" rel="noopener noreferrer">Trading Economics</a></li>
+              <li><a href="https://www.forexfactory.com/calendar" target="_blank" rel="noopener noreferrer">Forex Factory</a></li>
             </ul>
-            <div class="sub-header">Data Releases &amp; Nowcasts</div>
+          </details>
+
+          <details class="card" id="card-data-sources">
+            <summary>Data Sources</summary>
             <ul>
               <li><a href="https://fred.stlouisfed.org/releases/calendar" target="_blank" rel="noopener noreferrer">FRED Release Calendar</a></li>
               <li><a href="https://www.clevelandfed.org/indicators-and-data/inflation-nowcasting" target="_blank" rel="noopener noreferrer">Inflation Nowcasting (Cleveland Fed)</a></li>
@@ -472,14 +488,6 @@
               <li><a href="https://www.bls.gov/schedule/news_release.htm" target="_blank" rel="noopener noreferrer">BLS Release Schedule (CPI, NFP)</a></li>
               <li><a href="https://www.census.gov/economic-indicators/" target="_blank" rel="noopener noreferrer">Census Bureau Economic Indicators</a></li>
               <li><a href="https://pages.stern.nyu.edu/~adamodar/New_Home_Page/datacurrent.html" target="_blank" rel="noopener noreferrer">Damodaran Data</a></li>
-            </ul>
-            <div class="sub-header">Central Bank Calendars</div>
-            <ul>
-              <li><a href="https://www.federalreserve.gov/newsevents/calendar.htm" target="_blank" rel="noopener noreferrer">Fed Calendar (FOMC)</a></li>
-              <li><a href="https://www.ecb.europa.eu/press/calendars/mgcgc/html/index.en.html" target="_blank" rel="noopener noreferrer">ECB Governing Council</a></li>
-              <li><a href="https://www.boj.or.jp/en/mopo/mpmdeci/index.htm" target="_blank" rel="noopener noreferrer">BoJ Policy Decisions</a></li>
-              <li><a href="https://www.bankofengland.co.uk/monetary-policy-summary-and-minutes" target="_blank" rel="noopener noreferrer">BoE MPC</a></li>
-              <li><a href="https://www.snb.ch/en/the-snb/mandates-goals/monetary-policy/monetary-policy-decisions" target="_blank" rel="noopener noreferrer">SNB Monetary Policy</a></li>
             </ul>
           </details>
 
@@ -490,13 +498,8 @@
               <li><a href="https://app.koyfin.com/earc" target="_blank" rel="noopener noreferrer">KoyFin Earnings Calendar</a></li>
               <li><a href="https://www.nasdaq.com/market-activity/earnings" target="_blank" rel="noopener noreferrer">Nasdaq Earnings</a></li>
               <li><a href="https://finance.yahoo.com/calendar/earnings/" target="_blank" rel="noopener noreferrer">Yahoo Finance Earnings</a></li>
-              <li><a href="https://www.earningswhispers.com/calendar" target="_blank" rel="noopener noreferrer">Earnings Whispers</a></li>
               <li><a href="https://www.zacks.com/earnings/earnings-calendar" target="_blank" rel="noopener noreferrer">Zacks Earnings Calendar</a></li>
-            </ul>
-            <div class="sub-header">Estimates &amp; Transcripts</div>
-            <ul>
               <li><a href="https://seekingalpha.com/earnings/earnings-calendar" target="_blank" rel="noopener noreferrer">Seeking Alpha Earnings</a></li>
-              <li><a href="https://www.estimize.com" target="_blank" rel="noopener noreferrer">Estimize (Crowdsourced Estimates)</a></li>
               <li><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-Q&dateb=&owner=include&count=40" target="_blank" rel="noopener noreferrer">SEC 10-Q Filings</a></li>
               <li><a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-K&dateb=&owner=include&count=40" target="_blank" rel="noopener noreferrer">SEC 10-K Filings</a></li>
             </ul>
