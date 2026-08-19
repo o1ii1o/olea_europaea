@@ -343,6 +343,7 @@
       font-weight:600;
       text-transform:uppercase;
       letter-spacing:0.5px;
+      text-align:center;
       padding:8px 12px;
       width:120px;
       border:1px solid var(--card-border);
@@ -1175,18 +1176,32 @@
         if(!sym) return;
         updateLinks(sym);
 
-        // Chart: StockCharts image — loads where TradingView is blocked.
-        // Its header shows Open/High/Low/Last/Prev-close/Change (abs & %),
-        // and the chart carries the 50/100/200-day moving averages.
+        // Chart: StockCharts image (preferred layout — OHLC/prev-close/change
+        // header + moving averages). StockCharts hotlink-protects the image,
+        // so try no-referrer; if it still won't embed, fall back to the Finviz
+        // chart image, which isn't hotlink-protected.
         const enc = encodeURIComponent(sym);
         const chart = document.getElementById('tv-chart');
         if(chart){
-          const src = 'https://stockcharts.com/c-sc/sc?s=' + enc +
-            '&p=D&yr=1&mn=0&dy=0&i=t&cb=' + Date.now();
-          chart.innerHTML =
-            '<a href="https://stockcharts.com/sc3/ui/?s=' + enc +
-            '" target="_blank" rel="noopener noreferrer">' +
-            '<img class="sc-chart" src="' + src + '" alt="' + sym + ' — StockCharts"></a>';
+          const scSrc = 'https://stockcharts.com/c-sc/sc?s=' + enc + '&p=D&yr=1&mn=0&dy=0&i=t&cb=' + Date.now();
+          const fvSrc = 'https://charts2.finviz.com/chart.ashx?t=' + enc + '&ty=c&ta=1&p=d&cb=' + Date.now();
+          chart.innerHTML = '';
+          const a = document.createElement('a');
+          a.href = 'https://stockcharts.com/sc3/ui/?s=' + enc;
+          a.target = '_blank'; a.rel = 'noopener noreferrer';
+          const img = document.createElement('img');
+          img.className = 'sc-chart';
+          img.referrerPolicy = 'no-referrer';
+          img.alt = sym + ' chart';
+          img.onerror = function(){
+            img.onerror = null;                 // avoid loops
+            img.removeAttribute('referrerpolicy');
+            img.src = fvSrc;                     // fall back to Finviz
+            a.href = 'https://finviz.com/quote.ashx?t=' + enc;
+          };
+          img.src = scSrc;
+          a.appendChild(img);
+          chart.appendChild(a);
         }
 
         // Fundamentals — adaptive layout.
