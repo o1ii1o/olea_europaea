@@ -376,6 +376,8 @@
       padding:20px; font-size:13px; line-height:1.5; color:var(--muted);
       background:var(--page-bg); border-radius:var(--radius); text-align:center;
     }
+    .sc-chart{ display:block; max-width:100%; height:auto; margin:0 auto; }
+    #tv-chart{ padding:10px; text-align:center; }
     .research-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     @media (max-width: 860px){ .research-row{ grid-template-columns:1fr; } }
     .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
@@ -1164,21 +1166,19 @@
         if(!sym) return;
         updateLinks(sym);
 
-        // Technical chart: 3-year daily, 50/100/200-day SMAs overlaid,
-        // RSI pane above the volume bar at the bottom.
-        makeWidget('tv-chart', 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js', {
-          symbol: sym, autosize: false, width: '100%', height: 620,
-          interval: 'D', range: '36M', timezone: 'Etc/UTC', theme: 'light', style: '1',
-          locale: 'en', allow_symbol_change: true, hide_side_toolbar: false,
-          studies: [
-            { id: 'MASimple@tv-basicstudies', inputs: { length: 50 } },
-            { id: 'MASimple@tv-basicstudies', inputs: { length: 100 } },
-            { id: 'MASimple@tv-basicstudies', inputs: { length: 200 } },
-            'STD;RSI',
-            'STD;Volume'
-          ],
-          support_host: 'https://www.tradingview.com'
-        }, 620);
+        // Chart: StockCharts image — loads where TradingView is blocked.
+        // Its header shows Open/High/Low/Last/Prev-close/Change (abs & %),
+        // and the chart carries the 50/100/200-day moving averages.
+        const enc = encodeURIComponent(sym);
+        const chart = document.getElementById('tv-chart');
+        if(chart){
+          const src = 'https://stockcharts.com/c-sc/sc?s=' + enc +
+            '&p=D&yr=1&mn=0&dy=0&i=t&cb=' + Date.now();
+          chart.innerHTML =
+            '<a href="https://stockcharts.com/sc3/ui/?s=' + enc +
+            '" target="_blank" rel="noopener noreferrer">' +
+            '<img class="sc-chart" src="' + src + '" alt="' + sym + ' — StockCharts"></a>';
+        }
 
         // Fundamentals — adaptive layout.
         makeWidget('tv-fundamentals', 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
