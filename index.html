@@ -328,11 +328,15 @@
     }
     .research-body{ padding:14px 16px 16px; }
     .research-controls{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      gap:16px;
       align-items:center;
       margin-bottom:14px;
+    }
+    .ticker-group{ display:flex; gap:8px; justify-content:center; }
+    @media (max-width:720px){
+      .research-controls{ grid-template-columns:1fr; }
     }
     .research-controls input{
       font-size:14px;
@@ -358,7 +362,9 @@
       cursor:pointer;
     }
     .research-controls .go-btn:hover{ background:var(--accent-hover); }
-    .research-links{ display:flex; flex-wrap:wrap; gap:6px; margin-left:auto; }
+    .research-links{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+    .research-links.left{ justify-content:flex-end; }
+    .research-links.right{ justify-content:flex-start; }
     .research-links a{
       font-size:12px;
       font-weight:500;
@@ -375,6 +381,8 @@
       padding:20px; font-size:13px; line-height:1.5; color:var(--muted);
       background:var(--page-bg); border-radius:var(--radius); text-align:center;
     }
+    .sc-chart{ display:block; max-width:100%; height:auto; margin:0 auto; }
+    #tv-chart{ padding:10px; text-align:center; }
     .research-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     @media (max-width: 860px){ .research-row{ grid-template-columns:1fr; } }
     .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
@@ -433,13 +441,18 @@
     <div class="research" id="symbol-research">
       <div class="research-body">
         <form class="research-controls" id="research-form">
-          <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
-          <button type="submit" class="go-btn">Go</button>
-          <span class="research-links">
-            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
-            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
+          <span class="research-links left">
             <a id="link-investing" href="#" target="_blank" rel="noopener noreferrer">Investing.com ↗</a>
-            <a id="link-swissquote" href="#" target="_blank" rel="noopener noreferrer">Swissquote Derivatives ↗</a>
+            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
+            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
+          </span>
+          <span class="ticker-group">
+            <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
+          </span>
+          <span class="research-links right">
+            <a id="link-nasdaq" href="#" target="_blank" rel="noopener noreferrer">Nasdaq Option Chain ↗</a>
+            <a id="link-eurex" href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank" rel="noopener noreferrer">Eurex Option Chain ↗</a>
+            <a id="link-six" href="https://www.six-structured-products.com/en/search/underlyings" target="_blank" rel="noopener noreferrer">SIX Product Finder ↗</a>
           </span>
         </form>
         <div class="research-widgets" id="research-widgets" hidden>
@@ -1154,8 +1167,7 @@
         document.getElementById('link-stockcharts').href = 'https://stockcharts.com/sc3/ui/?s=' + t;
         document.getElementById('link-finviz').href      = 'https://finviz.com/quote.ashx?t=' + t;
         document.getElementById('link-investing').href   = 'https://www.investing.com/search/?q=' + t;
-        document.getElementById('link-swissquote').href  =
-          'https://www.swissquote.ch/sqi_web_search/market/equity/swissderivatives/SwissDerivativeSearch.action?asSearchEngine=true&l=e&xxx=' + t;
+        document.getElementById('link-nasdaq').href      = 'https://www.nasdaq.com/market-activity/stocks/' + t + '/option-chain';
       }
 
       function loadSymbol(sym){
@@ -1163,21 +1175,19 @@
         if(!sym) return;
         updateLinks(sym);
 
-        // Technical chart: 3-year daily, 50/100/200-day SMAs overlaid,
-        // RSI pane above the volume bar at the bottom.
-        makeWidget('tv-chart', 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js', {
-          symbol: sym, autosize: false, width: '100%', height: 620,
-          interval: 'D', range: '36M', timezone: 'Etc/UTC', theme: 'light', style: '1',
-          locale: 'en', allow_symbol_change: true, hide_side_toolbar: false,
-          studies: [
-            { id: 'MASimple@tv-basicstudies', inputs: { length: 50 } },
-            { id: 'MASimple@tv-basicstudies', inputs: { length: 100 } },
-            { id: 'MASimple@tv-basicstudies', inputs: { length: 200 } },
-            'STD;RSI',
-            'STD;Volume'
-          ],
-          support_host: 'https://www.tradingview.com'
-        }, 620);
+        // Chart: StockCharts image — loads where TradingView is blocked.
+        // Its header shows Open/High/Low/Last/Prev-close/Change (abs & %),
+        // and the chart carries the 50/100/200-day moving averages.
+        const enc = encodeURIComponent(sym);
+        const chart = document.getElementById('tv-chart');
+        if(chart){
+          const src = 'https://stockcharts.com/c-sc/sc?s=' + enc +
+            '&p=D&yr=1&mn=0&dy=0&i=t&cb=' + Date.now();
+          chart.innerHTML =
+            '<a href="https://stockcharts.com/sc3/ui/?s=' + enc +
+            '" target="_blank" rel="noopener noreferrer">' +
+            '<img class="sc-chart" src="' + src + '" alt="' + sym + ' — StockCharts"></a>';
+        }
 
         // Fundamentals — adaptive layout.
         makeWidget('tv-fundamentals', 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
