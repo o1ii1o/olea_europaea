@@ -1205,11 +1205,12 @@
           chart.appendChild(a);
         }
 
-        // Fundamentals — adaptive layout.
+        // Fundamentals — compact (single column, no horizontal scroll) and
+        // tall enough to avoid vertical scroll.
         makeWidget('tv-fundamentals', 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
-          symbol: sym, colorTheme: 'light', displayMode: 'adaptive', width: '100%', height: 460,
+          symbol: sym, colorTheme: 'light', displayMode: 'compact', width: '100%', height: 830,
           locale: 'en', isTransparent: false, largeChartUrl: ''
-        }, 460);
+        }, 830);
       }
 
       // Widgets stay hidden until a ticker is submitted; then reveal + load.
