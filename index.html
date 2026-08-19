@@ -328,12 +328,15 @@
     }
     .research-body{ padding:14px 16px 16px; }
     .research-controls{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
+      display:grid;
+      grid-template-columns:1fr auto 1fr;
+      gap:16px;
       align-items:center;
-      justify-content:center;
       margin-bottom:14px;
+    }
+    .ticker-group{ display:flex; gap:8px; justify-content:center; }
+    @media (max-width:720px){
+      .research-controls{ grid-template-columns:1fr; }
     }
     .research-controls input{
       font-size:14px;
@@ -360,6 +363,8 @@
     }
     .research-controls .go-btn:hover{ background:var(--accent-hover); }
     .research-links{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+    .research-links.left{ justify-content:flex-end; }
+    .research-links.right{ justify-content:flex-start; }
     .research-links a{
       font-size:12px;
       font-weight:500;
@@ -436,13 +441,19 @@
     <div class="research" id="symbol-research">
       <div class="research-body">
         <form class="research-controls" id="research-form">
-          <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
-          <button type="submit" class="go-btn">Go</button>
-          <span class="research-links">
-            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
-            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
+          <span class="research-links left">
             <a id="link-investing" href="#" target="_blank" rel="noopener noreferrer">Investing.com ↗</a>
-            <a id="link-swissquote" href="#" target="_blank" rel="noopener noreferrer">Swissquote Derivatives ↗</a>
+            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
+            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
+          </span>
+          <span class="ticker-group">
+            <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
+            <button type="submit" class="go-btn">Go</button>
+          </span>
+          <span class="research-links right">
+            <a id="link-nasdaq" href="#" target="_blank" rel="noopener noreferrer">Nasdaq Option Chain ↗</a>
+            <a id="link-eurex" href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank" rel="noopener noreferrer">Eurex Option Chain ↗</a>
+            <a id="link-six" href="https://www.six-structured-products.com/en/search/underlyings" target="_blank" rel="noopener noreferrer">SIX Product Finder ↗</a>
           </span>
         </form>
         <div class="research-widgets" id="research-widgets" hidden>
@@ -1157,8 +1168,7 @@
         document.getElementById('link-stockcharts').href = 'https://stockcharts.com/sc3/ui/?s=' + t;
         document.getElementById('link-finviz').href      = 'https://finviz.com/quote.ashx?t=' + t;
         document.getElementById('link-investing').href   = 'https://www.investing.com/search/?q=' + t;
-        document.getElementById('link-swissquote').href  =
-          'https://www.swissquote.ch/sqi_web_search/market/equity/swissderivatives/SwissDerivativeSearch.action?asSearchEngine=true&l=e&xxx=' + t;
+        document.getElementById('link-nasdaq').href      = 'https://www.nasdaq.com/market-activity/stocks/' + t + '/option-chain';
       }
 
       function loadSymbol(sym){
