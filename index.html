@@ -382,11 +382,51 @@
       padding:20px; font-size:13px; line-height:1.5; color:var(--muted);
       background:var(--page-bg); border-radius:var(--radius); text-align:center;
     }
-    .sc-chart{ display:block; max-width:100%; height:auto; margin:0 auto; }
-    #tv-chart{ padding:10px; text-align:center; }
+    .sc-chart{ display:block; width:100%; height:auto; margin:0 auto; }
+    #tv-chart{ padding:0; }
+    #tv-chart a{ display:block; }
     .research-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     @media (max-width: 860px){ .research-row{ grid-template-columns:1fr; } }
     .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
+
+    /* ── Watchlist ── */
+    .watchlist{ margin-top:16px; border-top:1px solid var(--divider); padding-top:14px; }
+    .watchlist-head{ display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:12px; }
+    .watchlist-title{ font-size:14px; font-weight:600; color:var(--text); margin:0; }
+    .watchlist-add{ display:flex; gap:8px; }
+    .watchlist-add input{
+      font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;
+      text-align:center; padding:7px 12px; width:120px;
+      border:1px solid var(--card-border); border-radius:var(--radius);
+      color:var(--text); background:var(--page-bg);
+    }
+    .watchlist-add input:focus{ outline:2px solid var(--accent); outline-offset:-1px; }
+    .wl-add-btn{
+      font-size:13px; font-weight:600; padding:7px 16px; border:none;
+      border-radius:var(--radius); background:var(--accent); color:#fff; cursor:pointer;
+    }
+    .wl-add-btn:hover{ background:var(--accent-hover); }
+    .watchlist-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:14px; }
+    .watchlist-empty{ text-align:center; font-size:13px; color:var(--muted); margin:6px 0 0; }
+    .wl-card{ border:1px solid var(--card-border); border-radius:var(--radius); background:var(--surface); overflow:hidden; }
+    .wl-card-head{ display:flex; align-items:center; justify-content:space-between; padding:8px 10px; border-bottom:1px solid var(--divider); }
+    .wl-sym{
+      font-size:14px; font-weight:700; letter-spacing:0.5px; color:var(--accent);
+      background:none; border:none; cursor:pointer; padding:0;
+    }
+    .wl-sym:hover{ color:var(--accent-hover); text-decoration:underline; }
+    .wl-remove{
+      font-size:16px; line-height:1; color:var(--muted); background:none; border:none;
+      cursor:pointer; padding:0 4px;
+    }
+    .wl-remove:hover{ color:#d33; }
+    .wl-chart{ display:block; width:100%; height:auto; background:var(--page-bg); }
+    .wl-links{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; padding:8px 10px; }
+    .wl-links a{
+      font-size:11px; font-weight:500; padding:4px 8px; border:1px solid var(--card-border);
+      border-radius:var(--radius); color:var(--accent); text-decoration:none; white-space:nowrap;
+    }
+    .wl-links a:hover{ background:var(--page-bg); color:var(--accent-hover); }
 
     /* ── Footer ── */
     footer.site-footer{ max-width:var(--max-width); margin:0 auto; padding:20px; color:var(--muted); font-size:12px; text-align:center; }
@@ -459,6 +499,18 @@
         <div class="research-widgets" id="research-widgets" hidden>
           <div class="tv-box" id="tv-chart"></div>
           <div class="tv-box" id="tv-fundamentals"></div>
+        </div>
+
+        <div class="watchlist" id="watchlist">
+          <div class="watchlist-head">
+            <h3 class="watchlist-title">Watchlist</h3>
+            <form class="watchlist-add" id="watchlist-form">
+              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
+              <button type="submit" class="wl-add-btn">Add</button>
+            </form>
+          </div>
+          <div class="watchlist-grid" id="watchlist-grid"></div>
+          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
         </div>
       </div>
     </div>
@@ -1204,11 +1256,12 @@
           chart.appendChild(a);
         }
 
-        // Fundamentals — adaptive layout.
+        // Fundamentals — compact (single column, no horizontal scroll) and
+        // tall enough to avoid vertical scroll.
         makeWidget('tv-fundamentals', 'https://s3.tradingview.com/external-embedding/embed-widget-financials.js', {
-          symbol: sym, colorTheme: 'light', displayMode: 'adaptive', width: '100%', height: 460,
+          symbol: sym, colorTheme: 'light', displayMode: 'compact', width: '100%', height: 1400,
           locale: 'en', isTransparent: false, largeChartUrl: ''
-        }, 460);
+        }, 1400);
       }
 
       // Widgets stay hidden until a ticker is submitted; then reveal + load.
@@ -1222,6 +1275,96 @@
 
       // Keep the external link-outs in sync with what's typed.
       input.addEventListener('input', () => updateLinks(input.value.trim()));
+
+      /* ── Watchlist (saved per device in localStorage) ── */
+      const WL_KEY = 'olea.watchlist';
+      const wlForm  = document.getElementById('watchlist-form');
+      const wlInput = document.getElementById('watchlist-input');
+      const wlGrid  = document.getElementById('watchlist-grid');
+      const wlEmpty = document.getElementById('watchlist-empty');
+
+      function wlLoad(){
+        try { return JSON.parse(localStorage.getItem(WL_KEY)) || []; }
+        catch(e){ return []; }
+      }
+      function wlSave(list){
+        try { localStorage.setItem(WL_KEY, JSON.stringify(list)); } catch(e){}
+      }
+      function wlAdd(sym){
+        sym = (sym || '').trim().toUpperCase();
+        if(!sym) return;
+        const list = wlLoad();
+        if(list.indexOf(sym) === -1){ list.push(sym); wlSave(list); }
+        wlRender();
+      }
+      function wlRemove(sym){
+        wlSave(wlLoad().filter(s => s !== sym));
+        wlRender();
+      }
+      function wlRender(){
+        const list = wlLoad();
+        wlGrid.innerHTML = '';
+        wlEmpty.style.display = list.length ? 'none' : '';
+        list.forEach(sym => {
+          const enc = encodeURIComponent(sym);
+          const card = document.createElement('div');
+          card.className = 'wl-card';
+
+          const head = document.createElement('div');
+          head.className = 'wl-card-head';
+          const symBtn = document.createElement('button');
+          symBtn.type = 'button';
+          symBtn.className = 'wl-sym';
+          symBtn.textContent = sym;
+          symBtn.title = 'Load ' + sym;
+          symBtn.addEventListener('click', () => {
+            input.value = sym;
+            updateLinks(sym);
+            widgetsBox.hidden = false;
+            loadSymbol(sym);
+            widgetsBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+          const rm = document.createElement('button');
+          rm.type = 'button';
+          rm.className = 'wl-remove';
+          rm.textContent = '×';
+          rm.title = 'Remove ' + sym;
+          rm.addEventListener('click', () => wlRemove(sym));
+          head.appendChild(symBtn);
+          head.appendChild(rm);
+
+          const a = document.createElement('a');
+          a.href = 'https://finviz.com/quote.ashx?t=' + enc;
+          a.target = '_blank'; a.rel = 'noopener noreferrer';
+          const img = document.createElement('img');
+          img.className = 'wl-chart';
+          img.loading = 'lazy';
+          img.alt = sym + ' chart';
+          img.src = 'https://charts2.finviz.com/chart.ashx?t=' + enc + '&ty=c&ta=1&p=d';
+          a.appendChild(img);
+
+          const links = document.createElement('div');
+          links.className = 'wl-links';
+          links.innerHTML =
+            '<a href="https://finviz.com/quote.ashx?t=' + enc + '" target="_blank" rel="noopener noreferrer">Finviz ↗</a>' +
+            '<a href="https://stockcharts.com/sc3/ui/?s=' + enc + '" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>' +
+            '<a href="https://www.investing.com/search/?q=' + enc + '" target="_blank" rel="noopener noreferrer">Investing ↗</a>';
+
+          card.appendChild(head);
+          card.appendChild(a);
+          card.appendChild(links);
+          wlGrid.appendChild(card);
+        });
+      }
+
+      if(wlForm){
+        wlForm.addEventListener('submit', e => {
+          e.preventDefault();
+          wlAdd(wlInput.value);
+          wlInput.value = '';
+        });
+      }
+      wlRender();
     })();
   </script>
 </body>
