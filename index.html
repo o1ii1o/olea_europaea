@@ -121,7 +121,7 @@
       display:grid;
       grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
       gap:20px;
-      align-items:start;
+      align-items:center;   /* centre the side columns (Calendars/News, Markets/Resources) against the taller Snapshot */
     }
     @media (max-width:1200px){
       .page-wrap{ grid-template-columns:1fr; }
@@ -194,13 +194,14 @@
     .snapshot-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:1px;
+      column-gap:14px;   /* wider light bar between left (Rates/Equities) and right (Currencies/Commodities) */
+      row-gap:1px;       /* hairline between the stacked blocks */
       background:var(--divider);
       border-top:1px solid var(--divider);
     }
     /* Narrow screens: stack blocks Rates → Currencies → Equities → Commodities */
     @media (max-width:720px){
-      .snapshot-grid{ grid-template-columns:1fr; }
+      .snapshot-grid{ grid-template-columns:1fr; column-gap:0; }
     }
     .snapshot-cell{ background:var(--surface); min-width:0; }
     .snapshot-cell-title{
@@ -390,7 +391,7 @@
     .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
 
     /* ── Watchlist ── */
-    .watchlist{ margin-top:16px; border-top:1px solid var(--divider); padding-top:14px; }
+    .watchlist{ margin:0; }
     .watchlist-head{ display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:12px; }
     .watchlist-title{ font-size:14px; font-weight:600; color:var(--text); margin:0; }
     .watchlist-add{ display:flex; gap:8px; }
@@ -499,18 +500,6 @@
         <div class="research-widgets" id="research-widgets" hidden>
           <div class="tv-box" id="tv-chart"></div>
           <div class="tv-box" id="tv-fundamentals"></div>
-        </div>
-
-        <div class="watchlist" id="watchlist">
-          <div class="watchlist-head">
-            <h3 class="watchlist-title">Watchlist</h3>
-            <form class="watchlist-add" id="watchlist-form">
-              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
-              <button type="submit" class="wl-add-btn">Add</button>
-            </form>
-          </div>
-          <div class="watchlist-grid" id="watchlist-grid"></div>
-          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
         </div>
       </div>
     </div>
@@ -820,12 +809,27 @@
                 <tr><td><a href="https://www.investing.com/commodities/natural-gas" target="_blank">Natural Gas</a></td><td>2.759</td><td class="chg-neg">-0.055</td><td class="chg-neg">-1.95%</td><td class="chg-neg">-25.15%</td><td class="snap-time">20/08</td></tr>
                 <tr><td><a href="https://www.investing.com/commodities/copper" target="_blank">Copper</a></td><td>6.484</td><td class="chg-neg">-0.003</td><td class="chg-neg">-0.05%</td><td class="chg-pos">+15.18%</td><td class="snap-time">20/08</td></tr>
                 <tr><td><a href="https://www.investing.com/commodities/aluminum" target="_blank">Aluminum</a></td><td>3,330.50</td><td class="chg-neg">-20.00</td><td class="chg-neg">-0.60%</td><td class="chg-pos">+14.60%</td><td class="snap-time">20/08</td></tr>
+                <tr><td><a href="https://www.investing.com/commodities/uranium" target="_blank">Uranium</a></td><td>—</td><td>—</td><td>—</td><td>—</td><td class="snap-time">—</td></tr>
                 <tr><td><a href="https://www.investing.com/commodities/us-cocoa" target="_blank">Cocoa</a></td><td>—</td><td>—</td><td>—</td><td>—</td><td class="snap-time">—</td></tr>
                 <tr><td><a href="https://www.investing.com/commodities/us-coffee-c" target="_blank">Coffee</a></td><td>—</td><td>—</td><td>—</td><td>—</td><td class="snap-time">—</td></tr>
               </tbody>
             </table>
           </div>
-        
+
+        </div>
+      </div>
+
+      <div class="sidebar-panel watchlist-panel">
+        <div class="watchlist" id="watchlist">
+          <div class="watchlist-head">
+            <h3 class="watchlist-title">Watchlist</h3>
+            <form class="watchlist-add" id="watchlist-form">
+              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
+              <button type="submit" class="wl-add-btn">Add</button>
+            </form>
+          </div>
+          <div class="watchlist-grid" id="watchlist-grid"></div>
+          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
         </div>
       </div>
     </aside>
