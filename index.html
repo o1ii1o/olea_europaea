@@ -194,13 +194,14 @@
     .snapshot-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:1px;
+      column-gap:14px;   /* wider light bar between left (Rates/Equities) and right (Currencies/Commodities) */
+      row-gap:1px;       /* hairline between the stacked blocks */
       background:var(--divider);
       border-top:1px solid var(--divider);
     }
     /* Narrow screens: stack blocks Rates → Currencies → Equities → Commodities */
     @media (max-width:720px){
-      .snapshot-grid{ grid-template-columns:1fr; }
+      .snapshot-grid{ grid-template-columns:1fr; column-gap:0; }
     }
     .snapshot-cell{ background:var(--surface); min-width:0; }
     .snapshot-cell-title{
