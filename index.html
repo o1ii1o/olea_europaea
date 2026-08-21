@@ -119,12 +119,25 @@
       margin:0 auto;
       padding:20px 20px 60px;
       display:grid;
-      grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+      /* Snapshot (centre) gets the largest share so it can be as wide as possible. */
+      grid-template-columns: minmax(0,1fr) minmax(0,2fr) minmax(0,1fr);
+      grid-template-rows: auto auto;
       gap:20px;
-      align-items:center;   /* centre the side columns (Calendars/News, Markets/Resources) against the taller Snapshot */
+      align-items:start;
     }
+    /* Row 1: side columns centre against the Snapshot's height (only). If a side
+       column is taller than the Snapshot it simply fills from the top. */
+    .page-wrap > .content-left { grid-column:1; grid-row:1; align-self:center; }
+    .page-wrap > aside.sidebar { grid-column:2; grid-row:1; align-self:start; }
+    .page-wrap > .content-right{ grid-column:3; grid-row:1; align-self:center; }
+    /* Row 2: watchlist sits under the Snapshot and never affects row-1 centring. */
+    .page-wrap > .watchlist-panel{ grid-column:2; grid-row:2; }
     @media (max-width:1200px){
-      .page-wrap{ grid-template-columns:1fr; }
+      .page-wrap{ grid-template-columns:1fr; grid-template-rows:none; }
+      .page-wrap > .content-left,
+      .page-wrap > aside.sidebar,
+      .page-wrap > .content-right,
+      .page-wrap > .watchlist-panel{ grid-column:auto; grid-row:auto; align-self:auto; }
     }
 
     .content{ display:flex; flex-direction:column; gap:16px; min-width:0; }
@@ -818,21 +831,21 @@
 
         </div>
       </div>
-
-      <div class="sidebar-panel watchlist-panel">
-        <div class="watchlist" id="watchlist">
-          <div class="watchlist-head">
-            <h3 class="watchlist-title">Watchlist</h3>
-            <form class="watchlist-add" id="watchlist-form">
-              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
-              <button type="submit" class="wl-add-btn">Add</button>
-            </form>
-          </div>
-          <div class="watchlist-grid" id="watchlist-grid"></div>
-          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
-        </div>
-      </div>
     </aside>
+
+    <div class="sidebar-panel watchlist-panel">
+      <div class="watchlist" id="watchlist">
+        <div class="watchlist-head">
+          <h3 class="watchlist-title">Watchlist</h3>
+          <form class="watchlist-add" id="watchlist-form">
+            <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
+            <button type="submit" class="wl-add-btn">Add</button>
+          </form>
+        </div>
+        <div class="watchlist-grid" id="watchlist-grid"></div>
+        <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
+      </div>
+    </div>
 
     <section class="content content-right">
       <!-- MARKETS -->
