@@ -8,6 +8,8 @@ Two data sources:
 Each row shows Last, Chg, Chg% and YTD%.
 """
 
+import csv
+import io
 import json
 import os
 from zoneinfo import ZoneInfo
@@ -88,6 +90,18 @@ SECTIONS = [
     ]),
 ]
 
+# FRED only carries these four sovereign 10-year yields as *monthly* OECD
+# series (…M156N), so they lag badly.  Stooq publishes the same yields daily
+# for free with no API key.  We fetch these from Stooq and only fall back to
+# the FRED (monthly) value if Stooq is unavailable.  The euro-area 10Y uses
+# the German Bund (10dey.b), the standard euro benchmark.
+STOOQ_SYMBOLS = {
+    "Japan 10Y": "10jpy.b",
+    "Swiss 10Y": "10chy.b",
+    "Euro 10Y": "10dey.b",
+    "UK 10Y": "10gby.b",
+}
+
 URLS = {
     "US Dollar Index": "https://www.investing.com/currencies/us-dollar-index",
     "AUD/USD": "https://www.investing.com/currencies/aud-usd",
@@ -136,6 +150,10 @@ for _section_title, _src, _instruments in SECTIONS:
             URLS.setdefault(
                 _name, f"https://fred.stlouisfed.org/series/{_series}"
             )
+
+# Stooq-sourced yields link to their Stooq chart instead of the monthly FRED page.
+for _name, _sym in STOOQ_SYMBOLS.items():
+    URLS[_name] = f"https://stooq.com/q/?s={_sym}"
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -225,6 +243,45 @@ def fred_observations(series_id, limit=800):
     dates = [d for d, _ in pairs]
     values = [v for _, v in pairs]
     return dates, values
+
+
+def fetch_stooq(symbol):
+    """Fetch a Stooq daily history CSV; return dict(last, chg, chg_pct, ytd, time).
+
+    Stooq's daily endpoint returns chronological CSV rows
+    (Date,Open,High,Low,Close,Volume); for bond-yield symbols Close is the
+    yield in percent.  Returns None on any failure so the caller can fall
+    back to the existing (FRED) value.
+    """
+    url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            text = resp.read().decode("utf-8", "replace")
+    except Exception as exc:  # noqa: BLE001 - network errors all fall back
+        print(f"  Stooq error {symbol}: {exc}")
+        return None
+    dates, values = [], []
+    for row in csv.DictReader(io.StringIO(text)):
+        raw = row.get("Close")
+        day = row.get("Date")
+        if not raw or raw in ("N/D", "") or not day:
+            continue
+        try:
+            values.append(float(raw))
+            dates.append(datetime.strptime(day, "%Y-%m-%d"))
+        except (ValueError, TypeError):
+            continue
+    if len(values) < 2:
+        print(f"  Stooq {symbol}: <2 usable rows")
+        return None
+    last, prev = values[-1], values[-2]
+    chg = last - prev
+    chg_pct = (chg / prev) * 100 if prev else 0.0
+    return dict(
+        last=last, chg=chg, chg_pct=chg_pct,
+        ytd=ytd_from_series(dates, values), time=dates[-1],
+    )
 
 
 def fetch_fred(instruments):
@@ -360,6 +417,16 @@ def main():
             results.update(fetch_yf(instruments))
         elif src == "fred":
             results.update(fetch_fred(instruments))
+
+    # Override the four sovereign 10Y yields with daily Stooq data; keep the
+    # FRED (monthly) value already in `results` if Stooq is unavailable.
+    for name, sym in STOOQ_SYMBOLS.items():
+        d = fetch_stooq(sym)
+        if d:
+            results[name] = d
+            print(f"  Stooq {name}: {d['last']:.3f} ({fmt_data_time(d['time'])})")
+        else:
+            print(f"  keeping FRED value for {name} (Stooq unavailable)")
 
     total = sum(len(instr) for _, _, instr in SECTIONS)
     print(f"Fetched data for {len(results)} / {total} instruments.")
