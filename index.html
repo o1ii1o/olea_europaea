@@ -311,7 +311,7 @@
     /* ── Symbol Research ── */
     .research-band{
       max-width:none;
-      margin:16px auto 0;
+      margin:16px auto 24px;
       padding:0 20px;
     }
     .research{
@@ -476,45 +476,6 @@
       <img src="./assets/images/olea%20europaea.png" alt="Olive tree">
     </a>
   </header>
-
-  <!-- SYMBOL RESEARCH -->
-  <div class="research-band">
-    <div class="research" id="symbol-research">
-      <div class="research-body">
-        <form class="research-controls" id="research-form">
-          <span class="research-links left">
-            <a id="link-investing" href="#" target="_blank" rel="noopener noreferrer">Investing.com ↗</a>
-            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
-            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
-          </span>
-          <span class="ticker-group">
-            <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
-          </span>
-          <span class="research-links right">
-            <a id="link-nasdaq" href="#" target="_blank" rel="noopener noreferrer">Nasdaq Option Chain ↗</a>
-            <a id="link-eurex" href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank" rel="noopener noreferrer">Eurex Option Chain ↗</a>
-            <a id="link-six" href="https://www.six-structured-products.com/en/search/underlyings" target="_blank" rel="noopener noreferrer">SIX Product Finder ↗</a>
-          </span>
-        </form>
-        <div class="research-widgets" id="research-widgets" hidden>
-          <div class="tv-box" id="tv-chart"></div>
-          <div class="tv-box" id="tv-fundamentals"></div>
-        </div>
-
-        <div class="watchlist" id="watchlist">
-          <div class="watchlist-head">
-            <h3 class="watchlist-title">Watchlist</h3>
-            <form class="watchlist-add" id="watchlist-form">
-              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
-              <button type="submit" class="wl-add-btn">Add</button>
-            </form>
-          </div>
-          <div class="watchlist-grid" id="watchlist-grid"></div>
-          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div class="page-wrap">
     <section class="content content-left" id="main-content">
@@ -1128,7 +1089,46 @@
       </div>
     </section>
 
-    
+
+  </div>
+
+  <!-- SYMBOL RESEARCH -->
+  <div class="research-band">
+    <div class="research" id="symbol-research">
+      <div class="research-body">
+        <form class="research-controls" id="research-form">
+          <span class="research-links left">
+            <a id="link-investing" href="#" target="_blank" rel="noopener noreferrer">Investing.com ↗</a>
+            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
+            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
+          </span>
+          <span class="ticker-group">
+            <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
+          </span>
+          <span class="research-links right">
+            <a id="link-nasdaq" href="#" target="_blank" rel="noopener noreferrer">Nasdaq Option Chain ↗</a>
+            <a id="link-eurex" href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank" rel="noopener noreferrer">Eurex Option Chain ↗</a>
+            <a id="link-six" href="https://www.six-structured-products.com/en/search/underlyings" target="_blank" rel="noopener noreferrer">SIX Product Finder ↗</a>
+          </span>
+        </form>
+        <div class="research-widgets" id="research-widgets" hidden>
+          <div class="tv-box" id="tv-chart"></div>
+          <div class="tv-box" id="tv-fundamentals"></div>
+        </div>
+
+        <div class="watchlist" id="watchlist">
+          <div class="watchlist-head">
+            <h3 class="watchlist-title">Watchlist</h3>
+            <form class="watchlist-add" id="watchlist-form">
+              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
+              <button type="submit" class="wl-add-btn">Add</button>
+            </form>
+          </div>
+          <div class="watchlist-grid" id="watchlist-grid"></div>
+          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
+        </div>
+      </div>
+    </div>
   </div>
   <script>
     (function(){
