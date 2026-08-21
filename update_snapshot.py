@@ -63,11 +63,15 @@ SECTIONS = [
         ("U.S. 5Y", "DGS5"),
         ("U.S. 10Y", "DGS10"),
         ("U.S. 30Y", "DGS30"),
-        ("Japan CB", "IRSTCB01JPM156N"),
+        # Traded overnight benchmarks (RFRs).  JPY TONA / CHF SARON are pulled
+        # daily from Stooq (see STOOQ_SYMBOLS); the FRED series here is only a
+        # monthly fallback if Stooq is unavailable.  EUR uses €STR, which FRED
+        # carries daily.
+        ("JPY TONA", "IRSTCB01JPM156N"),
         ("Japan 10Y", "IRLTLT01JPM156N"),
-        ("SNB Rate", "IR3TIB01CHM156N"),
+        ("CHF SARON", "IR3TIB01CHM156N"),
         ("Swiss 10Y", "IRLTLT01CHM156N"),
-        ("ECB Refi", "ECBMRRFR"),
+        ("EUR &euro;STR", "ECBESTRVOLWGTTRMDMNRT"),
         ("Euro 10Y", "IRLTLT01EZM156N"),
         ("BoE SONIA", "IUDSOIA"),
         ("UK 10Y", "IRLTLT01GBM156N"),
@@ -100,6 +104,11 @@ STOOQ_SYMBOLS = {
     "Swiss 10Y": "10chy.b",
     "Euro 10Y": "10dey.b",
     "UK 10Y": "10gby.b",
+    # Overnight risk-free rates (traded equivalents of the policy rates).
+    # These Stooq symbols are unverified from this environment; if a fetch
+    # returns no data the row falls back to its monthly FRED value.
+    "JPY TONA": "tona",
+    "CHF SARON": "saron",
 }
 
 URLS = {
@@ -151,9 +160,8 @@ for _section_title, _src, _instruments in SECTIONS:
                 _name, f"https://fred.stlouisfed.org/series/{_series}"
             )
 
-# Stooq-sourced yields link to their Stooq chart instead of the monthly FRED page.
-for _name, _sym in STOOQ_SYMBOLS.items():
-    URLS[_name] = f"https://stooq.com/q/?s={_sym}"
+# Stooq rows link to their Stooq chart only when the live fetch succeeds
+# (set in main()); otherwise they keep the FRED series page assigned above.
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -424,6 +432,7 @@ def main():
         d = fetch_stooq(sym)
         if d:
             results[name] = d
+            URLS[name] = f"https://stooq.com/q/?s={sym}"
             print(f"  Stooq {name}: {d['last']:.3f} ({fmt_data_time(d['time'])})")
         else:
             print(f"  keeping FRED value for {name} (Stooq unavailable)")
