@@ -104,11 +104,14 @@ STOOQ_SYMBOLS = {
     "Swiss 10Y": "10chy.b",
     "Euro 10Y": "10dey.b",
     "UK 10Y": "10gby.b",
-    # Overnight risk-free rates (traded equivalents of the policy rates).
-    # These Stooq symbols are unverified from this environment; if a fetch
-    # returns no data the row falls back to its monthly FRED value.
-    "JPY TONA": "tona",
-    "CHF SARON": "saron",
+}
+
+# Daily overnight risk-free rates that FRED only carries monthly: pulled from
+# the Swiss National Bank data portal's money-market cube ("zimoma"), which
+# publishes SARON and TONA (among others) daily.  {row name: D0 code}.
+SNB_RATES = {
+    "CHF SARON": "SARON",
+    "JPY TONA": "TONA",
 }
 
 URLS = {
@@ -253,6 +256,19 @@ def fred_observations(series_id, limit=800):
     return dates, values
 
 
+def row_from_series(dates, values):
+    """Build a snapshot row dict from an unordered (dates, values) series."""
+    pairs = sorted(zip(dates, values), key=lambda p: p[0])
+    dates = [d for d, _ in pairs]
+    values = [v for _, v in pairs]
+    last, prev = values[-1], values[-2]
+    chg = last - prev
+    return dict(
+        last=last, chg=chg, chg_pct=(chg / prev * 100 if prev else 0.0),
+        ytd=ytd_from_series(dates, values), time=dates[-1],
+    )
+
+
 def fetch_stooq(symbol):
     """Fetch a Stooq daily history CSV; return dict(last, chg, chg_pct, ytd, time).
 
@@ -283,13 +299,81 @@ def fetch_stooq(symbol):
     if len(values) < 2:
         print(f"  Stooq {symbol}: <2 usable rows")
         return None
-    last, prev = values[-1], values[-2]
-    chg = last - prev
-    chg_pct = (chg / prev) * 100 if prev else 0.0
-    return dict(
-        last=last, chg=chg, chg_pct=chg_pct,
-        ytd=ytd_from_series(dates, values), time=dates[-1],
+    return row_from_series(dates, values)
+
+
+def fetch_snb_zimoma(codes, from_year=None):
+    """Fetch daily money-market rates from the SNB data portal 'zimoma' cube.
+
+    `codes` is a list of D0 dimension codes (e.g. ["SARON", "TONA"]).  The
+    portal returns a semicolon-separated CSV with a few metadata lines, then a
+    header row containing Date / a dimension column / Value, then one row per
+    (date, code).  Returns {code: dict(last, chg, chg_pct, ytd, time)} for the
+    codes that parse; missing codes are simply absent so callers fall back.
+    """
+    if from_year is None:
+        from_year = datetime.now(timezone.utc).year - 2
+    joined = ",".join(codes)
+    url = (
+        "https://data.snb.ch/api/cube/zimoma/data/csv/en"
+        f"?dimSel=D0({joined})&fromDate={from_year}-01-01"
     )
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            text = resp.read().decode("utf-8", "replace")
+    except Exception as exc:  # noqa: BLE001 - network errors all fall back
+        print(f"  SNB error {joined}: {exc}")
+        return {}
+
+    lines = text.splitlines()
+    hdr_idx = next(
+        (i for i, ln in enumerate(lines) if ln.lower().lstrip('"').startswith("date;")),
+        None,
+    )
+    if hdr_idx is None:
+        print(f"  SNB {joined}: no header row found")
+        return {}
+    header = [c.strip().strip('"') for c in lines[hdr_idx].split(";")]
+
+    def col(name):
+        return header.index(name) if name in header else None
+
+    date_i, val_i = col("Date"), col("Value")
+    if date_i is None or val_i is None:
+        print(f"  SNB {joined}: unexpected header {header}")
+        return {}
+    # The dimension (code) column is whichever remaining column is present.
+    code_i = next((k for k in range(len(header)) if k not in (date_i, val_i)), None)
+
+    series = {c: ([], []) for c in codes}
+    for ln in lines[hdr_idx + 1:]:
+        if not ln.strip():
+            continue
+        parts = [p.strip().strip('"') for p in ln.split(";")]
+        if len(parts) <= max(date_i, val_i):
+            continue
+        code = parts[code_i] if code_i is not None and code_i < len(parts) else (
+            codes[0] if len(codes) == 1 else None
+        )
+        if code not in series:
+            continue
+        raw = parts[val_i].replace(",", ".")
+        if raw in ("", "NA", "."):
+            continue
+        try:
+            series[code][0].append(datetime.strptime(parts[date_i][:10], "%Y-%m-%d"))
+            series[code][1].append(float(raw))
+        except (ValueError, TypeError):
+            continue
+
+    out = {}
+    for code, (dates, values) in series.items():
+        if len(values) >= 2:
+            out[code] = row_from_series(dates, values)
+        else:
+            print(f"  SNB {code}: <2 usable rows")
+    return out
 
 
 def fetch_fred(instruments):
@@ -436,6 +520,18 @@ def main():
             print(f"  Stooq {name}: {d['last']:.3f} ({fmt_data_time(d['time'])})")
         else:
             print(f"  keeping FRED value for {name} (Stooq unavailable)")
+
+    # Override SARON / TONA with daily SNB money-market data; keep the FRED
+    # (monthly) value already in `results` if the SNB feed is unavailable.
+    snb = fetch_snb_zimoma(list(SNB_RATES.values()))
+    for name, code in SNB_RATES.items():
+        d = snb.get(code)
+        if d:
+            results[name] = d
+            URLS[name] = "https://data.snb.ch/en/topics/financial-markets-and-interest-rates"
+            print(f"  SNB {name}: {d['last']:.4f} ({fmt_data_time(d['time'])})")
+        else:
+            print(f"  keeping FRED value for {name} (SNB unavailable)")
 
     total = sum(len(instr) for _, _, instr in SECTIONS)
     print(f"Fetched data for {len(results)} / {total} instruments.")
