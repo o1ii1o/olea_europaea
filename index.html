@@ -391,7 +391,7 @@
     .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
 
     /* ── Watchlist ── */
-    .watchlist{ margin-top:16px; border-top:1px solid var(--divider); padding-top:14px; }
+    .watchlist{ margin:0; }
     .watchlist-head{ display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:12px; }
     .watchlist-title{ font-size:14px; font-weight:600; color:var(--text); margin:0; }
     .watchlist-add{ display:flex; gap:8px; }
@@ -500,18 +500,6 @@
         <div class="research-widgets" id="research-widgets" hidden>
           <div class="tv-box" id="tv-chart"></div>
           <div class="tv-box" id="tv-fundamentals"></div>
-        </div>
-
-        <div class="watchlist" id="watchlist">
-          <div class="watchlist-head">
-            <h3 class="watchlist-title">Watchlist</h3>
-            <form class="watchlist-add" id="watchlist-form">
-              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
-              <button type="submit" class="wl-add-btn">Add</button>
-            </form>
-          </div>
-          <div class="watchlist-grid" id="watchlist-grid"></div>
-          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
         </div>
       </div>
     </div>
@@ -827,7 +815,21 @@
               </tbody>
             </table>
           </div>
-        
+
+        </div>
+      </div>
+
+      <div class="sidebar-panel watchlist-panel">
+        <div class="watchlist" id="watchlist">
+          <div class="watchlist-head">
+            <h3 class="watchlist-title">Watchlist</h3>
+            <form class="watchlist-add" id="watchlist-form">
+              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
+              <button type="submit" class="wl-add-btn">Add</button>
+            </form>
+          </div>
+          <div class="watchlist-grid" id="watchlist-grid"></div>
+          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
         </div>
       </div>
     </aside>
