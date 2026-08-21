@@ -55,7 +55,6 @@ SECTIONS = [
         ("Natural Gas", "NG=F"),
         ("Copper", "HG=F"),
         ("Aluminum", "ALI=F"),
-        ("Steel", "SRU=F"),
         ("Uranium", "SRUUF"),
         ("Cocoa", "CC=F"),
         ("Coffee", "KC=F"),
