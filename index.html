@@ -310,8 +310,8 @@
 
     /* ── Symbol Research ── */
     .research-band{
-      max-width:var(--max-width);
-      margin:16px auto 0;
+      max-width:none;
+      margin:16px auto 24px;
       padding:0 20px;
     }
     .research{
@@ -344,8 +344,8 @@
       text-transform:uppercase;
       letter-spacing:0.5px;
       text-align:center;
-      padding:8px 12px;
-      width:120px;
+      padding:10px 12px;
+      width:min(320px, 100%);
       border:1px solid var(--card-border);
       border-radius:var(--radius);
       color:var(--text);
@@ -396,7 +396,7 @@
     .watchlist-add{ display:flex; gap:8px; }
     .watchlist-add input{
       font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;
-      text-align:center; padding:7px 12px; width:120px;
+      text-align:center; padding:9px 12px; width:min(220px, 100%);
       border:1px solid var(--card-border); border-radius:var(--radius);
       color:var(--text); background:var(--page-bg);
     }
@@ -477,45 +477,6 @@
     </a>
   </header>
 
-  <!-- SYMBOL RESEARCH -->
-  <div class="research-band">
-    <div class="research" id="symbol-research">
-      <div class="research-body">
-        <form class="research-controls" id="research-form">
-          <span class="research-links left">
-            <a id="link-investing" href="#" target="_blank" rel="noopener noreferrer">Investing.com ↗</a>
-            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
-            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
-          </span>
-          <span class="ticker-group">
-            <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
-          </span>
-          <span class="research-links right">
-            <a id="link-nasdaq" href="#" target="_blank" rel="noopener noreferrer">Nasdaq Option Chain ↗</a>
-            <a id="link-eurex" href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank" rel="noopener noreferrer">Eurex Option Chain ↗</a>
-            <a id="link-six" href="https://www.six-structured-products.com/en/search/underlyings" target="_blank" rel="noopener noreferrer">SIX Product Finder ↗</a>
-          </span>
-        </form>
-        <div class="research-widgets" id="research-widgets" hidden>
-          <div class="tv-box" id="tv-chart"></div>
-          <div class="tv-box" id="tv-fundamentals"></div>
-        </div>
-
-        <div class="watchlist" id="watchlist">
-          <div class="watchlist-head">
-            <h3 class="watchlist-title">Watchlist</h3>
-            <form class="watchlist-add" id="watchlist-form">
-              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
-              <button type="submit" class="wl-add-btn">Add</button>
-            </form>
-          </div>
-          <div class="watchlist-grid" id="watchlist-grid"></div>
-          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="page-wrap">
     <section class="content content-left" id="main-content">
       <!-- CALENDARS -->
@@ -593,11 +554,7 @@
               <li><a href="https://www.bloomberg.com/europe" target="_blank" rel="noopener noreferrer">Bloomberg</a></li>
               <li><a href="https://www.cnbc.com/world/?region=world" target="_blank" rel="noopener noreferrer">CNBC</a></li>
               <li><a href="https://www.reuters.com" target="_blank" rel="noopener noreferrer">Reuters</a></li>
-              <li><a href="https://finance.yahoo.com/news/" target="_blank" rel="noopener noreferrer">Yahoo Finance</a></li>
-              <li><a href="https://www.investing.com/news/latest-news" target="_blank" rel="noopener noreferrer">Investing News</a></li>
               <li><a href="https://www.finews.com/news/english-news" target="_blank" rel="noopener noreferrer">FinNews</a></li>
-              <li><a href="https://www.nytimes.com/section/business" target="_blank" rel="noopener noreferrer">NYT Business</a></li>
-              <li><a href="https://edition.cnn.com/business" target="_blank" rel="noopener noreferrer">CNN Business</a></li>
               <li><a href="https://www.calcalistech.com/ctechnews/category/5215" target="_blank" rel="noopener noreferrer">CTECH 24/7</a></li>
               <li><a href="https://en.globes.co.il/en/market.tag" target="_blank" rel="noopener noreferrer">Globes Market</a></li>
             </ul>
@@ -1128,7 +1085,46 @@
       </div>
     </section>
 
-    
+
+  </div>
+
+  <!-- SYMBOL RESEARCH -->
+  <div class="research-band">
+    <div class="research" id="symbol-research">
+      <div class="research-body">
+        <form class="research-controls" id="research-form">
+          <span class="research-links left">
+            <a id="link-investing" href="#" target="_blank" rel="noopener noreferrer">Investing.com ↗</a>
+            <a id="link-finviz" href="#" target="_blank" rel="noopener noreferrer">Finviz ↗</a>
+            <a id="link-stockcharts" href="#" target="_blank" rel="noopener noreferrer">StockCharts ↗</a>
+          </span>
+          <span class="ticker-group">
+            <input id="research-input" type="text" aria-label="Ticker symbol" placeholder="Ticker" />
+          </span>
+          <span class="research-links right">
+            <a id="link-nasdaq" href="#" target="_blank" rel="noopener noreferrer">Nasdaq Option Chain ↗</a>
+            <a id="link-eurex" href="https://www.eurex.com/ex-en/markets/equ/opt" target="_blank" rel="noopener noreferrer">Eurex Option Chain ↗</a>
+            <a id="link-six" href="https://www.six-structured-products.com/en/search/underlyings" target="_blank" rel="noopener noreferrer">SIX Product Finder ↗</a>
+          </span>
+        </form>
+        <div class="research-widgets" id="research-widgets" hidden>
+          <div class="tv-box" id="tv-chart"></div>
+          <div class="tv-box" id="tv-fundamentals"></div>
+        </div>
+
+        <div class="watchlist" id="watchlist">
+          <div class="watchlist-head">
+            <h3 class="watchlist-title">Watchlist</h3>
+            <form class="watchlist-add" id="watchlist-form">
+              <input id="watchlist-input" type="text" aria-label="Add ticker to watchlist" placeholder="Add ticker" />
+              <button type="submit" class="wl-add-btn">Add</button>
+            </form>
+          </div>
+          <div class="watchlist-grid" id="watchlist-grid"></div>
+          <p class="watchlist-empty" id="watchlist-empty">No symbols yet — add a ticker above. Saved on this device.</p>
+        </div>
+      </div>
+    </div>
   </div>
   <script>
     (function(){
