@@ -310,7 +310,7 @@
 
     /* ── Symbol Research ── */
     .research-band{
-      max-width:var(--max-width);
+      max-width:none;
       margin:16px auto 0;
       padding:0 20px;
     }
@@ -344,8 +344,8 @@
       text-transform:uppercase;
       letter-spacing:0.5px;
       text-align:center;
-      padding:8px 12px;
-      width:120px;
+      padding:10px 12px;
+      width:min(320px, 100%);
       border:1px solid var(--card-border);
       border-radius:var(--radius);
       color:var(--text);
@@ -396,7 +396,7 @@
     .watchlist-add{ display:flex; gap:8px; }
     .watchlist-add input{
       font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;
-      text-align:center; padding:7px 12px; width:120px;
+      text-align:center; padding:9px 12px; width:min(220px, 100%);
       border:1px solid var(--card-border); border-radius:var(--radius);
       color:var(--text); background:var(--page-bg);
     }
