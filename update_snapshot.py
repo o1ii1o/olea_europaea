@@ -8,6 +8,8 @@ Two data sources:
 Each row shows Last, Chg, Chg% and YTD%.
 """
 
+import csv
+import io
 import json
 import os
 from zoneinfo import ZoneInfo
@@ -29,22 +31,25 @@ SECTIONS = [
         ("US Dollar Index", "DX-Y.NYB"),
         ("AUD/USD", "AUDUSD=X"),
         ("USD/JPY", "JPY=X"),
-        ("USD/HKD", "HKD=X"),
         ("USD/CHF", "CHF=X"),
         ("USD/ILS", "ILS=X"),
-        ("EUR/ILS", "EURILS=X"),
         ("EUR/CHF", "EURCHF=X"),
         ("EUR/USD", "EURUSD=X"),
         ("EUR/GBP", "EURGBP=X"),
         ("GBP/CHF", "GBPCHF=X"),
         ("GBP/USD", "GBPUSD=X"),
+        ("USD/CAD", "CAD=X"),
+        ("USD/MXN", "MXN=X"),
+        ("USD/BRL", "BRL=X"),
         ("BTC/USD", "BTC-USD"),
         ("ETH/USD", "ETH-USD"),
     ]),
     ("Commodities", "yf", [
+        ("S&amp;P GSCI", "^SPGSCI"),
         ("XAU/USD", "GC=F"),
         ("XAG/USD", "SI=F"),
         ("Platinum", "PL=F"),
+        ("Palladium", "PA=F"),
         ("Crude Oil WTI", "CL=F"),
         ("Brent Oil", "BZ=F"),
         ("Natural Gas", "NG=F"),
@@ -52,6 +57,8 @@ SECTIONS = [
         ("Aluminum", "ALI=F"),
         ("Steel", "SRU=F"),
         ("Uranium", "UX=F"),
+        ("Cocoa", "CC=F"),
+        ("Coffee", "KC=F"),
     ]),
     ("Rates", "fred", [
         ("USD SOFR", "SOFR"),
@@ -61,11 +68,15 @@ SECTIONS = [
         ("U.S. 5Y", "DGS5"),
         ("U.S. 10Y", "DGS10"),
         ("U.S. 30Y", "DGS30"),
-        ("Japan CB", "IRSTCB01JPM156N"),
+        # Traded overnight benchmarks (RFRs).  JPY TONA / CHF SARON are pulled
+        # daily from Stooq (see STOOQ_SYMBOLS); the FRED series here is only a
+        # monthly fallback if Stooq is unavailable.  EUR uses €STR, which FRED
+        # carries daily.
+        ("JPY TONA", "IRSTCB01JPM156N"),
         ("Japan 10Y", "IRLTLT01JPM156N"),
-        ("SNB Rate", "IR3TIB01CHM156N"),
+        ("CHF SARON", "IR3TIB01CHM156N"),
         ("Swiss 10Y", "IRLTLT01CHM156N"),
-        ("ECB Refi", "ECBMRRFR"),
+        ("EUR &euro;STR", "ECBESTRVOLWGTTRMDMNRT"),
         ("Euro 10Y", "IRLTLT01EZM156N"),
         ("BoE SONIA", "IUDSOIA"),
         ("UK 10Y", "IRLTLT01GBM156N"),
@@ -88,21 +99,46 @@ SECTIONS = [
     ]),
 ]
 
+# FRED only carries these four sovereign 10-year yields as *monthly* OECD
+# series (…M156N), so they lag badly.  Stooq publishes the same yields daily
+# for free with no API key.  We fetch these from Stooq and only fall back to
+# the FRED (monthly) value if Stooq is unavailable.  The euro-area 10Y uses
+# the German Bund (10dey.b), the standard euro benchmark.
+STOOQ_SYMBOLS = {
+    "Japan 10Y": "10jpy.b",
+    "Swiss 10Y": "10chy.b",
+    "Euro 10Y": "10dey.b",
+    "UK 10Y": "10gby.b",
+}
+
+# Daily overnight risk-free rates that FRED only carries monthly: pulled from
+# the Swiss National Bank data portal's money-market cube ("zimoma"), which
+# publishes SARON and TONA (among others) daily.  {row name: D0 code}.
+SNB_RATES = {
+    "CHF SARON": "SARON",
+    "JPY TONA": "TONA",
+}
+
 URLS = {
     "US Dollar Index": "https://www.investing.com/currencies/us-dollar-index",
     "AUD/USD": "https://www.investing.com/currencies/aud-usd",
     "USD/JPY": "https://www.investing.com/currencies/usd-jpy",
-    "USD/HKD": "https://www.investing.com/currencies/usd-hkd",
     "USD/CHF": "https://www.investing.com/currencies/usd-chf",
     "USD/ILS": "https://www.investing.com/currencies/usd-ils",
-    "EUR/ILS": "https://www.investing.com/currencies/eur-ils",
     "EUR/CHF": "https://www.investing.com/currencies/eur-chf",
     "EUR/USD": "https://www.investing.com/currencies/eur-usd",
     "EUR/GBP": "https://www.investing.com/currencies/eur-gbp",
     "GBP/CHF": "https://www.investing.com/currencies/gbp-chf",
     "GBP/USD": "https://www.investing.com/currencies/gbp-usd",
+    "USD/CAD": "https://www.investing.com/currencies/usd-cad",
+    "USD/MXN": "https://www.investing.com/currencies/usd-mxn",
+    "USD/BRL": "https://www.investing.com/currencies/usd-brl",
+    "S&amp;P GSCI": "https://www.investing.com/commodities/real-time-futures",
     "XAU/USD": "https://www.investing.com/commodities/gold",
     "XAG/USD": "https://www.investing.com/commodities/silver",
+    "Palladium": "https://www.investing.com/commodities/palladium",
+    "Cocoa": "https://www.investing.com/commodities/us-cocoa",
+    "Coffee": "https://www.investing.com/commodities/us-coffee-c",
     "BTC/USD": "https://www.investing.com/crypto/bitcoin",
     "ETH/USD": "https://www.investing.com/crypto/ethereum",
     "Platinum": "https://www.investing.com/commodities/platinum",
@@ -136,6 +172,9 @@ for _section_title, _src, _instruments in SECTIONS:
             URLS.setdefault(
                 _name, f"https://fred.stlouisfed.org/series/{_series}"
             )
+
+# Stooq rows link to their Stooq chart only when the live fetch succeeds
+# (set in main()); otherwise they keep the FRED series page assigned above.
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -225,6 +264,126 @@ def fred_observations(series_id, limit=800):
     dates = [d for d, _ in pairs]
     values = [v for _, v in pairs]
     return dates, values
+
+
+def row_from_series(dates, values):
+    """Build a snapshot row dict from an unordered (dates, values) series."""
+    pairs = sorted(zip(dates, values), key=lambda p: p[0])
+    dates = [d for d, _ in pairs]
+    values = [v for _, v in pairs]
+    last, prev = values[-1], values[-2]
+    chg = last - prev
+    return dict(
+        last=last, chg=chg, chg_pct=(chg / prev * 100 if prev else 0.0),
+        ytd=ytd_from_series(dates, values), time=dates[-1],
+    )
+
+
+def fetch_stooq(symbol):
+    """Fetch a Stooq daily history CSV; return dict(last, chg, chg_pct, ytd, time).
+
+    Stooq's daily endpoint returns chronological CSV rows
+    (Date,Open,High,Low,Close,Volume); for bond-yield symbols Close is the
+    yield in percent.  Returns None on any failure so the caller can fall
+    back to the existing (FRED) value.
+    """
+    url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            text = resp.read().decode("utf-8", "replace")
+    except Exception as exc:  # noqa: BLE001 - network errors all fall back
+        print(f"  Stooq error {symbol}: {exc}")
+        return None
+    dates, values = [], []
+    for row in csv.DictReader(io.StringIO(text)):
+        raw = row.get("Close")
+        day = row.get("Date")
+        if not raw or raw in ("N/D", "") or not day:
+            continue
+        try:
+            values.append(float(raw))
+            dates.append(datetime.strptime(day, "%Y-%m-%d"))
+        except (ValueError, TypeError):
+            continue
+    if len(values) < 2:
+        print(f"  Stooq {symbol}: <2 usable rows")
+        return None
+    return row_from_series(dates, values)
+
+
+def fetch_snb_zimoma(codes, from_year=None):
+    """Fetch daily money-market rates from the SNB data portal 'zimoma' cube.
+
+    `codes` is a list of D0 dimension codes (e.g. ["SARON", "TONA"]).  The
+    portal returns a semicolon-separated CSV with a few metadata lines, then a
+    header row containing Date / a dimension column / Value, then one row per
+    (date, code).  Returns {code: dict(last, chg, chg_pct, ytd, time)} for the
+    codes that parse; missing codes are simply absent so callers fall back.
+    """
+    if from_year is None:
+        from_year = datetime.now(timezone.utc).year - 2
+    joined = ",".join(codes)
+    url = (
+        "https://data.snb.ch/api/cube/zimoma/data/csv/en"
+        f"?dimSel=D0({joined})&fromDate={from_year}-01-01"
+    )
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            text = resp.read().decode("utf-8", "replace")
+    except Exception as exc:  # noqa: BLE001 - network errors all fall back
+        print(f"  SNB error {joined}: {exc}")
+        return {}
+
+    lines = text.splitlines()
+    hdr_idx = next(
+        (i for i, ln in enumerate(lines) if ln.lower().lstrip('"').startswith("date;")),
+        None,
+    )
+    if hdr_idx is None:
+        print(f"  SNB {joined}: no header row found")
+        return {}
+    header = [c.strip().strip('"') for c in lines[hdr_idx].split(";")]
+
+    def col(name):
+        return header.index(name) if name in header else None
+
+    date_i, val_i = col("Date"), col("Value")
+    if date_i is None or val_i is None:
+        print(f"  SNB {joined}: unexpected header {header}")
+        return {}
+    # The dimension (code) column is whichever remaining column is present.
+    code_i = next((k for k in range(len(header)) if k not in (date_i, val_i)), None)
+
+    series = {c: ([], []) for c in codes}
+    for ln in lines[hdr_idx + 1:]:
+        if not ln.strip():
+            continue
+        parts = [p.strip().strip('"') for p in ln.split(";")]
+        if len(parts) <= max(date_i, val_i):
+            continue
+        code = parts[code_i] if code_i is not None and code_i < len(parts) else (
+            codes[0] if len(codes) == 1 else None
+        )
+        if code not in series:
+            continue
+        raw = parts[val_i].replace(",", ".")
+        if raw in ("", "NA", "."):
+            continue
+        try:
+            series[code][0].append(datetime.strptime(parts[date_i][:10], "%Y-%m-%d"))
+            series[code][1].append(float(raw))
+        except (ValueError, TypeError):
+            continue
+
+    out = {}
+    for code, (dates, values) in series.items():
+        if len(values) >= 2:
+            out[code] = row_from_series(dates, values)
+        else:
+            print(f"  SNB {code}: <2 usable rows")
+    return out
 
 
 def fetch_fred(instruments):
@@ -360,6 +519,29 @@ def main():
             results.update(fetch_yf(instruments))
         elif src == "fred":
             results.update(fetch_fred(instruments))
+
+    # Override the four sovereign 10Y yields with daily Stooq data; keep the
+    # FRED (monthly) value already in `results` if Stooq is unavailable.
+    for name, sym in STOOQ_SYMBOLS.items():
+        d = fetch_stooq(sym)
+        if d:
+            results[name] = d
+            URLS[name] = f"https://stooq.com/q/?s={sym}"
+            print(f"  Stooq {name}: {d['last']:.3f} ({fmt_data_time(d['time'])})")
+        else:
+            print(f"  keeping FRED value for {name} (Stooq unavailable)")
+
+    # Override SARON / TONA with daily SNB money-market data; keep the FRED
+    # (monthly) value already in `results` if the SNB feed is unavailable.
+    snb = fetch_snb_zimoma(list(SNB_RATES.values()))
+    for name, code in SNB_RATES.items():
+        d = snb.get(code)
+        if d:
+            results[name] = d
+            URLS[name] = "https://data.snb.ch/en/topics/financial-markets-and-interest-rates"
+            print(f"  SNB {name}: {d['last']:.4f} ({fmt_data_time(d['time'])})")
+        else:
+            print(f"  keeping FRED value for {name} (SNB unavailable)")
 
     total = sum(len(instr) for _, _, instr in SECTIONS)
     print(f"Fetched data for {len(results)} / {total} instruments.")
