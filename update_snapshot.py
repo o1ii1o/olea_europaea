@@ -56,7 +56,7 @@ SECTIONS = [
         ("Copper", "HG=F"),
         ("Aluminum", "ALI=F"),
         ("Steel", "SRU=F"),
-        ("Uranium", "UX=F"),
+        ("Uranium", "SRUUF"),
         ("Cocoa", "CC=F"),
         ("Coffee", "KC=F"),
     ]),
