@@ -391,6 +391,28 @@
     @media (max-width: 860px){ .research-row{ grid-template-columns:1fr; } }
     .tv-box{ border:1px solid var(--card-border); border-radius:var(--radius); overflow:hidden; background:var(--surface); }
 
+    /* ── TD Sequential screen ── */
+    .td-band{ max-width:none; margin:0 auto 24px; padding:0 20px; }
+    .td-panel h4{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
+    .td-updated{ font-size:11px; font-weight:400; text-transform:none; letter-spacing:0; color:var(--muted); }
+    .td-cols{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media (max-width:720px){ .td-cols{ grid-template-columns:1fr; } }
+    .td-col-title{ font-size:12px; font-weight:700; margin-bottom:8px; }
+    .td-col-title.td-bull{ color:#16a34a; }
+    .td-col-title.td-bear{ color:#dc2626; }
+    .td-list{ display:flex; flex-wrap:wrap; gap:6px; }
+    .td-item{ display:inline-flex; align-items:center; gap:6px; padding:4px 8px;
+      border:1px solid var(--card-border); border-radius:var(--radius);
+      text-decoration:none; color:var(--text); font-size:12px; background:var(--page-bg); }
+    .td-item:hover{ border-color:var(--accent); }
+    .td-tkr{ font-weight:700; }
+    .td-idx{ font-size:10px; color:var(--muted); letter-spacing:0.5px; }
+    .td-sig{ font-size:10px; font-weight:700; padding:1px 5px; border-radius:4px; }
+    .td-sig.td-c13{ background:#dbeafe; color:#1d4ed8; }
+    .td-sig.td-s9{ background:#f1f5f9; color:#475569; }
+    .td-px{ font-size:11px; color:var(--muted); }
+    .td-empty{ font-size:12px; color:var(--muted); margin:0; }
+
     /* ── Watchlist ── */
     .watchlist-band{ max-width:none; margin:0 auto 24px; padding:0 20px; }
     .watchlist{ margin:0; }
@@ -1122,6 +1144,23 @@
     </section>
 
 
+  </div>
+
+  <!-- TD SEQUENTIAL SCREEN (full page width) -->
+  <div class="td-band">
+    <div class="sidebar-panel td-panel">
+      <h4>TD Sequential — Daily Screen (DJIA · S&amp;P 500 · Nasdaq 100)<span class="td-updated" id="td-updated"><!--TD_UPDATED_START-->Awaiting first nightly run<!--TD_UPDATED_END--></span></h4>
+      <div class="td-cols">
+        <div class="td-col">
+          <div class="td-col-title td-bull">Bullish · TD Buy (Setup&nbsp;9 / Countdown&nbsp;13)</div>
+          <div class="td-list" id="td-bullish"><!--TD_BULLISH_START--><p class="td-empty">Awaiting first nightly run.</p><!--TD_BULLISH_END--></div>
+        </div>
+        <div class="td-col">
+          <div class="td-col-title td-bear">Bearish · TD Sell (Setup&nbsp;9 / Countdown&nbsp;13)</div>
+          <div class="td-list" id="td-bearish"><!--TD_BEARISH_START--><p class="td-empty">Awaiting first nightly run.</p><!--TD_BEARISH_END--></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- WATCHLIST (full page width, like the ticker bar) -->
