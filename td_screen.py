@@ -167,6 +167,25 @@ def td_last_bar_signals(highs, lows, closes):
     return signals
 
 
+def rsi(closes, period=14):
+    """Wilder's RSI on the last bar; None if not enough data."""
+    if len(closes) < period + 1:
+        return None
+    gains = losses = 0.0
+    for i in range(1, period + 1):
+        d = closes[i] - closes[i - 1]
+        gains += d if d > 0 else 0.0
+        losses += -d if d < 0 else 0.0
+    avg_gain, avg_loss = gains / period, losses / period
+    for i in range(period + 1, len(closes)):
+        d = closes[i] - closes[i - 1]
+        avg_gain = (avg_gain * (period - 1) + (d if d > 0 else 0.0)) / period
+        avg_loss = (avg_loss * (period - 1) + (-d if d < 0 else 0.0)) / period
+    if avg_loss == 0:
+        return 100.0
+    return 100.0 - 100.0 / (1.0 + avg_gain / avg_loss)
+
+
 # ── HTML rendering ────────────────────────────────────────────────────────────
 
 def _badges(idx_set):
@@ -188,6 +207,24 @@ def render_list(rows):
             f'<span class="td-tkr">{r["ticker"]}</span>'
             f'<span class="td-idx">{r["badges"]}</span>'
             f'<span class="td-sig {sig_cls}">{r["kind"]}</span>'
+            f'<span class="td-px">{r["px"]}</span></a>'
+        )
+    return "\n".join(out)
+
+
+def render_rsi(rows):
+    """rows: list of dict(ticker, badges, rsi, px). Most oversold first."""
+    if not rows:
+        return '<p class="td-empty">No names below RSI 30 on the latest close.</p>'
+    rows = sorted(rows, key=lambda r: r["rsi"])
+    out = []
+    for r in rows:
+        out.append(
+            f'<a class="td-item" href="https://finviz.com/quote.ashx?t={r["ticker"]}" '
+            f'target="_blank" rel="noopener noreferrer">'
+            f'<span class="td-tkr">{r["ticker"]}</span>'
+            f'<span class="td-idx">{r["badges"]}</span>'
+            f'<span class="td-sig td-rsi">RSI {r["rsi"]:.1f}</span>'
             f'<span class="td-px">{r["px"]}</span></a>'
         )
     return "\n".join(out)
@@ -218,19 +255,18 @@ def main():
     prices = fetch_history(tickers)
     print(f"Got price history for {len(prices)} / {len(tickers)} tickers.")
 
-    bullish, bearish = [], []
+    bullish, bearish, oversold = [], [], []
     data_date = None
     for t in tickers:
         hist = prices.get(t)
         if not hist:
             continue
         dates, highs, lows, closes = hist
-        sig = td_last_bar_signals(highs, lows, closes)
-        if not sig:
-            continue
         if data_date is None or dates[-1] > data_date:
             data_date = dates[-1]
         row = dict(ticker=t, badges=_badges(members[t]), px=fmt_px(closes[-1]))
+
+        sig = td_last_bar_signals(highs, lows, closes)
         if "buy_countdown" in sig:
             bullish.append({**row, "kind": "C13"})
         elif "buy_setup" in sig:
@@ -240,7 +276,11 @@ def main():
         elif "sell_setup" in sig:
             bearish.append({**row, "kind": "S9"})
 
-    print(f"Bullish: {len(bullish)}  |  Bearish: {len(bearish)}")
+        r = rsi(closes)
+        if r is not None and r < 30:
+            oversold.append({**row, "rsi": r})
+
+    print(f"Bullish: {len(bullish)}  |  Bearish: {len(bearish)}  |  RSI<30: {len(oversold)}")
 
     now_zurich = datetime.now(ZoneInfo("Europe/Zurich")).strftime("%d/%m %H:%M")
     dstr = data_date.strftime("%d/%m/%Y") if data_date is not None else "—"
@@ -250,6 +290,8 @@ def main():
     content = replace_marker(content, "TD_BULLISH", "\n" + render_list(bullish) + "\n")
     content = replace_marker(content, "TD_BEARISH", "\n" + render_list(bearish) + "\n")
     content = replace_marker(content, "TD_UPDATED", stamp)
+    content = replace_marker(content, "RSI_LIST", "\n" + render_rsi(oversold) + "\n")
+    content = replace_marker(content, "RSI_UPDATED", stamp)
     HTML_FILE.write_text(content)
     print(f"Wrote {HTML_FILE}")
 
