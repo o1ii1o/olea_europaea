@@ -20,6 +20,7 @@ the finer deferral/cancellation nuances are not modelled.
 
 import re
 import sys
+import time
 import urllib.request
 from zoneinfo import ZoneInfo
 from datetime import datetime
@@ -96,16 +97,28 @@ def get_index_members():
 
 # ── Prices ──────────────────────────────────────────────────────────────────
 
-def fetch_history(tickers, period="1y", batch=80):
+def _download(chunk, period, attempts=3):
+    """yf.download one chunk with retries (Yahoo rate-limits bulk pulls)."""
+    for a in range(attempts):
+        try:
+            data = yf.download(chunk, period=period, group_by="ticker",
+                               auto_adjust=False, progress=False, threads=True)
+            if data is not None and not data.empty:
+                return data
+        except Exception as exc:  # noqa: BLE001
+            print(f"    download attempt {a + 1}/{attempts}: {exc}")
+        time.sleep(3 * (a + 1))
+    return None
+
+
+def fetch_history(tickers, period="1y", batch=50):
     """Return {ticker: (dates, highs, lows, closes)} chronological."""
     out = {}
     for k in range(0, len(tickers), batch):
         chunk = tickers[k:k + batch]
-        try:
-            data = yf.download(chunk, period=period, group_by="ticker",
-                               auto_adjust=False, progress=False, threads=True)
-        except Exception as exc:  # noqa: BLE001
-            print(f"  price batch {k // batch}: {exc}")
+        data = _download(chunk, period)
+        if data is None:
+            print(f"  price batch {k // batch}: no data after retries")
             continue
         for t in chunk:
             try:
