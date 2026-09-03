@@ -199,6 +199,71 @@ def rsi(closes, period=14):
     return 100.0 - 100.0 / (1.0 + avg_gain / avg_loss)
 
 
+def sma_series(vals, period):
+    """Simple moving average as a list (None until enough data)."""
+    out = [None] * len(vals)
+    s = 0.0
+    for i, v in enumerate(vals):
+        s += v
+        if i >= period:
+            s -= vals[i - period]
+        if i >= period - 1:
+            out[i] = s / period
+    return out
+
+
+def hl_break(closes, window=252):
+    """'high' / 'low' if the latest close is a fresh closing high/low, else None."""
+    n = len(closes)
+    if n < 30:
+        return None
+    prior = (closes[-window:] if n > window else closes)[:-1]
+    if not prior:
+        return None
+    if closes[-1] > max(prior):
+        return "high"
+    if closes[-1] < min(prior):
+        return "low"
+    return None
+
+
+def ma_cross(closes, fast=50, slow=200, recent=5):
+    """('golden'|'death', days_ago) if a 50/200 SMA cross happened in the last
+    `recent` sessions, else None."""
+    n = len(closes)
+    if n < slow + recent + 1:
+        return None
+    f, s = sma_series(closes, fast), sma_series(closes, slow)
+    for i in range(n - 1, n - 1 - recent, -1):
+        if None in (f[i], s[i], f[i - 1], s[i - 1]):
+            continue
+        if f[i - 1] <= s[i - 1] and f[i] > s[i]:
+            return ("golden", n - 1 - i)
+        if f[i - 1] >= s[i - 1] and f[i] < s[i]:
+            return ("death", n - 1 - i)
+    return None
+
+
+def bb_squeeze(closes, period=20, lookback=120, mult=2.0):
+    """Return the current Bollinger bandwidth if it is the tightest over the
+    last `lookback` sessions (a squeeze), else None."""
+    n = len(closes)
+    if n < period + 20:
+        return None
+    bw = [None] * n
+    for i in range(period - 1, n):
+        w = closes[i - period + 1:i + 1]
+        m = sum(w) / period
+        if not m:
+            continue
+        sd = (sum((x - m) ** 2 for x in w) / period) ** 0.5
+        bw[i] = (2 * mult * sd) / m           # (upper - lower) / middle
+    vals = [b for b in bw[-lookback:] if b is not None]
+    if len(vals) < 20 or bw[-1] is None:
+        return None
+    return bw[-1] if bw[-1] <= min(vals) else None
+
+
 # ── HTML rendering ────────────────────────────────────────────────────────────
 
 def _badges(idx_set):
@@ -243,6 +308,23 @@ def render_rsi(rows, descending=False, sig_cls="td-rsi", empty="No names on the 
     return "\n".join(out)
 
 
+def render_items(rows, empty):
+    """rows: pre-sorted list of dict(ticker, badges, tag, tag_cls, px)."""
+    if not rows:
+        return f'<p class="td-empty">{empty}</p>'
+    out = []
+    for r in rows:
+        out.append(
+            f'<a class="td-item" href="https://finviz.com/quote.ashx?t={r["ticker"]}" '
+            f'target="_blank" rel="noopener noreferrer">'
+            f'<span class="td-tkr">{r["ticker"]}</span>'
+            f'<span class="td-idx">{r["badges"]}</span>'
+            f'<span class="td-sig {r["tag_cls"]}">{r["tag"]}</span>'
+            f'<span class="td-px">{r["px"]}</span></a>'
+        )
+    return "\n".join(out)
+
+
 def replace_marker(content, name, inner):
     start, end = f"<!--{name}_START-->", f"<!--{name}_END-->"
     i = content.index(start) + len(start)
@@ -269,6 +351,7 @@ def main():
     print(f"Got price history for {len(prices)} / {len(tickers)} tickers.")
 
     bullish, bearish, oversold, overbought = [], [], [], []
+    new_highs, new_lows, golden, death, squeeze = [], [], [], [], []
     data_date = None
     for t in tickers:
         hist = prices.get(t)
@@ -295,8 +378,29 @@ def main():
         elif r is not None and r > 70:
             overbought.append({**row, "rsi": r})
 
+        hl = hl_break(closes)
+        if hl == "high":
+            new_highs.append({**row, "tag": "52W H", "tag_cls": "td-hi", "sort": t})
+        elif hl == "low":
+            new_lows.append({**row, "tag": "52W L", "tag_cls": "td-lo", "sort": t})
+
+        cr = ma_cross(closes)
+        if cr:
+            kind, days = cr
+            ago = "today" if days == 0 else f"{days}d ago"
+            if kind == "golden":
+                golden.append({**row, "tag": f"GC · {ago}", "tag_cls": "td-gc", "sort": days})
+            else:
+                death.append({**row, "tag": f"DC · {ago}", "tag_cls": "td-dc", "sort": days})
+
+        bw = bb_squeeze(closes)
+        if bw is not None:
+            squeeze.append({**row, "tag": f"BW {bw * 100:.1f}%", "tag_cls": "td-sq", "sort": bw})
+
     print(f"Bullish: {len(bullish)}  |  Bearish: {len(bearish)}  |  "
-          f"RSI<30: {len(oversold)}  |  RSI>70: {len(overbought)}")
+          f"RSI<30: {len(oversold)}  |  RSI>70: {len(overbought)}  |  "
+          f"52wH: {len(new_highs)}  |  52wL: {len(new_lows)}  |  "
+          f"Golden: {len(golden)}  |  Death: {len(death)}  |  Squeeze: {len(squeeze)}")
 
     now_zurich = datetime.now(ZoneInfo("Europe/Zurich")).strftime("%d/%m %H:%M")
     dstr = data_date.strftime("%d/%m/%Y") if data_date is not None else "—"
@@ -315,6 +419,23 @@ def main():
         "\n" + render_rsi(overbought, descending=True, sig_cls="td-rsi-ob",
                           empty="No names above RSI 70 on the latest close.") + "\n")
     content = replace_marker(content, "RSI_OB_UPDATED", stamp)
+
+    def by_sort(rows):
+        return sorted(rows, key=lambda r: r["sort"])
+
+    content = replace_marker(content, "HL_HIGH",
+                             "\n" + render_items(by_sort(new_highs), "No new 52-week highs.") + "\n")
+    content = replace_marker(content, "HL_LOW",
+                             "\n" + render_items(by_sort(new_lows), "No new 52-week lows.") + "\n")
+    content = replace_marker(content, "HL_UPDATED", stamp)
+    content = replace_marker(content, "CROSS_GOLDEN",
+                             "\n" + render_items(by_sort(golden), "No recent golden crosses.") + "\n")
+    content = replace_marker(content, "CROSS_DEATH",
+                             "\n" + render_items(by_sort(death), "No recent death crosses.") + "\n")
+    content = replace_marker(content, "CROSS_UPDATED", stamp)
+    content = replace_marker(content, "SQZ_LIST",
+                             "\n" + render_items(by_sort(squeeze), "No Bollinger squeezes.") + "\n")
+    content = replace_marker(content, "SQZ_UPDATED", stamp)
     HTML_FILE.write_text(content)
     print(f"Wrote {HTML_FILE}")
 
