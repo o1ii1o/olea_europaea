@@ -225,11 +225,11 @@ def render_list(rows):
     return "\n".join(out)
 
 
-def render_rsi(rows):
-    """rows: list of dict(ticker, badges, rsi, px). Most oversold first."""
+def render_rsi(rows, descending=False, sig_cls="td-rsi", empty="No names on the latest close."):
+    """rows: list of dict(ticker, badges, rsi, px). Sorted by RSI."""
     if not rows:
-        return '<p class="td-empty">No names below RSI 30 on the latest close.</p>'
-    rows = sorted(rows, key=lambda r: r["rsi"])
+        return f'<p class="td-empty">{empty}</p>'
+    rows = sorted(rows, key=lambda r: r["rsi"], reverse=descending)
     out = []
     for r in rows:
         out.append(
@@ -237,7 +237,7 @@ def render_rsi(rows):
             f'target="_blank" rel="noopener noreferrer">'
             f'<span class="td-tkr">{r["ticker"]}</span>'
             f'<span class="td-idx">{r["badges"]}</span>'
-            f'<span class="td-sig td-rsi">RSI {r["rsi"]:.1f}</span>'
+            f'<span class="td-sig {sig_cls}">RSI {r["rsi"]:.1f}</span>'
             f'<span class="td-px">{r["px"]}</span></a>'
         )
     return "\n".join(out)
@@ -268,7 +268,7 @@ def main():
     prices = fetch_history(tickers)
     print(f"Got price history for {len(prices)} / {len(tickers)} tickers.")
 
-    bullish, bearish, oversold = [], [], []
+    bullish, bearish, oversold, overbought = [], [], [], []
     data_date = None
     for t in tickers:
         hist = prices.get(t)
@@ -292,8 +292,11 @@ def main():
         r = rsi(closes)
         if r is not None and r < 30:
             oversold.append({**row, "rsi": r})
+        elif r is not None and r > 70:
+            overbought.append({**row, "rsi": r})
 
-    print(f"Bullish: {len(bullish)}  |  Bearish: {len(bearish)}  |  RSI<30: {len(oversold)}")
+    print(f"Bullish: {len(bullish)}  |  Bearish: {len(bearish)}  |  "
+          f"RSI<30: {len(oversold)}  |  RSI>70: {len(overbought)}")
 
     now_zurich = datetime.now(ZoneInfo("Europe/Zurich")).strftime("%d/%m %H:%M")
     dstr = data_date.strftime("%d/%m/%Y") if data_date is not None else "—"
@@ -303,8 +306,15 @@ def main():
     content = replace_marker(content, "TD_BULLISH", "\n" + render_list(bullish) + "\n")
     content = replace_marker(content, "TD_BEARISH", "\n" + render_list(bearish) + "\n")
     content = replace_marker(content, "TD_UPDATED", stamp)
-    content = replace_marker(content, "RSI_LIST", "\n" + render_rsi(oversold) + "\n")
+    content = replace_marker(
+        content, "RSI_LIST",
+        "\n" + render_rsi(oversold, empty="No names below RSI 30 on the latest close.") + "\n")
     content = replace_marker(content, "RSI_UPDATED", stamp)
+    content = replace_marker(
+        content, "RSI_OB_LIST",
+        "\n" + render_rsi(overbought, descending=True, sig_cls="td-rsi-ob",
+                          empty="No names above RSI 70 on the latest close.") + "\n")
+    content = replace_marker(content, "RSI_OB_UPDATED", stamp)
     HTML_FILE.write_text(content)
     print(f"Wrote {HTML_FILE}")
 
