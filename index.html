@@ -412,6 +412,9 @@
     .td-sig.td-s9{ background:#f1f5f9; color:#475569; }
     .td-sig.td-rsi{ background:#fef3c7; color:#b45309; }
     .td-sig.td-rsi-ob{ background:#dcfce7; color:#15803d; }
+    .td-sig.td-hi, .td-sig.td-gc{ background:#dcfce7; color:#15803d; }
+    .td-sig.td-lo, .td-sig.td-dc{ background:#fee2e2; color:#b91c1c; }
+    .td-sig.td-sq{ background:#e0e7ff; color:#4338ca; }
     .td-px{ font-size:11px; color:var(--muted); }
     .td-empty{ font-size:12px; color:var(--muted); margin:0; }
 
@@ -1182,6 +1185,48 @@
     <div class="sidebar-panel td-panel">
       <h4>RSI(14) &gt; 70 · Overbought (DJIA · S&amp;P 500 · Nasdaq 100)<span class="td-updated" id="rsi-ob-updated"><!--RSI_OB_UPDATED_START-->Awaiting first nightly run<!--RSI_OB_UPDATED_END--></span></h4>
       <div class="td-list" id="rsi-ob-list"><!--RSI_OB_LIST_START--><p class="td-empty">Awaiting first nightly run.</p><!--RSI_OB_LIST_END--></div>
+    </div>
+  </div>
+
+  <!-- 52-WEEK HIGH/LOW BREAKOUTS (full page width) -->
+  <div class="td-band">
+    <div class="sidebar-panel td-panel">
+      <h4>52-Week Breakouts · closing high / low (DJIA · S&amp;P 500 · Nasdaq 100)<span class="td-updated" id="hl-updated"><!--HL_UPDATED_START-->Awaiting first nightly run<!--HL_UPDATED_END--></span></h4>
+      <div class="td-cols">
+        <div class="td-col">
+          <div class="td-col-title td-bull">New 52-week highs</div>
+          <div class="td-list" id="hl-high"><!--HL_HIGH_START--><p class="td-empty">Awaiting first nightly run.</p><!--HL_HIGH_END--></div>
+        </div>
+        <div class="td-col">
+          <div class="td-col-title td-bear">New 52-week lows</div>
+          <div class="td-list" id="hl-low"><!--HL_LOW_START--><p class="td-empty">Awaiting first nightly run.</p><!--HL_LOW_END--></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 50/200 SMA CROSSES (full page width) -->
+  <div class="td-band">
+    <div class="sidebar-panel td-panel">
+      <h4>50/200 SMA Crosses · last 5 sessions (DJIA · S&amp;P 500 · Nasdaq 100)<span class="td-updated" id="cross-updated"><!--CROSS_UPDATED_START-->Awaiting first nightly run<!--CROSS_UPDATED_END--></span></h4>
+      <div class="td-cols">
+        <div class="td-col">
+          <div class="td-col-title td-bull">Golden cross (50 &uarr; 200)</div>
+          <div class="td-list" id="cross-golden"><!--CROSS_GOLDEN_START--><p class="td-empty">Awaiting first nightly run.</p><!--CROSS_GOLDEN_END--></div>
+        </div>
+        <div class="td-col">
+          <div class="td-col-title td-bear">Death cross (50 &darr; 200)</div>
+          <div class="td-list" id="cross-death"><!--CROSS_DEATH_START--><p class="td-empty">Awaiting first nightly run.</p><!--CROSS_DEATH_END--></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOLLINGER SQUEEZE (full page width) -->
+  <div class="td-band">
+    <div class="sidebar-panel td-panel">
+      <h4>Bollinger Squeeze · tightest bands in 120 sessions (DJIA · S&amp;P 500 · Nasdaq 100)<span class="td-updated" id="sqz-updated"><!--SQZ_UPDATED_START-->Awaiting first nightly run<!--SQZ_UPDATED_END--></span></h4>
+      <div class="td-list" id="sqz-list"><!--SQZ_LIST_START--><p class="td-empty">Awaiting first nightly run.</p><!--SQZ_LIST_END--></div>
     </div>
   </div>
 
