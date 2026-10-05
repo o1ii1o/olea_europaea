@@ -41,6 +41,7 @@ Output
 
 import json
 import math
+import re
 import os
 import sys
 import time
@@ -58,6 +59,9 @@ OUT_FILE = DATA_DIR / "buffett_screen.json"
 CACHE_FILE = Path(os.environ.get("BUFFETT_CACHE", DATA_DIR / "buffett_cache.json"))
 
 MIN_MCAP_USD = float(os.environ.get("BUFFETT_MIN_MCAP_USD", 1e9))
+# Average daily traded value floor — also removes dormant copies of foreign
+# shares on Vienna / Xetra / SIX that the other filters miss.
+MIN_TRADED_USD = float(os.environ.get("BUFFETT_MIN_TRADED_USD", 1e5))
 REFRESH_DAYS = int(os.environ.get("BUFFETT_REFRESH_DAYS", 7))
 MAX_FETCH = int(os.environ.get("BUFFETT_MAX_FETCH", 6000))     # per run
 PAUSE = float(os.environ.get("BUFFETT_PAUSE", 0.25))            # s between tickers
@@ -162,37 +166,82 @@ def get_universe():
             # is set loose here; the exact USD cut is applied after FX.
             quotes, total = screen_region(code, exch, MIN_MCAP_USD * 0.5)
             print(f"  {label}/{code}: {len(quotes)} of {total}")
-            names_seen = set()
             for q in quotes:
                 sym = q.get("symbol")
                 if not sym or sym in seen:
                     continue
-                name = q.get("longName") or q.get("shortName") or sym
-                # One line per company (GOOG/GOOGL, BRK-A/BRK-B, ...): quotes
-                # are sorted by mcap, so the first listing seen is kept.
-                key = name.lower().replace(",", "").replace(".", "")
-                if key in names_seen:
-                    continue
-                names_seen.add(key)
                 seen.add(sym)
                 rows.append(dict(
-                    s=sym, n=name, r=label, c=code.upper(),
-                    x=q.get("fullExchangeName") or q.get("exchange"),
-                    cur=q.get("currency"), mcap_local=q.get("marketCap"),
-                    px=q.get("regularMarketPrice"),
+                    s=sym, n=q.get("longName") or q.get("shortName") or sym,
+                    r=label, c=code.upper(), x=q.get("exchange"),
+                    cur=q.get("currency"), fcur=q.get("financialCurrency"),
+                    mcap_local=q.get("marketCap"), px=q.get("regularMarketPrice"),
+                    vol=q.get("averageDailyVolume3Month") or q.get("averageDailyVolume10Day"),
                 ))
                 n_label += 1
         stats[label] = n_label
-    return rows, stats
+    sample = quotes[0] if quotes else {}
+    return rows, stats, sorted(sample.keys())
 
 
-def drop_adr_duplicates(rows):
-    """Drop a US listing (ADR) when the same company is in the universe via
-    its home market, so each company appears once."""
-    def key(name):
-        return "".join(ch for ch in name.lower() if ch.isalnum())
-    home = {key(r["n"]) for r in rows if r["r"] != "US"}
-    return [r for r in rows if r["r"] != "US" or key(r["n"]) not in home]
+# Secondary-market codes for shares whose primary listing is elsewhere:
+#   LSE "0xxx.L" international lines, Borsa Italiana "1xxx.MI" (GEM / EuroTLX
+#   foreign shares), HKEX 8xxxx.HK RMB counters.
+SECONDARY_PATTERNS = [re.compile(p) for p in
+                      (r"^0[A-Z0-9]{3}\.L$", r"^1[A-Z][A-Z0-9-]*\.MI$", r"^8\d{4}\.HK$")]
+
+# Reporting currencies plausible for a primary listing in each region.  A
+# Xetra / Vienna / SIX line of a Japanese or Canadian company reports in JPY /
+# CAD and is dropped; US-dollar reporters are kept (Shell, HSBC, Glencore ...).
+HOME_FCUR = {
+    "UK": {"GBP", "GBp", "USD", "EUR"},
+    "Europe": {"EUR", "CHF", "GBP", "SEK", "NOK", "DKK", "PLN", "USD"},
+    "HK": {"HKD", "CNY", "USD"},
+}
+
+_SUFFIXES = {"inc", "incorporated", "corp", "corporation", "co", "company", "ltd",
+             "limited", "plc", "ag", "sa", "se", "nv", "spa", "ab", "publ", "asa",
+             "as", "oyj", "the", "holding", "holdings", "group", "class", "a", "b"}
+
+
+def name_key(name):
+    words = re.sub(r"[^\w ]", " ", name.lower().replace(".", "")).split()
+    core = [w for w in words if w not in _SUFFIXES]
+    return " ".join(core or words)
+
+
+def clean_universe(rows):
+    """Keep one primary listing per company."""
+    dropped = {"secondary_code": 0, "foreign_reporting_ccy": 0, "illiquid": 0,
+               "duplicate": 0}
+    keep = []
+    for u in rows:
+        if any(p.match(u["s"]) for p in SECONDARY_PATTERNS):
+            dropped["secondary_code"] += 1
+            continue
+        allowed = HOME_FCUR.get(u["r"])
+        if allowed and u["fcur"] and u["fcur"] not in allowed:
+            dropped["foreign_reporting_ccy"] += 1
+            continue
+        if 0 < (u["vt"] or 0) < MIN_TRADED_USD:
+            dropped["illiquid"] += 1
+            continue
+        keep.append(u)
+    # Same company on several venues (ADR + home line, Xetra / Vienna / SIX
+    # copies of foreign shares, A/B classes): keep the most-traded line.  A
+    # US ADR is only preferred over a home listing if it trades >10x more, so
+    # Shell stays a UK name and BABA an HK name, while Apple's Xetra copy
+    # never displaces AAPL.
+    def weight(u):
+        return (u["vt"] or 0) / (10 if u["r"] == "US" else 1)
+    best = {}
+    for u in keep:
+        k = name_key(u["n"])
+        if k not in best or weight(u) > weight(best[k]):
+            best[k] = u
+    out = [u for u in keep if best[name_key(u["n"])] is u]
+    dropped["duplicate"] = len(keep) - len(out)
+    return out, dropped
 
 
 # ── Fundamentals ────────────────────────────────────────────────────────────
@@ -407,7 +456,7 @@ def replace_marker(content, name, inner):
 def main():
     started = time.time()
     print(f"Universe: mcap > USD {MIN_MCAP_USD / 1e9:.1f}bn ...")
-    universe, screener_counts = get_universe()
+    universe, screener_counts, quote_fields = get_universe()
     print(f"Screener returned {len(universe)} listings: {screener_counts}")
 
     # Market cap in USD.  LSE quotes are in pence (GBp) but Yahoo reports the
@@ -418,11 +467,15 @@ def main():
         rate = rates.get(norm.get(u["cur"], u["cur"]))
         u["mc"] = (u["mcap_local"] * rate / 1e9
                    if (rate and u["mcap_local"]) else None)
+        # Average daily traded value in USD (LSE prices are in pence).
+        px = (u["px"] or 0) / (100 if u["cur"] in ("GBp", "GBX", "ZAc", "ILA") else 1)
+        u["vt"] = (u["vol"] or 0) * px * (rate or 0)
     mcap_check = {u["s"]: [u["cur"], u["mcap_local"], u["mc"] and round(u["mc"], 1)]
                   for u in universe if u["s"] in MCAP_CHECK}
     print("Market-cap check:", mcap_check)
     universe = [u for u in universe if u["mc"] and u["mc"] * 1e9 >= MIN_MCAP_USD]
-    universe = drop_adr_duplicates(universe)
+    universe, dropped = clean_universe(universe)
+    print(f"Dropped: {dropped}")
     region_counts = {k: sum(1 for u in universe if u["r"] == k) for k in UNIVERSE}
     if LIMIT:
         universe = universe[:LIMIT]
@@ -485,6 +538,8 @@ def main():
         "universe": len(universe),
         "by_region": region_counts,
         "screener_listings": screener_counts,
+        "dropped": dropped,
+        "quote_fields": quote_fields,
         "fx": {k: round(v, 5) for k, v in rates.items()},
         "mcap_check": mcap_check,
         "evaluated": len(rows),
