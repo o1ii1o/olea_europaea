@@ -418,6 +418,40 @@
     .td-px{ font-size:11px; color:var(--muted); }
     .td-empty{ font-size:12px; color:var(--muted); margin:0; }
 
+    /* ── Buffett fundamentals screen ── */
+    .bf-controls{ display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin-bottom:10px; font-size:12px; }
+    .bf-group{ display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+    .bf-label{ color:var(--muted); font-weight:600; margin-right:2px; }
+    .bf-chip{ font:inherit; font-size:11px; padding:3px 8px; border:1px solid var(--card-border); border-radius:999px;
+      background:var(--surface); color:var(--text); cursor:pointer; }
+    .bf-chip:hover{ border-color:var(--accent); }
+    .bf-chip[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:#fff; }
+    .bf-chip.bf-rule[aria-pressed="false"]{ text-decoration:line-through; color:var(--muted); background:var(--page-bg); }
+    .bf-controls select, .bf-controls input{ font:inherit; font-size:12px; padding:4px 8px; border:1px solid var(--card-border);
+      border-radius:var(--radius); background:var(--surface); color:var(--text); }
+    .bf-controls input{ width:160px; }
+    .bf-count{ color:var(--muted); margin-left:auto; }
+    .bf-wrap{ overflow-x:auto; border:1px solid var(--card-border); border-radius:var(--radius); background:var(--surface); max-height:640px; overflow-y:auto; }
+    .bf-table{ width:100%; border-collapse:collapse; font-size:11px; line-height:1.3; }
+    .bf-table th{ position:sticky; top:0; z-index:1; background:var(--section-bg); color:var(--muted); font-weight:600; padding:6px 6px;
+      text-align:right; white-space:nowrap; border-bottom:1px solid var(--divider); cursor:pointer; user-select:none; }
+    .bf-table th:hover{ color:var(--accent); }
+    .bf-table th.bf-l, .bf-table td.bf-l{ text-align:left; }
+    .bf-table th small{ display:block; font-weight:400; font-size:9px; }
+    .bf-table td{ padding:4px 6px; text-align:right; white-space:nowrap; border-bottom:1px solid var(--divider); }
+    .bf-table td.bf-name{ max-width:200px; overflow:hidden; text-overflow:ellipsis; }
+    .bf-table td a{ color:var(--text); font-weight:700; text-decoration:none; }
+    .bf-table td a:hover{ color:var(--accent); text-decoration:underline; }
+    .bf-table tbody tr:hover{ background:rgba(0,0,0,0.025); }
+    .bf-table td.bf-y{ background:#dcfce7; color:#15803d; }
+    .bf-table td.bf-n{ background:#fee2e2; color:#b91c1c; }
+    .bf-table td.bf-na{ color:#94a3b8; }
+    .bf-table td.bf-off{ opacity:.35; }
+    .bf-score{ font-weight:700; }
+    .bf-more{ display:block; margin:8px auto 0; }
+    .bf-more[hidden]{ display:none; }
+    .bf-notes{ font-size:11px; color:var(--muted); margin:10px 0 0; line-height:1.5; }
+
     /* ── Watchlist ── */
     .watchlist-band{ max-width:none; margin:0 auto 24px; padding:0 20px; }
     .watchlist{ margin:0; }
@@ -1247,6 +1281,53 @@
     </div>
   </div>
 
+  <!-- BUFFETT FUNDAMENTALS SCREEN (full page width) — data: data/buffett_screen.json, built by buffett_screen.py -->
+  <div class="td-band" id="buffett-band">
+    <div class="sidebar-panel td-panel">
+      <h4>Buffett Fundamentals Screen · 14 rules of thumb (US · UK · Europe · HK, mkt cap &gt; $1bn)<span class="td-updated" id="bf-updated"><!--BUFFETT_UPDATED_START-->not yet run<!--BUFFETT_UPDATED_END--></span></h4>
+      <div class="bf-controls">
+        <div class="bf-group" id="bf-regions" role="group" aria-label="Region">
+          <span class="bf-label">Region</span>
+          <button type="button" class="bf-chip" data-region="" aria-pressed="true">All</button>
+          <button type="button" class="bf-chip" data-region="US" aria-pressed="false">US</button>
+          <button type="button" class="bf-chip" data-region="UK" aria-pressed="false">UK</button>
+          <button type="button" class="bf-chip" data-region="Europe" aria-pressed="false">Europe</button>
+          <button type="button" class="bf-chip" data-region="HK" aria-pressed="false">HK</button>
+        </div>
+        <label class="bf-group"><span class="bf-label">Must pass</span>
+          <select id="bf-min">
+            <option value="0">all active rules</option>
+            <option value="1">all but 1</option>
+            <option value="2" selected>all but 2</option>
+            <option value="3">all but 3</option>
+            <option value="99">show everything</option>
+          </select>
+        </label>
+        <input id="bf-search" type="search" placeholder="Filter ticker / name" aria-label="Filter by ticker or company name" />
+        <span class="bf-count" id="bf-count" aria-live="polite"></span>
+      </div>
+      <div class="bf-controls">
+        <div class="bf-group" id="bf-rules" role="group" aria-label="Active rules">
+          <span class="bf-label">Rules (click to switch off)</span>
+        </div>
+      </div>
+      <div class="bf-wrap">
+        <table class="bf-table" id="bf-table">
+          <thead><tr id="bf-head"></tr></thead>
+          <tbody id="bf-body"><tr><td class="bf-l" colspan="20">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <button type="button" class="bf-chip bf-more" id="bf-more" hidden>Show more</button>
+      <p class="bf-notes">
+        Rules from Brian Feroldi's &ldquo;Warren Buffett's financial statements rules of thumb&rdquo;, applied to the latest annual report (Yahoo Finance data).
+        Green = pass, red = fail, grey = not reported (counts as not passed). Tax is passed when the effective rate is 15&ndash;35% (a full corporate rate);
+        EPS must be positive in every year shown (up to 4) and up on the prior year; retained earnings must rise in every year shown.
+        Missing R&amp;D, interest expense or preferred stock are treated as zero. Many UK, European and HK companies cancel repurchased shares, so they never show
+        treasury stock — switch that rule off to compare them fairly. Banks and insurers have no gross profit and will not screen. Statements refresh weekly. Not investment advice.
+      </p>
+    </div>
+  </div>
+
   <!-- WATCHLIST (full page width, like the ticker bar) -->
   <div class="watchlist-band">
     <div class="sidebar-panel watchlist-panel">
@@ -1500,6 +1581,146 @@
         });
       }
       wlRender();
+    })();
+
+    /* ── Buffett fundamentals screen ── */
+    (function(){
+      const band = document.getElementById('buffett-band');
+      if(!band) return;
+      // Order must match RULES in buffett_screen.py
+      const RULES = [
+        {k:'gm',   h:'Gross',   t:'>40%',   f:'pct', d:'Gross profit / Revenue > 40%'},
+        {k:'sga',  h:'SG&A',    t:'<30%',   f:'pct', d:'SG&A / Gross profit < 30%'},
+        {k:'rd',   h:'R&D',     t:'<30%',   f:'pct', d:'R&D / Gross profit < 30%'},
+        {k:'dep',  h:'Deprec.', t:'<10%',   f:'pct', d:'Depreciation & amortisation / Gross profit < 10%'},
+        {k:'int',  h:'Interest',t:'<15%',   f:'pct', d:'Interest expense / Operating income < 15%'},
+        {k:'tax',  h:'Tax',     t:'15–35%', f:'pct', d:'Tax provision / Pre-tax income between 15% and 35%'},
+        {k:'nm',   h:'Net',     t:'>20%',   f:'pct', d:'Net income / Revenue > 20%'},
+        {k:'eps',  h:'EPS',     t:'+ & ↑',  f:'chg', d:'Diluted EPS positive every year and up y/y (value = y/y growth)'},
+        {k:'cd',   h:'Cash/Debt',t:'>1×',   f:'x',   d:'Cash + short-term investments > Total debt'},
+        {k:'de',   h:'Adj D/E', t:'<0.80',  f:'num', d:'Total liabilities / (Shareholder equity + Treasury stock) < 0.80'},
+        {k:'pref', h:'Pref.',   t:'none',   f:'none',d:'No preferred stock'},
+        {k:'re',   h:'Ret. earn.',t:'↑ yearly',f:'chg',d:'Retained earnings up in every year shown (value = y/y growth)'},
+        {k:'ts',   h:'Treasury',t:'exists', f:'exists',d:'Treasury stock on the balance sheet'},
+        {k:'cap',  h:'Capex',   t:'<25%',   f:'pct', d:'Capex / Net income < 25%'},
+      ];
+      const PAGE = 250;
+      const state = { rows: [], region: '', slack: 2, q: '', off: new Set(), sort: 'sc', asc: false, shown: PAGE };
+      const $ = id => document.getElementById(id);
+      const body = $('bf-body'), head = $('bf-head'), count = $('bf-count'), more = $('bf-more');
+
+      const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+      function fmt(v, f, pass){
+        if(f === 'none') return pass === 1 ? 'none' : 'yes';
+        if(f === 'exists') return pass === 1 ? 'yes' : 'none';
+        if(v === null || v === undefined){
+          if(f === 'x' && pass === 1) return 'no debt';
+          return pass === 0 ? 'neg.' : 'n/a';
+        }
+        if(f === 'pct') return (v * 100).toFixed(1) + '%';
+        if(f === 'chg') return (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + '%';
+        if(f === 'x') return v.toFixed(1) + '×';
+        return v.toFixed(2);
+      }
+      function score(r){
+        let s = 0, n = 0;
+        RULES.forEach((rule, i) => { if(!state.off.has(rule.k)){ n++; if(r.p[i] === 1) s++; } });
+        return [s, n];
+      }
+
+      // Header + rule chips
+      const cols = [
+        {k:'s', h:'Ticker', l:true}, {k:'n', h:'Company', l:true}, {k:'r', h:'Region', l:true},
+        {k:'mc', h:'Mkt cap', t:'$bn'}, {k:'fy', h:'FY end'}, {k:'sc', h:'Score'},
+      ].concat(RULES.map((r, i) => ({k:'m' + i, h:r.h, t:r.t, d:r.d})));
+      head.innerHTML = cols.map(c =>
+        `<th class="${c.l ? 'bf-l' : ''}" data-k="${c.k}" title="${esc(c.d || 'Sort by ' + c.h)}">${esc(c.h)}${c.t ? '<small>' + esc(c.t) + '</small>' : ''}</th>`
+      ).join('');
+      head.addEventListener('click', e => {
+        const th = e.target.closest('th'); if(!th) return;
+        const k = th.dataset.k;
+        if(state.sort === k) state.asc = !state.asc; else { state.sort = k; state.asc = ['s','n','r'].includes(k); }
+        render();
+      });
+      const rulesBox = $('bf-rules');
+      RULES.forEach(r => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'bf-chip bf-rule'; b.textContent = r.h;
+        b.title = r.d; b.setAttribute('aria-pressed', 'true');
+        b.addEventListener('click', () => {
+          const on = state.off.has(r.k);
+          if(on) state.off.delete(r.k); else state.off.add(r.k);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+          state.shown = PAGE; render();
+        });
+        rulesBox.appendChild(b);
+      });
+      $('bf-regions').addEventListener('click', e => {
+        const b = e.target.closest('button'); if(!b) return;
+        state.region = b.dataset.region;
+        $('bf-regions').querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+        state.shown = PAGE; render();
+      });
+      $('bf-min').addEventListener('change', e => { state.slack = +e.target.value; state.shown = PAGE; render(); });
+      $('bf-search').addEventListener('input', e => { state.q = e.target.value.trim().toLowerCase(); state.shown = PAGE; render(); });
+      more.addEventListener('click', () => { state.shown += PAGE; render(); });
+
+      function sortVal(r, k){
+        if(k === 'sc') return r._s;
+        if(k[0] === 'm' && k.length <= 3 && k !== 'mc'){
+          const i = +k.slice(1); return r.m[i] === null ? null : r.m[i];
+        }
+        return r[k];
+      }
+      function render(){
+        const list = [];
+        for(const r of state.rows){
+          if(state.region && r.r !== state.region) continue;
+          if(state.q && !(r.s.toLowerCase().includes(state.q) || r.n.toLowerCase().includes(state.q))) continue;
+          const [s, n] = score(r);
+          if(s < n - state.slack) continue;
+          r._s = s; r._n = n; list.push(r);
+        }
+        const k = state.sort, dir = state.asc ? 1 : -1;
+        list.sort((a, b) => {
+          const va = sortVal(a, k), vb = sortVal(b, k);
+          if(va === vb) return (b.mc || 0) - (a.mc || 0);
+          if(va === null || va === undefined) return 1;
+          if(vb === null || vb === undefined) return -1;
+          return (va < vb ? -1 : 1) * dir;
+        });
+        const nAll = list.filter(r => r._s === r._n).length;
+        count.textContent = `${list.length.toLocaleString()} shown · ${nAll} pass all ${list.length ? list[0]._n : 14 - state.off.size} active rules`;
+        if(!list.length){
+          body.innerHTML = '<tr><td class="bf-l" colspan="20">No companies match these settings.</td></tr>';
+          more.hidden = true; return;
+        }
+        body.innerHTML = list.slice(0, state.shown).map(r => {
+          const cells = RULES.map((rule, i) => {
+            const p = r.p[i], cls = p === 1 ? 'bf-y' : p === 0 ? 'bf-n' : 'bf-na';
+            return `<td class="${cls}${state.off.has(rule.k) ? ' bf-off' : ''}">${fmt(r.m[i], rule.f, p)}</td>`;
+          }).join('');
+          return `<tr><td class="bf-l"><a href="https://finance.yahoo.com/quote/${encodeURIComponent(r.s)}" target="_blank" rel="noopener noreferrer">${esc(r.s)}</a></td>`
+            + `<td class="bf-l bf-name" title="${esc(r.n)}">${esc(r.n)}</td><td class="bf-l">${esc(r.r)}</td>`
+            + `<td>${r.mc === null ? '–' : r.mc.toLocaleString(undefined, {maximumFractionDigits: r.mc < 10 ? 1 : 0})}</td>`
+            + `<td>${esc((r.fy || '').slice(0, 7))}</td><td class="bf-score">${r._s}/${r._n}</td>${cells}</tr>`;
+        }).join('');
+        more.hidden = list.length <= state.shown;
+        if(!more.hidden) more.textContent = `Show more (${(list.length - state.shown).toLocaleString()} left)`;
+      }
+
+      let loaded = false;
+      function load(){
+        if(loaded) return; loaded = true;
+        fetch('data/buffett_screen.json', {cache: 'no-cache'})
+          .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+          .then(d => { state.rows = d.rows || []; render(); })
+          .catch(() => { body.innerHTML = '<tr><td class="bf-l" colspan="20">Screen data not available yet.</td></tr>'; });
+      }
+      if('IntersectionObserver' in window){
+        const io = new IntersectionObserver(es => { if(es.some(e => e.isIntersecting)){ io.disconnect(); load(); } }, {rootMargin: '600px'});
+        io.observe(band);
+      } else { load(); }
     })();
   </script>
 </body>
