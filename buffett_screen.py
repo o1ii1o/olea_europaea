@@ -100,6 +100,11 @@ RULES = ["gm", "sga", "rd", "dep", "int", "tax", "nm", "eps",
 
 TAX_BAND = (0.15, 0.35)
 
+# Listings whose USD market cap is logged each run as a sanity check on the
+# currency handling (LSE quotes in pence, HK in HKD, ...).
+MCAP_CHECK = {"AZN.L", "HSBA.L", "SHEL.L", "0700.HK", "0005.HK", "NESN.SW",
+              "SAP.DE", "ASML.AS", "MC.PA", "NOVO-B.CO", "AAPL"}
+
 
 # ── Universe ────────────────────────────────────────────────────────────────
 
@@ -153,7 +158,9 @@ def get_universe():
     for label, regions in UNIVERSE.items():
         n_label = 0
         for code, exch in regions.items():
-            quotes, total = screen_region(code, exch, MIN_MCAP_USD)
+            # Yahoo applies this filter in the listing's own currency, so it
+            # is set loose here; the exact USD cut is applied after FX.
+            quotes, total = screen_region(code, exch, MIN_MCAP_USD * 0.5)
             print(f"  {label}/{code}: {len(quotes)} of {total}")
             names_seen = set()
             for q in quotes:
@@ -177,6 +184,15 @@ def get_universe():
                 n_label += 1
         stats[label] = n_label
     return rows, stats
+
+
+def drop_adr_duplicates(rows):
+    """Drop a US listing (ADR) when the same company is in the universe via
+    its home market, so each company appears once."""
+    def key(name):
+        return "".join(ch for ch in name.lower() if ch.isalnum())
+    home = {key(r["n"]) for r in rows if r["r"] != "US"}
+    return [r for r in rows if r["r"] != "US" or key(r["n"]) not in home]
 
 
 # ── Fundamentals ────────────────────────────────────────────────────────────
@@ -391,14 +407,8 @@ def replace_marker(content, name, inner):
 def main():
     started = time.time()
     print(f"Universe: mcap > USD {MIN_MCAP_USD / 1e9:.1f}bn ...")
-    universe, region_counts = get_universe()
-    if LIMIT:
-        universe = universe[:LIMIT]
-    if len(universe) < 100 and not LIMIT:
-        print(f"Only {len(universe)} names from the screener — aborting, "
-              "previous output left unchanged.")
-        return 1
-    print(f"{len(universe)} companies: {region_counts}")
+    universe, screener_counts = get_universe()
+    print(f"Screener returned {len(universe)} listings: {screener_counts}")
 
     # Market cap in USD.  LSE quotes are in pence (GBp) but Yahoo reports the
     # market cap itself in pounds.
@@ -408,6 +418,19 @@ def main():
         rate = rates.get(norm.get(u["cur"], u["cur"]))
         u["mc"] = (u["mcap_local"] * rate / 1e9
                    if (rate and u["mcap_local"]) else None)
+    mcap_check = {u["s"]: [u["cur"], u["mcap_local"], u["mc"] and round(u["mc"], 1)]
+                  for u in universe if u["s"] in MCAP_CHECK}
+    print("Market-cap check:", mcap_check)
+    universe = [u for u in universe if u["mc"] and u["mc"] * 1e9 >= MIN_MCAP_USD]
+    universe = drop_adr_duplicates(universe)
+    region_counts = {k: sum(1 for u in universe if u["r"] == k) for k in UNIVERSE}
+    if LIMIT:
+        universe = universe[:LIMIT]
+    elif len(universe) < 500:
+        print(f"Only {len(universe)} names after filters — aborting, "
+              "previous output left unchanged.")
+        return 1
+    print(f"{len(universe)} companies above USD {MIN_MCAP_USD / 1e9:.1f}bn: {region_counts}")
 
     cache = load_cache()
     today = datetime.now(timezone.utc).date()
@@ -461,6 +484,9 @@ def main():
         "rules": RULES,
         "universe": len(universe),
         "by_region": region_counts,
+        "screener_listings": screener_counts,
+        "fx": {k: round(v, 5) for k, v in rates.items()},
+        "mcap_check": mcap_check,
         "evaluated": len(rows),
         "no_data": no_data,
         "fetched_this_run": len(stale),
