@@ -92,7 +92,8 @@ KEYS = [
     "DilutedEPS", "BasicEPS",
     # balance sheet
     "CashCashEquivalentsAndShortTermInvestments", "CashAndCashEquivalents",
-    "TotalDebt", "TotalLiabilitiesNetMinorityInterest", "StockholdersEquity",
+    "TotalDebt", "TotalLiabilitiesNetMinorityInterest", "TotalAssets",
+    "MinorityInterest", "StockholdersEquity",
     "TreasuryStock", "PreferredStock", "PreferredStockEquity", "RetainedEarnings",
     # cash flow
     "CapitalExpenditure", "DepreciationAndAmortization",
@@ -343,6 +344,10 @@ def evaluate(f):
     debt = at(_series(f, "TotalDebt"))
     liab = at(_series(f, "TotalLiabilitiesNetMinorityInterest"))
     eq = at(_series(f, "StockholdersEquity"))
+    if liab is None and eq is not None:
+        assets = at(_series(f, "TotalAssets"))
+        if assets is not None:
+            liab = assets - eq - (at(_series(f, "MinorityInterest")) or 0.0)
     ts = at(_series(f, "TreasuryStock"))
     pref = at(_series(f, "PreferredStock", "PreferredStockEquity"))
     capex = at(_series(f, "CapitalExpenditure"))

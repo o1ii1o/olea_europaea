@@ -6,8 +6,6 @@ on:
     # so the whole universe rolls over roughly once a week.
     - cron: '15 3 * * 2-6'
   workflow_dispatch: # Allow manual trigger
-  push:
-    branches: [claude/buffett-screener]   # TEMP: test runs on the feature branch
 
 permissions:
   contents: write
