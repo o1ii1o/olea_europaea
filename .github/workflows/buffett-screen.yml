@@ -1,0 +1,59 @@
+name: Buffett Fundamentals Screen
+
+on:
+  schedule:
+    # 03:15 UTC Tue-Sat. Each run re-fetches only statements older than 7 days,
+    # so the whole universe rolls over roughly once a week.
+    - cron: '15 3 * * 2-6'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+concurrency:
+  group: buffett-screen
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore statement cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/buffett_cache.json
+          key: buffett-cache-${{ github.run_id }}
+          restore-keys: buffett-cache-
+
+      - name: Run Buffett screen
+        run: python buffett_screen.py
+
+      - name: Save statement cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/buffett_cache.json
+          key: buffett-cache-${{ github.run_id }}
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html data/buffett_screen.json
+          git diff --cached --quiet && echo "No changes" && exit 0
+          git commit -m "Update Buffett screen $(date -u +'%Y-%m-%d %H:%M UTC')"
+          for i in 1 2 3; do
+            git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep 10
+          done
+          exit 1
