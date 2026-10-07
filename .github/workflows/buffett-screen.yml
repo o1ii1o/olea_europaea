@@ -6,6 +6,8 @@ on:
     # so the whole universe rolls over roughly once a week.
     - cron: '15 3 * * 2-6'
   workflow_dispatch: # Allow manual trigger
+  push:
+    branches: [claude/buffett-ttm]   # TEMP test
 
 permissions:
   contents: write
@@ -36,6 +38,8 @@ jobs:
           restore-keys: buffett-cache-
 
       - name: Run Buffett screen
+        env:
+          BUFFETT_LIMIT: 300   # TEMP test
         run: python buffett_screen.py
 
       - name: Save statement cache

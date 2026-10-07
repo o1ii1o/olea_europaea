@@ -448,6 +448,8 @@
     .bf-table td.bf-na{ color:#94a3b8; }
     .bf-table td.bf-off{ opacity:.35; }
     .bf-score{ font-weight:700; }
+    .bf-basis{ font-size:9px; font-weight:700; padding:0 4px; border-radius:3px; background:#f1f5f9; color:#475569; }
+    .bf-basis.bf-ttm{ background:#dbeafe; color:#1d4ed8; }
     .bf-more{ display:block; margin:8px auto 0; }
     .bf-more[hidden]{ display:none; }
     .bf-notes{ font-size:11px; color:var(--muted); margin:10px 0 0; line-height:1.5; }
@@ -1317,11 +1319,14 @@
       </div>
       <button type="button" class="bf-chip bf-more" id="bf-more" hidden>Show more</button>
       <p class="bf-notes">
-        Rules from Brian Feroldi's &ldquo;Warren Buffett's financial statements rules of thumb&rdquo;, applied to the latest annual report (Yahoo Finance data).
+        Rules from Brian Feroldi's &ldquo;Warren Buffett's financial statements rules of thumb&rdquo;, applied to the most recent reported figures (Yahoo Finance data): income-statement and cash-flow ratios use the trailing twelve months
+        (TTM) to the latest quarter or half-year, and balance-sheet rules use the latest interim balance sheet; where a TTM or interim line is not reported, the annual figure is used.
+        &ldquo;Data to&rdquo; shows the period end (hover for the balance-sheet date). Most UK, European and HK companies report half-yearly, so their data is up to six months older than US quarterly reporters.
         Green = pass, red = fail, grey = not reported (counts as not passed). Tax is passed when the effective rate is 15&ndash;35% (a full corporate rate);
-        EPS must be positive in every year shown (up to 4) and up on the prior year; retained earnings must rise in every year shown.
+        EPS must be positive in every fiscal year shown (up to 4) and TTM EPS must be above the last fiscal year (i.e. the latest quarters beat the same quarters a year earlier);
+        retained earnings must rise in every fiscal year and be higher than at the same balance-sheet date a year earlier.
         Missing R&amp;D, interest expense or preferred stock are treated as zero. Many UK, European and HK companies cancel repurchased shares, so they never show
-        treasury stock — switch that rule off to compare them fairly. Banks and insurers have no gross profit and will not screen. Statements refresh weekly. Not investment advice.
+        treasury stock — switch that rule off to compare them fairly. Banks and insurers have no gross profit and will not screen. Each company is re-checked two days after its earnings date and at least weekly. Not investment advice.
       </p>
     </div>
   </div>
@@ -1620,6 +1625,11 @@
         if(f === 'x') return v.toFixed(1) + '×';
         return v.toFixed(2);
       }
+      function periodTip(r){
+        const fe = r.fe || r.fy, be = r.be || r.fy;
+        return `Income & cash flow: ${r.fb === 'TTM' ? 'trailing 12 months to ' : 'fiscal year to '}${fe}\n`
+          + `Balance sheet: ${be}${be > r.fy ? ' (interim)' : ' (annual)'}\nLast fiscal year: ${r.fy}`;
+      }
       function score(r){
         let s = 0, n = 0;
         RULES.forEach((rule, i) => { if(!state.off.has(rule.k)){ n++; if(r.p[i] === 1) s++; } });
@@ -1629,7 +1639,7 @@
       // Header + rule chips
       const cols = [
         {k:'s', h:'Ticker', l:true}, {k:'n', h:'Company', l:true}, {k:'r', h:'Region', l:true},
-        {k:'mc', h:'Mkt cap', t:'$bn'}, {k:'fy', h:'FY end'}, {k:'sc', h:'Score'},
+        {k:'mc', h:'Mkt cap', t:'$bn'}, {k:'fe', h:'Data to', t:'TTM / FY', d:'Period end of the income-statement and cash-flow figures (TTM = trailing twelve months). Hover a cell for the balance-sheet date.'}, {k:'sc', h:'Score'},
       ].concat(RULES.map((r, i) => ({k:'m' + i, h:r.h, t:r.t, d:r.d})));
       head.innerHTML = cols.map(c =>
         `<th class="${c.l ? 'bf-l' : ''}" data-k="${c.k}" title="${esc(c.d || 'Sort by ' + c.h)}">${esc(c.h)}${c.t ? '<small>' + esc(c.t) + '</small>' : ''}</th>`
@@ -1665,6 +1675,7 @@
 
       function sortVal(r, k){
         if(k === 'sc') return r._s;
+        if(k === 'fe') return r.fe || r.fy;
         if(k[0] === 'm' && k.length <= 3 && k !== 'mc'){
           const i = +k.slice(1); return r.m[i] === null ? null : r.m[i];
         }
@@ -1701,7 +1712,7 @@
           return `<tr><td class="bf-l"><a href="https://finance.yahoo.com/quote/${encodeURIComponent(r.s)}" target="_blank" rel="noopener noreferrer">${esc(r.s)}</a></td>`
             + `<td class="bf-l bf-name" title="${esc(r.n)}">${esc(r.n)}</td><td class="bf-l">${esc(r.r)}</td>`
             + `<td>${r.mc === null ? '–' : r.mc.toLocaleString(undefined, {maximumFractionDigits: r.mc < 10 ? 1 : 0})}</td>`
-            + `<td>${esc((r.fy || '').slice(0, 7))}</td><td class="bf-score">${r._s}/${r._n}</td>${cells}</tr>`;
+            + `<td title="${esc(periodTip(r))}">${esc((r.fe || r.fy || '').slice(0, 7))} <span class="bf-basis${r.fb === 'TTM' ? ' bf-ttm' : ''}">${esc(r.fb || 'FY')}</span></td><td class="bf-score">${r._s}/${r._n}</td>${cells}</tr>`;
         }).join('');
         more.hidden = list.length <= state.shown;
         if(!more.hidden) more.textContent = `Show more (${(list.length - state.shown).toLocaleString()} left)`;

@@ -7,13 +7,19 @@ Universe
     Yahoo Finance screener.
 
 Data
-    Latest *annual* statements from Yahoo's fundamentals-timeseries endpoint
-    (up to 4 fiscal years), fetched in ONE request per ticker.  Results are
-    cached (data/buffett_cache.json, kept in the Actions cache rather than in
-    git) and a ticker is only re-fetched once its cache entry is older than
-    REFRESH_DAYS — statements only change once a quarter.
+    Yahoo's fundamentals-timeseries endpoint, three requests per ticker:
+      * annual statements (up to 4 fiscal years) — history for the EPS and
+        retained-earnings rules, and fallback for everything else;
+      * trailing twelve months (TTM) for income-statement and cash-flow lines;
+      * the latest interim (quarterly / half-year) balance sheet.
+    So the ratios reflect the most recent reported quarter (US) or half-year
+    (most UK / European / HK issuers), not just the last annual report.
+    Results are cached (data/buffett_cache.json, kept in the Actions cache
+    rather than in git).  A ticker is re-fetched two days after its earnings
+    date (from the Yahoo quote), and in any case once its entry is older than
+    REFRESH_DAYS.
 
-Rules (14) — latest fiscal year unless stated
+Rules (14) — TTM / latest balance sheet unless stated
     Income statement
       gm   Gross margin            Gross profit / Revenue            > 40 %
       sga  SG&A margin             SG&A / Gross profit               < 30 %
@@ -22,13 +28,15 @@ Rules (14) — latest fiscal year unless stated
       int  Interest margin         Interest expense / Op. income     < 15 %
       tax  Tax margin              Tax provision / Pre-tax income    15–35 %
       nm   Net income margin       Net income / Revenue              > 20 %
-      eps  EPS growth              Diluted EPS positive every year and up y/y
+      eps  EPS growth              Diluted EPS positive every year; TTM above
+                                   last FY (else FY above prior FY)
     Balance sheet
       cd   Cash & debt             Cash + ST investments > Total debt
       de   Adj. debt to equity     Total liabilities /
                                    (Equity + Treasury stock)         < 0.80
       pref Preferred stock         none
-      re   Retained earnings       up in every year available
+      re   Retained earnings       up in every fiscal year, and latest interim
+                                   above the same date a year earlier
       ts   Treasury stock          exists
     Cash-flow statement
       cap  Capex margin            Capex / Net income                < 25 %
@@ -80,8 +88,8 @@ UNIVERSE = {
     "HK": {"hk": ["HKG"]},
 }
 
-# Annual line items requested from Yahoo (without the "annual" prefix).
-KEYS = [
+# Line items requested from Yahoo (without the annual/quarterly/trailing prefix).
+FLOW_KEYS = [
     # income statement
     "TotalRevenue", "OperatingRevenue", "CostOfRevenue", "GrossProfit",
     "SellingGeneralAndAdministration", "SellingAndMarketingExpense",
@@ -90,15 +98,18 @@ KEYS = [
     "InterestExpense", "InterestExpenseNonOperating", "OperatingIncome",
     "TaxProvision", "PretaxIncome", "NetIncome", "NetIncomeCommonStockholders",
     "DilutedEPS", "BasicEPS",
-    # balance sheet
-    "CashCashEquivalentsAndShortTermInvestments", "CashAndCashEquivalents",
-    "TotalDebt", "TotalLiabilitiesNetMinorityInterest", "TotalAssets",
-    "MinorityInterest", "StockholdersEquity",
-    "TreasuryStock", "PreferredStock", "PreferredStockEquity", "RetainedEarnings",
     # cash flow
     "CapitalExpenditure", "DepreciationAndAmortization",
     "DepreciationAmortizationDepletion",
 ]
+BAL_KEYS = [
+    "CashCashEquivalentsAndShortTermInvestments", "CashAndCashEquivalents",
+    "TotalDebt", "TotalLiabilitiesNetMinorityInterest", "TotalAssets",
+    "MinorityInterest", "StockholdersEquity",
+    "TreasuryStock", "PreferredStock", "PreferredStockEquity", "RetainedEarnings",
+]
+KEYS = FLOW_KEYS + BAL_KEYS
+CACHE_VERSION = 2          # 2 = annual + quarterly balance sheet + TTM flows
 
 RULES = ["gm", "sga", "rd", "dep", "int", "tax", "nm", "eps",
          "cd", "de", "pref", "re", "ts", "cap"]
@@ -178,6 +189,7 @@ def get_universe():
                     cur=q.get("currency"), fcur=q.get("financialCurrency"),
                     mcap_local=q.get("marketCap"), px=q.get("regularMarketPrice"),
                     vol=q.get("averageDailyVolume3Month") or q.get("averageDailyVolume10Day"),
+                    earn=q.get("earningsTimestamp") or q.get("earningsTimestampStart"),
                 ))
                 n_label += 1
         stats[label] = n_label
@@ -247,31 +259,51 @@ def clean_universe(rows):
 
 # ── Fundamentals ────────────────────────────────────────────────────────────
 
+def _table(t, timescale, keys):
+    """One fundamentals-timeseries request -> {'dates': [desc], 'v': {key: [...]}}."""
+    try:
+        # Same code path yfinance uses for income_stmt / balance_sheet /
+        # cashflow, but with our own key list so it is a single request.
+        df = t._fundamentals._financials._get_financials_time_series(timescale, keys)
+    except Exception as exc:  # noqa: BLE001
+        if "Empty fundamentals" in str(exc):
+            return None
+        raise
+    if df is None or df.empty:
+        return None
+    df = df.loc[:, sorted(df.columns, reverse=True)]
+    v = {}
+    for k in df.index:
+        vals = [None if (x is None or (isinstance(x, float) and math.isnan(x)))
+                else float(x) for x in df.loc[k].tolist()]
+        if any(x is not None for x in vals):
+            v[k] = vals
+    return {"dates": [c.strftime("%Y-%m-%d") for c in df.columns], "v": v}
+
+
 def fetch_fundamentals(sym, attempts=3):
-    """Return {'dates': [...desc], 'v': {key: [values aligned to dates]}}."""
+    """Annual history (4y), latest interim balance sheets and TTM flows.
+
+    Returns {'a': table, 'q': table|None, 't': table|None} or None if Yahoo
+    has no annual statements for the ticker.
+    """
     last_exc = None
     for a in range(attempts):
         try:
             t = yf.Ticker(sym)
-            # One request for all three statements (same code path yfinance
-            # uses for income_stmt / balance_sheet / cashflow).
-            df = t._fundamentals._financials._get_financials_time_series("yearly", KEYS)
-            if df is None or df.empty:
+            annual = _table(t, "yearly", KEYS)
+            if annual is None:
                 return None
-            df = df.loc[:, sorted(df.columns, reverse=True)]
-            dates = [c.strftime("%Y-%m-%d") for c in df.columns]
-            v = {}
-            for k in df.index:
-                vals = [None if (x is None or (isinstance(x, float) and math.isnan(x)))
-                        else float(x) for x in df.loc[k].tolist()]
-                if any(x is not None for x in vals):
-                    v[k] = vals
-            return {"dates": dates, "v": v}
+            out = {"a": annual, "q": None, "t": None}
+            for key, scale, keys in (("q", "quarterly", BAL_KEYS),
+                                     ("t", "trailing", FLOW_KEYS)):
+                try:
+                    out[key] = _table(t, scale, keys)
+                except Exception as exc:  # noqa: BLE001  annual still usable
+                    print(f"    {sym} {scale}: {exc}")
+            return out
         except Exception as exc:  # noqa: BLE001
             last_exc = exc
-            msg = str(exc)
-            if "Empty fundamentals" in msg or "No data" in msg:
-                return None
             time.sleep(4 * (a + 1))
     raise RuntimeError(str(last_exc))
 
@@ -304,58 +336,126 @@ def _ratio(a, b):
     return a / b
 
 
+def _days(d1, d2):
+    return (datetime.fromisoformat(d1) - datetime.fromisoformat(d2)).days
+
+
 def evaluate(f):
-    """Return (fy, metrics{rule: value}, passes{rule: True/False/None})."""
-    n = len(f["dates"])
-    rev = _series(f, "TotalRevenue", "OperatingRevenue")
-    ni = _series(f, "NetIncomeCommonStockholders", "NetIncome")
+    """Return (info, metrics{rule: value}, passes{rule: True/False/None}).
+
+    Flow items (income statement, cash flow) use the trailing twelve months
+    when Yahoo has a TTM period ending after the last fiscal year; balance
+    sheet items use the latest interim balance sheet when it is newer than
+    the annual one.  Anything missing from those falls back to the annual
+    report.  info = {'fe': flow period end, 'fb': 'TTM'|'FY', 'be': balance
+    sheet date, 'fy': last fiscal year end}.
+    """
+    if "a" not in f:                       # cache entry from v1 (annual only)
+        f = {"a": f, "q": None, "t": None}
+    A = f["a"]
+    n = len(A["dates"])
+    rev = _series(A, "TotalRevenue", "OperatingRevenue")
+    ni = _series(A, "NetIncomeCommonStockholders", "NetIncome")
 
     # Latest fiscal year with both revenue and net income reported.
     i0 = next((i for i in range(n) if rev[i] is not None and ni[i] is not None), None)
     if i0 is None:
         return None
     idx = list(range(i0, n))                      # latest -> oldest
+    fy = A["dates"][i0]
 
-    def at(series, i=i0):
-        return series[i] if i < len(series) else None
+    def annual(*keys):
+        ser = _series(A, *keys)
+        return ser[i0] if i0 < len(ser) else None
 
-    R, NI = at(rev), at(ni)
-    gp = at(_series(f, "GrossProfit"))
+    # TTM flows -------------------------------------------------------------
+    T = f.get("t")
+    use_ttm = False
+    if T and T["dates"] and T["dates"][0] > fy:
+        t_rev = _series(T, "TotalRevenue", "OperatingRevenue")[0]
+        t_ni = _series(T, "NetIncomeCommonStockholders", "NetIncome")[0]
+        use_ttm = t_rev is not None and t_ni is not None
+
+    def flow(*keys):
+        if use_ttm:
+            v = _series(T, *keys)[0]
+            if v is not None:
+                return v
+        return annual(*keys)
+
+    # Latest balance sheet ---------------------------------------------------
+    Q = f.get("q")
+    jq = None
+    if Q and Q["dates"]:
+        eqs = _series(Q, "StockholdersEquity")
+        jq = next((j for j in range(len(Q["dates"]))
+                   if eqs[j] is not None and Q["dates"][j] > fy), None)
+
+    def bal(*keys):
+        if jq is not None:
+            v = _series(Q, *keys)[jq]
+            if v is not None:
+                return v
+        return annual(*keys)
+
+    info = {"fe": T["dates"][0] if use_ttm else fy, "fb": "TTM" if use_ttm else "FY",
+            "be": Q["dates"][jq] if jq is not None else fy, "fy": fy}
+
+    R = flow("TotalRevenue", "OperatingRevenue")
+    NI = flow("NetIncomeCommonStockholders", "NetIncome")
+    gp = flow("GrossProfit")
     if gp is None:
-        cor = at(_series(f, "CostOfRevenue"))
+        cor = flow("CostOfRevenue")
         gp = R - cor if (R is not None and cor is not None) else None
 
-    sga = at(_series(f, "SellingGeneralAndAdministration"))
+    sga = flow("SellingGeneralAndAdministration")
     if sga is None:
-        sm = at(_series(f, "SellingAndMarketingExpense"))
-        ga = at(_series(f, "GeneralAndAdministrativeExpense"))
+        sm = flow("SellingAndMarketingExpense")
+        ga = flow("GeneralAndAdministrativeExpense")
         if sm is not None or ga is not None:
             sga = (sm or 0) + (ga or 0)
-    rd = at(_series(f, "ResearchAndDevelopment"))
-    dep = at(_series(f, "ReconciledDepreciation", "DepreciationAndAmortization",
-                     "DepreciationAmortizationDepletion",
-                     "DepreciationAndAmortizationInIncomeStatement"))
-    intx = at(_series(f, "InterestExpense", "InterestExpenseNonOperating"))
-    opi = at(_series(f, "OperatingIncome"))
-    tax = at(_series(f, "TaxProvision"))
-    pti = at(_series(f, "PretaxIncome"))
-    cash = at(_series(f, "CashCashEquivalentsAndShortTermInvestments",
-                      "CashAndCashEquivalents"))
-    debt = at(_series(f, "TotalDebt"))
-    liab = at(_series(f, "TotalLiabilitiesNetMinorityInterest"))
-    eq = at(_series(f, "StockholdersEquity"))
-    if liab is None and eq is not None:
-        assets = at(_series(f, "TotalAssets"))
-        if assets is not None:
-            liab = assets - eq - (at(_series(f, "MinorityInterest")) or 0.0)
-    ts = at(_series(f, "TreasuryStock"))
-    pref = at(_series(f, "PreferredStock", "PreferredStockEquity"))
-    capex = at(_series(f, "CapitalExpenditure"))
+    rd = flow("ResearchAndDevelopment")
+    dep = flow("ReconciledDepreciation", "DepreciationAndAmortization",
+               "DepreciationAmortizationDepletion",
+               "DepreciationAndAmortizationInIncomeStatement")
+    intx = flow("InterestExpense", "InterestExpenseNonOperating")
+    opi = flow("OperatingIncome")
+    tax = flow("TaxProvision")
+    pti = flow("PretaxIncome")
+    capex = flow("CapitalExpenditure")
 
-    eps_s = _series(f, "DilutedEPS", "BasicEPS")
+    cash = bal("CashCashEquivalentsAndShortTermInvestments", "CashAndCashEquivalents")
+    debt = bal("TotalDebt")
+    liab = bal("TotalLiabilitiesNetMinorityInterest")
+    eq = bal("StockholdersEquity")
+    if liab is None and eq is not None:
+        assets = bal("TotalAssets")
+        if assets is not None:
+            liab = assets - eq - (bal("MinorityInterest") or 0.0)
+    ts = bal("TreasuryStock")
+    pref = bal("PreferredStock", "PreferredStockEquity")
+
+    # EPS: positive in every fiscal year; growth measured on the most recent
+    # comparison available — TTM vs last fiscal year (i.e. the latest
+    # quarters vs the same quarters a year earlier), else FY vs prior FY.
+    eps_s = _series(A, "DilutedEPS", "BasicEPS")
     eps = [eps_s[i] for i in idx if eps_s[i] is not None]
-    re_s = _series(f, "RetainedEarnings")
+    eps_ttm = _series(T, "DilutedEPS", "BasicEPS")[0] if use_ttm else None
+    if eps_ttm is not None and eps_s[i0] is not None:
+        eps = [eps_ttm] + eps
+
+    # Retained earnings: up in every fiscal year, and — when interim balance
+    # sheets exist — latest interim above the same date a year earlier.
+    re_s = _series(A, "RetainedEarnings")
     re = [re_s[i] for i in idx if re_s[i] is not None]
+    re_yoy = None
+    if jq is not None:
+        rq = _series(Q, "RetainedEarnings")
+        if rq[jq] is not None:
+            for j in range(jq + 1, len(Q["dates"])):
+                if rq[j] is not None and 320 <= _days(Q["dates"][jq], Q["dates"][j]) <= 410:
+                    re_yoy = (rq[jq], rq[j])
+                    break
 
     gp_ok = gp is not None and gp > 0
     m, p = {}, {}
@@ -425,8 +525,10 @@ def evaluate(f):
     p["pref"] = not pref
 
     if len(re) >= 2:
-        m["re"] = (re[0] / re[1] - 1) if re[1] > 0 else None
-        p["re"] = all(re[k] > re[k + 1] for k in range(len(re) - 1)) and re[0] > 0
+        yearly_up = all(re[k] > re[k + 1] for k in range(len(re) - 1))
+        now, base = re_yoy if re_yoy else (re[0], re[1])
+        m["re"] = (now / base - 1) if base > 0 else None
+        p["re"] = yearly_up and now > base and now > 0
     else:
         m["re"], p["re"] = None, None
 
@@ -442,7 +544,7 @@ def evaluate(f):
         m["cap"] = abs(capex) / NI
         p["cap"] = m["cap"] < 0.25
 
-    return f["dates"][i0], m, p
+    return info, m, p
 
 
 # ── Output ──────────────────────────────────────────────────────────────────
@@ -482,8 +584,8 @@ def main():
     universe, dropped = clean_universe(universe)
     print(f"Dropped: {dropped}")
     region_counts = {k: sum(1 for u in universe if u["r"] == k) for k in UNIVERSE}
-    if LIMIT:
-        universe = universe[:LIMIT]
+    if LIMIT:            # debug: an evenly spread sample across regions
+        universe = universe[::max(1, len(universe) // LIMIT)][:LIMIT]
     elif len(universe) < 500:
         print(f"Only {len(universe)} names after filters — aborting, "
               "previous output left unchanged.")
@@ -491,21 +593,39 @@ def main():
     print(f"{len(universe)} companies above USD {MIN_MCAP_USD / 1e9:.1f}bn: {region_counts}")
 
     cache = load_cache()
-    today = datetime.now(timezone.utc).date()
+    now = datetime.now(timezone.utc)
+    today = now.date()
     cutoff = (today - timedelta(days=REFRESH_DAYS)).isoformat()
-    stale = [u["s"] for u in universe
-             if cache.get(u["s"], {}).get("fetched", "") < cutoff]
-    # Never-fetched first, then oldest.
-    stale.sort(key=lambda s: cache.get(s, {}).get("fetched", ""))
+
+    def refresh_reason(u):
+        c = cache.get(u["s"]) or {}
+        fetched = c.get("fetched", "")
+        if c.get("ver") != CACHE_VERSION:
+            return "new"
+        # Results published since our last fetch: give Yahoo two days to
+        # load the new statements, then re-fetch.
+        if u.get("earn"):
+            due = datetime.fromtimestamp(u["earn"], timezone.utc) + timedelta(days=2)
+            if due <= now and fetched < due.date().isoformat():
+                return "earnings"
+        if fetched < cutoff:
+            return "age"
+        return None
+
+    reasons = {u["s"]: refresh_reason(u) for u in universe}
+    order = {"new": 0, "earnings": 1, "age": 2}
+    stale = sorted((s for s, r in reasons.items() if r),
+                   key=lambda s: (order[reasons[s]], cache.get(s, {}).get("fetched", "")))
     stale = stale[:MAX_FETCH]
-    print(f"Fetching statements for {len(stale)} tickers "
+    why = {k: sum(1 for s in stale if reasons[s] == k) for k in order}
+    print(f"Fetching statements for {len(stale)} tickers {why} "
           f"({len(universe) - len(stale)} served from cache) ...")
 
     errors = []
     for k, sym in enumerate(stale, 1):
         try:
             f = fetch_fundamentals(sym)
-            cache[sym] = {"fetched": today.isoformat(), "f": f}
+            cache[sym] = {"fetched": today.isoformat(), "ver": CACHE_VERSION, "f": f}
         except Exception as exc:  # noqa: BLE001
             errors.append(f"{sym}: {exc}"[:160])
         if k % 250 == 0:
@@ -516,19 +636,21 @@ def main():
     save_cache(cache)
 
     rows, no_data = [], 0
-    fy_dates = []
+    basis = {"TTM": 0, "FY": 0, "interim_bs": 0, "annual_bs": 0}
     for u in universe:
         f = (cache.get(u["s"]) or {}).get("f")
         res = evaluate(f) if f else None
         if not res:
             no_data += 1
             continue
-        fy, m, p = res
-        fy_dates.append(fy)
+        info, m, p = res
+        basis[info["fb"]] += 1
+        basis["interim_bs" if info["be"] > info["fy"] else "annual_bs"] += 1
         flags = [None if p[r] is None else int(p[r]) for r in RULES]
         rows.append({
             "s": u["s"], "n": u["n"], "r": u["r"], "c": u["c"],
-            "mc": _r(u["mc"], 2), "fy": fy,
+            "mc": _r(u["mc"], 2), "fy": info["fy"], "fe": info["fe"],
+            "fb": info["fb"], "be": info["be"],
             "m": [_r(m[r]) for r in RULES], "p": flags,
             "sc": sum(1 for x in flags if x == 1),
         })
@@ -550,6 +672,8 @@ def main():
         "evaluated": len(rows),
         "no_data": no_data,
         "fetched_this_run": len(stale),
+        "fetch_reasons": why,
+        "data_basis": basis,
         "fetch_errors": len(errors),
         "error_sample": errors[:15],
         "pass_all": full,
