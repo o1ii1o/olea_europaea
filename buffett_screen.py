@@ -376,12 +376,42 @@ def evaluate(f):
         t_ni = _series(T, "NetIncomeCommonStockholders", "NetIncome")[0]
         use_ttm = t_rev is not None and t_ni is not None
 
-    def flow(*keys):
-        if use_ttm:
-            v = _series(T, *keys)[0]
-            if v is not None:
-                return v
-        return annual(*keys)
+    def flows(get):
+        """All flow line items from one source (TTM or annual)."""
+        F = {"R": get("TotalRevenue", "OperatingRevenue"),
+             "NI": get("NetIncomeCommonStockholders", "NetIncome"),
+             "gp": get("GrossProfit"),
+             "sga": get("SellingGeneralAndAdministration"),
+             "rd": get("ResearchAndDevelopment"),
+             "dep": get("ReconciledDepreciation", "DepreciationAndAmortization",
+                        "DepreciationAmortizationDepletion",
+                        "DepreciationAndAmortizationInIncomeStatement"),
+             "int": get("InterestExpense", "InterestExpenseNonOperating"),
+             "opi": get("OperatingIncome"),
+             "tax": get("TaxProvision"),
+             "pti": get("PretaxIncome"),
+             "capex": get("CapitalExpenditure")}
+        if F["gp"] is None:
+            cor = get("CostOfRevenue")
+            if F["R"] is not None and cor is not None:
+                F["gp"] = F["R"] - cor
+        if F["sga"] is None:
+            sm = get("SellingAndMarketingExpense")
+            ga = get("GeneralAndAdministrativeExpense")
+            if sm is not None or ga is not None:
+                F["sga"] = (sm or 0) + (ga or 0)
+        return F
+
+    Fa = flows(annual)
+    Ft = flows(lambda *k: _series(T, *k)[0]) if use_ttm else None
+
+    def src(num, den, missing_is_zero=False):
+        """Numerator and denominator always come from the SAME period: TTM
+        when both lines are in the TTM data, otherwise the fiscal year."""
+        if Ft and Ft[den] is not None and (
+                Ft[num] is not None or (missing_is_zero and Fa[num] is None)):
+            return Ft
+        return Fa
 
     # Latest balance sheet ---------------------------------------------------
     Q = f.get("q")
@@ -391,49 +421,38 @@ def evaluate(f):
         jq = next((j for j in range(len(Q["dates"]))
                    if eqs[j] is not None and Q["dates"][j] > fy), None)
 
-    def bal(*keys):
-        if jq is not None:
-            v = _series(Q, *keys)[jq]
-            if v is not None:
-                return v
-        return annual(*keys)
+    def balance(get):
+        B = {"cash": get("CashCashEquivalentsAndShortTermInvestments",
+                         "CashAndCashEquivalents"),
+             "debt": get("TotalDebt"),
+             "liab": get("TotalLiabilitiesNetMinorityInterest"),
+             "eq": get("StockholdersEquity"),
+             "ts": get("TreasuryStock"),
+             "pref": get("PreferredStock", "PreferredStockEquity")}
+        if B["liab"] is None and B["eq"] is not None:
+            assets = get("TotalAssets")
+            if assets is not None:
+                B["liab"] = assets - B["eq"] - (get("MinorityInterest") or 0.0)
+        return B
+
+    Ba = balance(annual)
+    Bq = balance(lambda *k: _series(Q, *k)[jq]) if jq is not None else None
 
     info = {"fe": T["dates"][0] if use_ttm else fy, "fb": "TTM" if use_ttm else "FY",
             "be": Q["dates"][jq] if jq is not None else fy, "fy": fy}
 
-    R = flow("TotalRevenue", "OperatingRevenue")
-    NI = flow("NetIncomeCommonStockholders", "NetIncome")
-    gp = flow("GrossProfit")
-    if gp is None:
-        cor = flow("CostOfRevenue")
-        gp = R - cor if (R is not None and cor is not None) else None
 
-    sga = flow("SellingGeneralAndAdministration")
-    if sga is None:
-        sm = flow("SellingAndMarketingExpense")
-        ga = flow("GeneralAndAdministrativeExpense")
-        if sm is not None or ga is not None:
-            sga = (sm or 0) + (ga or 0)
-    rd = flow("ResearchAndDevelopment")
-    dep = flow("ReconciledDepreciation", "DepreciationAndAmortization",
-               "DepreciationAmortizationDepletion",
-               "DepreciationAndAmortizationInIncomeStatement")
-    intx = flow("InterestExpense", "InterestExpenseNonOperating")
-    opi = flow("OperatingIncome")
-    tax = flow("TaxProvision")
-    pti = flow("PretaxIncome")
-    capex = flow("CapitalExpenditure")
-
-    cash = bal("CashCashEquivalentsAndShortTermInvestments", "CashAndCashEquivalents")
-    debt = bal("TotalDebt")
-    liab = bal("TotalLiabilitiesNetMinorityInterest")
-    eq = bal("StockholdersEquity")
-    if liab is None and eq is not None:
-        assets = bal("TotalAssets")
-        if assets is not None:
-            liab = assets - eq - (bal("MinorityInterest") or 0.0)
-    ts = bal("TreasuryStock")
-    pref = bal("PreferredStock", "PreferredStockEquity")
+    # Cash vs debt and debt/equity: interim balance sheet when it carries the
+    # lines needed (debt counted as zero only if the annual shows none).
+    Bc = Bq if (Bq and Bq["cash"] is not None and
+                (Bq["debt"] is not None or Ba["debt"] is None)) else Ba
+    cash, debt = Bc["cash"], Bc["debt"]
+    Bd = Bq if (Bq and Bq["liab"] is not None and Bq["eq"] is not None) else Ba
+    liab, eq = Bd["liab"], Bd["eq"]
+    ts_de = Bd["ts"] if Bd["ts"] is not None else (Ba["ts"] if Bd is Bq else None)
+    Bl = Bq or Ba                                      # latest balance sheet
+    ts = Bl["ts"] if Bl["ts"] is not None else Ba["ts"]
+    pref = Bl["pref"] if Bl["pref"] is not None else Ba["pref"]
 
     # EPS: positive in every fiscal year; growth measured on the most recent
     # comparison available — TTM vs last fiscal year (i.e. the latest
@@ -457,27 +476,32 @@ def evaluate(f):
                     re_yoy = (rq[jq], rq[j])
                     break
 
-    gp_ok = gp is not None and gp > 0
     m, p = {}, {}
 
     # Income statement ------------------------------------------------------
+    S = src("gp", "R")
+    gp, R = S["gp"], S["R"]
     m["gm"] = _ratio(gp, R) if (R and R > 0) else None
     p["gm"] = None if m["gm"] is None else m["gm"] > 0.40
 
-    def over_gp(x, limit, missing_is_zero=False):
+    def over_gp(key, limit, missing_is_zero=False):
+        S = src(key, "gp", missing_is_zero)
+        x, g = S[key], S["gp"]
         if x is None and missing_is_zero:
             x = 0.0
-        if x is None or gp is None:
+        if x is None or g is None:
             return None, None
-        if not gp_ok:
+        if g <= 0:
             return None, False
-        v = abs(x) / gp
+        v = abs(x) / g
         return v, v < limit
 
-    m["sga"], p["sga"] = over_gp(sga, 0.30)
-    m["rd"], p["rd"] = over_gp(rd, 0.30, missing_is_zero=True)
-    m["dep"], p["dep"] = over_gp(dep, 0.10)
+    m["sga"], p["sga"] = over_gp("sga", 0.30)
+    m["rd"], p["rd"] = over_gp("rd", 0.30, missing_is_zero=True)
+    m["dep"], p["dep"] = over_gp("dep", 0.10)
 
+    S = src("int", "opi", missing_is_zero=True)
+    opi, intx = S["opi"], S["int"]
     if opi is None:
         m["int"], p["int"] = None, None
     elif opi <= 0:
@@ -486,6 +510,8 @@ def evaluate(f):
         m["int"] = abs(intx or 0.0) / opi
         p["int"] = m["int"] < 0.15
 
+    S = src("tax", "pti")
+    tax, pti = S["tax"], S["pti"]
     if tax is None or pti is None:
         m["tax"], p["tax"] = None, None
     elif pti <= 0:
@@ -494,6 +520,8 @@ def evaluate(f):
         m["tax"] = tax / pti
         p["tax"] = TAX_BAND[0] <= m["tax"] <= TAX_BAND[1]
 
+    S = src("NI", "R")
+    NI, R = S["NI"], S["R"]
     m["nm"] = _ratio(NI, R) if (R and R > 0) else None
     p["nm"] = None if m["nm"] is None else m["nm"] > 0.20
 
@@ -514,7 +542,7 @@ def evaluate(f):
     if liab is None or eq is None:
         m["de"], p["de"] = None, None
     else:
-        denom = eq + abs(ts or 0.0)
+        denom = eq + abs(ts_de or 0.0)
         if denom <= 0:
             m["de"], p["de"] = None, False
         else:
@@ -536,6 +564,8 @@ def evaluate(f):
     p["ts"] = bool(ts)
 
     # Cash flow -------------------------------------------------------------
+    S = src("capex", "NI")
+    capex, NI = S["capex"], S["NI"]
     if capex is None or NI is None:
         m["cap"], p["cap"] = None, None
     elif NI <= 0:
